@@ -36,10 +36,12 @@ public:
     // 画像
     ofImage inputOfImg;
     // 出力データ（SPECTRAL_RESIDUAL, UI(画像)）
-    ofImage outputOfImg, outputOfImg2, outputOfImg3;
+    ofImage outputOfImg, outputOfSaliencyImg, outputOfHeatMapImg;
     // 顕著性マップ
     cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap, saliencyMap_color;
 
+
+    cv::Mat dividA;
     // 最小と最大の要素値とそれらの位置
 //    SaliencyTool::MinMax minMax;
 //    std::vector<int> pixelsList;
