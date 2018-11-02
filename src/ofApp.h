@@ -37,6 +37,9 @@ public:
 
     // 画像
     ofImage inputOfImg;
+
+    cv::Mat mat, mat_copy;
+    
     // 出力データ
     ofImage outputOfSaliencyImg, outputOfHeatMapImg;
     ofImage outputOfImg, outputOfImg2, outputOfImg3, outputOfImg4, outputOfImg5, outputOfImg6;

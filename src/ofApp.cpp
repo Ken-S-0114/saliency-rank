@@ -10,10 +10,12 @@ void ofApp::setup(){
     inputOfImg.update();
 
     // Mat変換
-    cv::Mat mat, mat_gray, mat_gaus, saliencyMap_norm;
+    cv::Mat mat_gray, mat_gaus, saliencyMap_norm;
 
     // Mat画像に変換
     mat = ofxCv::toCv(inputOfImg);
+
+    mat_copy = mat.clone();
 
     // 白黒Mat画像に変換
     cvtColor(mat.clone(), mat_gray, cv::COLOR_BGR2GRAY);
@@ -79,8 +81,8 @@ void ofApp::setup(){
     // 画像(ofImage)に変換
     ofxCv::toOf(sure_bg.clone(), outputOfImg);
     outputOfImg.update();
-    ofxCv::toOf(sure_fg.clone(), outputOfImg2);
-    outputOfImg2.update();
+//    ofxCv::toOf(sure_fg.clone(), outputOfImg2);
+//    outputOfImg2.update();
 
     // 不明領域抽出
     cv::Mat unknown, sure_fg_uc1;
@@ -88,8 +90,8 @@ void ofApp::setup(){
     cv::subtract(sure_bg, sure_fg_uc1, unknown);
 
     // 画像(ofImage)に変換
-    ofxCv::toOf(unknown.clone(), outputOfImg3);
-    outputOfImg3.update();
+    ofxCv::toOf(unknown.clone(), outputOfImg2);
+    outputOfImg2.update();
 
     // 前景ラベリング
     int compCount = 0;
@@ -184,6 +186,8 @@ void ofApp::setup(){
             int index = markers.at<int>(i,j);
             if( index == saliencyPointMaxIndex+1 ) {
                 dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+            } else {
+                mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
             }
         }
     }
@@ -194,11 +198,13 @@ void ofApp::setup(){
     dividB = dividB*0.5 + imgG*0.5;
 
     // 画像(ofImage)に変換
-    ofxCv::toOf(wshed.clone(), outputOfImg4);
+    ofxCv::toOf(wshed.clone(), outputOfImg3);
+    outputOfImg3.update();
+    ofxCv::toOf(dividA.clone(), outputOfImg4);
     outputOfImg4.update();
-    ofxCv::toOf(dividA.clone(), outputOfImg5);
+    ofxCv::toOf(dividB.clone(), outputOfImg5);
     outputOfImg5.update();
-    ofxCv::toOf(dividB.clone(), outputOfImg6);
+    ofxCv::toOf(mat_copy.clone(), outputOfImg6);
     outputOfImg6.update();
 
     markersSave = markers.clone();
@@ -216,7 +222,6 @@ void ofApp::update(){
 
     if (state) {
 
-        // 分割した画像をそれぞれの画像に書き込む
 //        for(int i = 0; i < markersSave.rows; i++ ){
 //            for(int j = 0; j < markersSave.cols; j++ )
 //            {
@@ -228,7 +233,7 @@ void ofApp::update(){
 //                }
 //            }
 //        }
-        // 分割した画像をそれぞれの画像に書き込む
+
         for (int i=0; i<saliencyPointSave.size(); i++) {
             ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPointSave[i];
         }
@@ -237,14 +242,19 @@ void ofApp::update(){
         saliencyPointMaxIndex = std::distance(saliencyPointSave.begin(), iter);
         ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
 
+        // 初期化
         dividB = cv::Mat::zeros(dividB.size(), CV_8UC3);
+        mat_copy = mat.clone();
 
+        // 画像に書き込む
         for(int i = 0; i < markersSave.rows; i++ ){
             for(int j = 0; j < markersSave.cols; j++ )
             {
                 int index = markersSave.at<int>(i,j);
                 if( index == saliencyPointMaxIndex+1 ) {
                     dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+                } else {
+                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
                 }
             }
         }
@@ -252,7 +262,9 @@ void ofApp::update(){
         dividB = dividB*0.5 + imgG*0.5;
 
         // 画像(ofImage)に変換
-        ofxCv::toOf(dividB.clone(), outputOfImg6);
+        ofxCv::toOf(dividB.clone(), outputOfImg5);
+        outputOfImg5.update();
+        ofxCv::toOf(mat_copy.clone(), outputOfImg6);
         outputOfImg6.update();
 
         state = false;
@@ -288,11 +300,11 @@ void ofApp::draw(){
     ofDrawBitmapStringHighlight("saliencyMap", ofGetWidth()/3+20, 20);
     ofDrawBitmapStringHighlight("saliencyMap-heatMap", ofGetWidth()-ofGetWidth()/3+20, 20);
     ofDrawBitmapStringHighlight("background", 20, ofGetHeight()/3+20);
-    ofDrawBitmapStringHighlight("front", ofGetWidth()/3+20, ofGetHeight()/3+20);
-    ofDrawBitmapStringHighlight("unknown", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()/3+20);
-    ofDrawBitmapStringHighlight("watershed", 20, ofGetHeight()-ofGetHeight()/3+20);
-    ofDrawBitmapStringHighlight("watershed-after", ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
-    ofDrawBitmapStringHighlight("watershed-index", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("unknown", ofGetWidth()/3+20, ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("watershed", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("watershed-after", 20, ofGetHeight()-ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("watershed-index", ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("saliencyMap-index", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
 }
 
 //--------------------------------------------------------------
@@ -306,7 +318,7 @@ void ofApp::keyPressed(int key){
 //                {
 //                    int index = markersSave.at<int>(i,j);
 //                    if( index == saliencyPointMaxIndex+1 ) {
-//                        markersSave.at<cv::Vec3b>(i,j) = 0;
+//                        markersSave.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
 //                    }
 //                }
 //            }
