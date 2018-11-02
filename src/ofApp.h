@@ -43,12 +43,22 @@ public:
     // 顕著性マップ
     cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap, saliencyMap_color;
 
-
+    std::vector<cv::Vec3b> colorTab;
+    cv::Mat markersSave;
+    
     cv::Mat dividA, dividB;
+    
+    cv::Mat imgG;
+
     // 最小と最大の要素値とそれらの位置
     SaliencyTool::MinMax minMax;
 //    std::vector<int> pixelsList;
 
-    // 10*10の顕著マップの最小値の場所
-//    SaliencyTool::MinPlace minPlace;
+    std::vector<int> saliencyPointSave;
+
+    // vector内の最大値の要素番号
+    std::vector<int>::iterator iter;
+    int saliencyPointMaxIndex;
+
+    bool state;
 };

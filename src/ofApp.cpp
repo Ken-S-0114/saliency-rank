@@ -2,8 +2,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+
+    state = false;
+
     // 画像の読み込み
-    inputOfImg.load("sample.jpg");
+    inputOfImg.load("sample2.jpg");
     inputOfImg.update();
 
     // Mat変換
@@ -97,7 +100,8 @@ void ofApp::setup(){
     cv::findContours(sure_fg, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
     if( contours.empty() ) return;
 
-//    ofLogNotice()<<"contours: "<<&contours;
+    //    ofLogNotice()<<"contours: "<<&contours;
+
     // watershedに流し込む用のマーカー画像作成
     cv::Mat markers = cv::Mat::zeros(sure_fg.rows, sure_fg.cols, CV_32SC1);
     // マーカーを描画
@@ -124,7 +128,7 @@ void ofApp::setup(){
     dividB = cv::Mat::zeros(mat.size(), CV_8UC3);
 
     cv::Mat wshed(markers.size(), CV_8UC3);
-    std::vector<cv::Vec3b> colorTab;
+    //    std::vector<cv::Vec3b> colorTab;
 
     std::vector<int> saliencyPoint(compCount, 0);
 
@@ -138,29 +142,27 @@ void ofApp::setup(){
         colorTab.push_back(cv::Vec3b((uchar)b, (uchar)g, (uchar)r));
     }
 
-//    ofLogNotice()<<"saliencyMap.r: "<<saliencyMap.rows;
-//    ofLogNotice()<<"saliencyMap.c: "<<saliencyMap.cols;
-//    ofLogNotice()<<"markers.r: "<<markers.rows;
-//    ofLogNotice()<<"markers.c: "<<markers.cols;
+    //    ofLogNotice()<<"saliencyMap.r: "<<saliencyMap.rows;
+    //    ofLogNotice()<<"saliencyMap.c: "<<saliencyMap.cols;
+    //    ofLogNotice()<<"markers.r: "<<markers.rows;
+    //    ofLogNotice()<<"markers.c: "<<markers.cols;
 
     // 分割した画像をそれぞれの画像に書き込む
     for(int i = 0; i < markers.rows; i++ ){
         for(int j = 0; j < markers.cols; j++ )
         {
-//            ofLogNotice()<<"index: "<<index;
+            //            ofLogNotice()<<"index: "<<index;
             int index = markers.at<int>(i,j);
 
             if( index == -1 ) {
                 wshed.at<cv::Vec3b>(i,j) = cv::Vec3b(255,255,255);
-            } else if( index <= 0 || index > compCount ) {
+            }
+            else if( index <= 0 || index > compCount ) {
                 wshed.at<cv::Vec3b>(i,j) = cv::Vec3b(0,0,0);
             }
             else if( index == 1 ) {
                 wshed.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             }
-//            else if( index == 26 ) {
-//                dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
-//            }
             else {
                 dividA.at<cv::Vec3b>(i,j) = colorTab[index - 1];
                 saliencyPoint[index-1] += (int)saliencyMap.at<uchar>(i, j);
@@ -169,12 +171,12 @@ void ofApp::setup(){
     }
 
     for (int i=0; i<saliencyPoint.size(); i++) {
-        ofLogNotice()<<"saliencyPoint["<<i<<"]: "<<saliencyPoint[i];
+        ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPoint[i];
     }
 
-    std::vector<int>::iterator iter = std::max_element(saliencyPoint.begin(), saliencyPoint.end());
-    int saliencyPointMaxIndex = std::distance(saliencyPoint.begin(), iter);
-    std::cout << "Index of max element: " << saliencyPointMaxIndex << std::endl;
+    iter = std::max_element(saliencyPoint.begin(), saliencyPoint.end());
+    saliencyPointMaxIndex = std::distance(saliencyPoint.begin(), iter);
+    ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
 
     for(int i = 0; i < markers.rows; i++ ){
         for(int j = 0; j < markers.cols; j++ )
@@ -186,7 +188,6 @@ void ofApp::setup(){
         }
     }
 
-    cv::Mat imgG;
     cvtColor(saliencyMap.clone(), imgG, cv::COLOR_GRAY2BGR);
     wshed = wshed*0.5 + imgG*0.5;
     dividA = dividA*0.5 + imgG*0.5;
@@ -200,7 +201,11 @@ void ofApp::setup(){
     ofxCv::toOf(dividB.clone(), outputOfImg6);
     outputOfImg6.update();
 
+    markersSave = markers.clone();
+
+
     if (!saliencyPoint.empty()) {
+        saliencyPointSave = saliencyPoint;
         saliencyPoint.clear();
     }
 
@@ -208,6 +213,50 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
+    if (state) {
+
+        // 分割した画像をそれぞれの画像に書き込む
+//        for(int i = 0; i < markersSave.rows; i++ ){
+//            for(int j = 0; j < markersSave.cols; j++ )
+//            {
+//                //            ofLogNotice()<<"index: "<<index;
+//                int index = markersSave.at<int>(i,j);
+//
+//                if( index != -1 && index > 0 && index != 1 ) {
+//                    saliencyPointSave[index-1] += (int)saliencyMap.at<uchar>(i, j);
+//                }
+//            }
+//        }
+        // 分割した画像をそれぞれの画像に書き込む
+        for (int i=0; i<saliencyPointSave.size(); i++) {
+            ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPointSave[i];
+        }
+
+        iter = std::max_element(saliencyPointSave.begin(), saliencyPointSave.end());
+        saliencyPointMaxIndex = std::distance(saliencyPointSave.begin(), iter);
+        ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
+
+        dividB = cv::Mat::zeros(dividB.size(), CV_8UC3);
+
+        for(int i = 0; i < markersSave.rows; i++ ){
+            for(int j = 0; j < markersSave.cols; j++ )
+            {
+                int index = markersSave.at<int>(i,j);
+                if( index == saliencyPointMaxIndex+1 ) {
+                    dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+                }
+            }
+        }
+
+        dividB = dividB*0.5 + imgG*0.5;
+
+        // 画像(ofImage)に変換
+        ofxCv::toOf(dividB.clone(), outputOfImg6);
+        outputOfImg6.update();
+
+        state = false;
+    }
 
 }
 
@@ -248,6 +297,26 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    ofLogNotice() << "keyPressed: " << key;
+
+    switch (key) {
+        case 13:
+//            for(int i = 0; i < markersSave.rows; i++ ){
+//                for(int j = 0; j < markersSave.cols; j++ )
+//                {
+//                    int index = markersSave.at<int>(i,j);
+//                    if( index == saliencyPointMaxIndex+1 ) {
+//                        markersSave.at<cv::Vec3b>(i,j) = 0;
+//                    }
+//                }
+//            }
+
+            saliencyPointSave[saliencyPointMaxIndex] = 0;
+
+            state = true;
+            break;
+
+    }
 
 }
 
