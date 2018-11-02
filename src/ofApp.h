@@ -11,6 +11,8 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "iostream"
+#include "vector"
+#include "algorithm"
 
 #include "saliencyTools.hpp"
 

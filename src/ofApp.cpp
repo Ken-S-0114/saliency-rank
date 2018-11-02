@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     // 画像の読み込み
-    inputOfImg.load("sample2.jpg");
+    inputOfImg.load("sample.jpg");
     inputOfImg.update();
 
     // Mat変換
@@ -36,8 +36,8 @@ void ofApp::setup(){
 
     cv::Mat saliency_copy = saliencyMap.clone();
     // 画素値の反転（現状 : 0:黒:顕著性が低い, 255:白:顕著性が高い）
-    for(int y = 0; y < saliency_copy.cols; ++y){
-        for(int x = 0; x < saliency_copy.rows; ++x){
+    for(int x = 0; x < saliency_copy.rows; ++x){
+        for(int y = 0; y < saliency_copy.cols; ++y){
             saliency_copy.at<uchar>( x, y ) = 255 - (int)saliency_copy.at<uchar>(x, y);
             //            ofLog()<<"(int)saliencyMap.at<uchar>("<<x<<","<<y<< ") : "<<(int)saliencyMap.at<uchar>( x, y );
         }
@@ -126,6 +126,8 @@ void ofApp::setup(){
     cv::Mat wshed(markers.size(), CV_8UC3);
     std::vector<cv::Vec3b> colorTab;
 
+    std::vector<int> saliencyPoint(compCount, 0);
+
     ofLogNotice()<<"count: "<<compCount;
     for(int i = 0; i < compCount; i++ )
     {
@@ -136,11 +138,15 @@ void ofApp::setup(){
         colorTab.push_back(cv::Vec3b((uchar)b, (uchar)g, (uchar)r));
     }
 
+//    ofLogNotice()<<"saliencyMap.r: "<<saliencyMap.rows;
+//    ofLogNotice()<<"saliencyMap.c: "<<saliencyMap.cols;
+//    ofLogNotice()<<"markers.r: "<<markers.rows;
+//    ofLogNotice()<<"markers.c: "<<markers.cols;
+
     // 分割した画像をそれぞれの画像に書き込む
     for(int i = 0; i < markers.rows; i++ ){
         for(int j = 0; j < markers.cols; j++ )
         {
-
 //            ofLogNotice()<<"index: "<<index;
             int index = markers.at<int>(i,j);
 
@@ -152,11 +158,30 @@ void ofApp::setup(){
             else if( index == 1 ) {
                 wshed.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             }
-            else if( index == 26 ) {
-                dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
-            }
+//            else if( index == 26 ) {
+//                dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+//            }
             else {
                 dividA.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+                saliencyPoint[index-1] += (int)saliencyMap.at<uchar>(i, j);
+            }
+        }
+    }
+
+    for (int i=0; i<saliencyPoint.size(); i++) {
+        ofLogNotice()<<"saliencyPoint["<<i<<"]: "<<saliencyPoint[i];
+    }
+
+    std::vector<int>::iterator iter = std::max_element(saliencyPoint.begin(), saliencyPoint.end());
+    int saliencyPointMaxIndex = std::distance(saliencyPoint.begin(), iter);
+    std::cout << "Index of max element: " << saliencyPointMaxIndex << std::endl;
+
+    for(int i = 0; i < markers.rows; i++ ){
+        for(int j = 0; j < markers.cols; j++ )
+        {
+            int index = markers.at<int>(i,j);
+            if( index == saliencyPointMaxIndex+1 ) {
+                dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             }
         }
     }
@@ -174,6 +199,10 @@ void ofApp::setup(){
     outputOfImg5.update();
     ofxCv::toOf(dividB.clone(), outputOfImg6);
     outputOfImg6.update();
+
+    if (!saliencyPoint.empty()) {
+        saliencyPoint.clear();
+    }
 
 }
 
