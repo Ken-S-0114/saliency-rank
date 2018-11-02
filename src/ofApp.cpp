@@ -3,7 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     // 画像の読み込み
-    inputOfImg.load("sample.jpg");
+    inputOfImg.load("sample2.jpg");
     inputOfImg.update();
 
     // Mat変換
@@ -34,10 +34,24 @@ void ofApp::setup(){
     ofxCv::toOf(saliencyMap.clone(), outputOfSaliencyImg);
     outputOfSaliencyImg.update();
 
+    cv::Mat saliency_copy = saliencyMap.clone();
+    // 画素値の反転（現状 : 0:黒:顕著性が低い, 255:白:顕著性が高い）
+    for(int y = 0; y < saliency_copy.cols; ++y){
+        for(int x = 0; x < saliency_copy.rows; ++x){
+            saliency_copy.at<uchar>( x, y ) = 255 - (int)saliency_copy.at<uchar>(x, y);
+            //            ofLog()<<"(int)saliencyMap.at<uchar>("<<x<<","<<y<< ") : "<<(int)saliencyMap.at<uchar>( x, y );
+        }
+    }
+    // ヒートマップへ変換 :（0:赤:顕著性が高い, 255:青:顕著性が低い）
+    applyColorMap(saliency_copy.clone(), saliencyMap_color, cv::COLORMAP_JET);
+
+    // 画像(ofImage)に変換
+    ofxCv::toOf(saliencyMap_color.clone(), outputOfHeatMapImg);
+    outputOfHeatMapImg.update();
+
     // 二値化
     cv::Mat thresh;
     cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
-//    cv::threshold(saliencyMap.clone(), thresh, 255/2, 255, CV_THRESH_BINARY);
 
     // ノイズ除去
     cv::Mat opening;
@@ -52,27 +66,41 @@ void ofApp::setup(){
     cv::Mat dist_transform;
     cv::distanceTransform(opening, dist_transform, CV_DIST_L2, 5);
 
+    // 最小と最大の要素値とそれらの位置を求める
     cv::Mat sure_fg;
-    double minVal, maxVal;
-    cv::Point minLoc, maxLoc;
-    cv::minMaxLoc(dist_transform, &minVal, &maxVal, &minLoc, &maxLoc);
-    cv::threshold(dist_transform, sure_fg, 0.3*maxVal, 255, 0);
+    cv::minMaxLoc(dist_transform, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc);
+    cv::threshold(dist_transform, sure_fg, 0.3*minMax.max_val, 255, 0);
 
-    dist_transform = dist_transform/maxVal;
+    dist_transform = dist_transform/minMax.max_val;
+
+    // 画像(ofImage)に変換
+    ofxCv::toOf(sure_bg.clone(), outputOfImg);
+    outputOfImg.update();
+    ofxCv::toOf(sure_fg.clone(), outputOfImg2);
+    outputOfImg2.update();
 
     // 不明領域抽出
     cv::Mat unknown, sure_fg_uc1;
     sure_fg.convertTo(sure_fg_uc1, CV_8UC1);
     cv::subtract(sure_bg, sure_fg_uc1, unknown);
 
+    // 画像(ofImage)に変換
+    ofxCv::toOf(unknown.clone(), outputOfImg3);
+    outputOfImg3.update();
+
     // 前景ラベリング
     int compCount = 0;
+    // すべてのマーカーを取得
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
     sure_fg.convertTo(sure_fg, CV_32SC1, 1.0);
     cv::findContours(sure_fg, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
     if( contours.empty() ) return;
+
+//    ofLogNotice()<<"contours: "<<&contours;
+    // watershedに流し込む用のマーカー画像作成
     cv::Mat markers = cv::Mat::zeros(sure_fg.rows, sure_fg.cols, CV_32SC1);
+    // マーカーを描画
     int idx = 0;
     for( ; idx >= 0; idx = hierarchy[idx][0], compCount++ )
         cv::drawContours(markers, contours, idx, cv::Scalar::all(compCount+1), -1, 8, hierarchy, INT_MAX);
@@ -89,13 +117,16 @@ void ofApp::setup(){
     }
 
     // 分水嶺
-    cv::watershed( mat, markers );
+    cv::watershed(mat, markers);
 
     // 背景黒のMat画像
     dividA = cv::Mat::zeros(mat.size(), CV_8UC3);
+    dividB = cv::Mat::zeros(mat.size(), CV_8UC3);
 
     cv::Mat wshed(markers.size(), CV_8UC3);
     std::vector<cv::Vec3b> colorTab;
+
+    ofLogNotice()<<"count: "<<compCount;
     for(int i = 0; i < compCount; i++ )
     {
         int b = cv::theRNG().uniform(0, 255);
@@ -105,11 +136,14 @@ void ofApp::setup(){
         colorTab.push_back(cv::Vec3b((uchar)b, (uchar)g, (uchar)r));
     }
 
-    // paint the watershed image
+    // 分割した画像をそれぞれの画像に書き込む
     for(int i = 0; i < markers.rows; i++ ){
         for(int j = 0; j < markers.cols; j++ )
         {
+
+//            ofLogNotice()<<"index: "<<index;
             int index = markers.at<int>(i,j);
+
             if( index == -1 ) {
                 wshed.at<cv::Vec3b>(i,j) = cv::Vec3b(255,255,255);
             } else if( index <= 0 || index > compCount ) {
@@ -118,8 +152,10 @@ void ofApp::setup(){
             else if( index == 1 ) {
                 wshed.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             }
+            else if( index == 26 ) {
+                dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+            }
             else {
-//                ofLogNotice()<<"index: "<<index;
                 dividA.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             }
         }
@@ -128,30 +164,16 @@ void ofApp::setup(){
     cv::Mat imgG;
     cvtColor(saliencyMap.clone(), imgG, cv::COLOR_GRAY2BGR);
     wshed = wshed*0.5 + imgG*0.5;
-
-    cv::Mat imgG2;
-    cvtColor(saliencyMap.clone(), imgG2, cv::COLOR_GRAY2BGR);
-    dividA = dividA*0.5 + imgG2*0.5;
+    dividA = dividA*0.5 + imgG*0.5;
+    dividB = dividB*0.5 + imgG*0.5;
 
     // 画像(ofImage)に変換
-//    ofxCv::toOf(wshed.clone(), outputOfImg);
-    ofxCv::toOf(dividA.clone(), outputOfImg);
-
-    outputOfImg.update();
-
-    // 画素値の反転（現状 : 0:黒:顕著性が低い, 255:白:顕著性が高い）
-    for(int y = 0; y < saliencyMap.cols; ++y){
-        for(int x = 0; x < saliencyMap.rows; ++x){
-            saliencyMap.at<uchar>( x, y ) = 255 - (int)saliencyMap.at<uchar>(x, y);
-            //        ofLog()<<"(int)saliencyMap.at<uchar>("<<x<<","<<y<< ") : "<<(int)saliencyMap.at<uchar>( x, y );
-        }
-    }
-    // ヒートマップへ変換 :（0:赤:顕著性が高い, 255:青:顕著性が低い）
-    applyColorMap(saliencyMap.clone(), saliencyMap_color, cv::COLORMAP_JET);
-
-    // 画像(ofImage)に変換
-    ofxCv::toOf(saliencyMap_color.clone(), outputOfHeatMapImg);
-    outputOfHeatMapImg.update();
+    ofxCv::toOf(wshed.clone(), outputOfImg4);
+    outputOfImg4.update();
+    ofxCv::toOf(dividA.clone(), outputOfImg5);
+    outputOfImg5.update();
+    ofxCv::toOf(dividB.clone(), outputOfImg6);
+    outputOfImg6.update();
 
 }
 
@@ -164,19 +186,35 @@ void ofApp::update(){
 void ofApp::draw(){
 
     // 元画像
-    inputOfImg.draw(0,0,ofGetWidth()/2, ofGetHeight()/2);
-    // 顕著性マップ(SPECTRAL_RESIDUAL)を出力
-    outputOfSaliencyImg.draw(ofGetWidth()/2,0,ofGetWidth()/2, ofGetHeight()/2);
+    inputOfImg.draw(0,0,ofGetWidth()/3, ofGetHeight()/3);
     // 顕著性マップを出力
-    outputOfHeatMapImg.draw(0,ofGetHeight()/2,ofGetWidth()/2, ofGetHeight()/2);
+    outputOfSaliencyImg.draw(ofGetWidth()/3,0,ofGetWidth()/3, ofGetHeight()/3);
     // 顕著性マップのヒートマップを出力
-    outputOfImg.draw(ofGetWidth()/2,ofGetHeight()/2,ofGetWidth()/2, ofGetHeight()/2);
+    outputOfHeatMapImg.draw(ofGetWidth()-ofGetWidth()/3,0,ofGetWidth()/3, ofGetHeight()/3);
+    // 分水嶺を出力
+    outputOfImg.draw(0,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+    // 領域分割を出力
+    outputOfImg2.draw(ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+    // 分水嶺を出力
+    outputOfImg3.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+    // 領域分割を出力
+    outputOfImg4.draw(0,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+    // 領域分割を出力
+    outputOfImg5.draw(ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+    // 領域分割（特定箇所）を出力
+    outputOfImg6.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+
 
     // Label
     ofDrawBitmapStringHighlight("original", 20, 20);
-    ofDrawBitmapStringHighlight("saliencyMap", ofGetWidth()/2+20, 20);
-    ofDrawBitmapStringHighlight("saliencyMap-heatMap", 20, ofGetHeight()/2+20);
-    ofDrawBitmapStringHighlight("watershed", ofGetWidth()/2+20, ofGetHeight()/2+20);
+    ofDrawBitmapStringHighlight("saliencyMap", ofGetWidth()/3+20, 20);
+    ofDrawBitmapStringHighlight("saliencyMap-heatMap", ofGetWidth()-ofGetWidth()/3+20, 20);
+    ofDrawBitmapStringHighlight("background", 20, ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("front", ofGetWidth()/3+20, ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("unknown", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("watershed", 20, ofGetHeight()-ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("watershed-after", ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
+    ofDrawBitmapStringHighlight("watershed-index", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
 }
 
 //--------------------------------------------------------------
