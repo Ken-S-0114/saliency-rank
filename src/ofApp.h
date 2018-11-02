@@ -64,4 +64,18 @@ public:
     int saliencyPointMaxIndex;
 
     bool state;
+
+    // 環境指定
+    enum Use {
+        release,
+        debug
+    };
+    
+    Use use;
+
+    struct FileName {
+        std::string christmas = "sample.jpg";
+        std::string cardboard = "sample2.jpg";
+    };
+
 };
