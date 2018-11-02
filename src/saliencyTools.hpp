@@ -12,7 +12,7 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 
-class SaliencyTool {
+class SaliencyTools {
 public:
     // 最小と最大の要素値とそれらの位置
     struct MinMax {

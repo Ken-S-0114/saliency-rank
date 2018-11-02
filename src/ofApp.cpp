@@ -3,11 +3,10 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-    state = false;
-//    use = release;
+    enterState = false;
 
     // 画像の読み込み
-    FileName fileName;
+    ConstTools::FileName fileName;
 
     inputOfImg.load(fileName.christmas);
     inputOfImg.update();
@@ -82,10 +81,8 @@ void ofApp::setup(){
     dist_transform = dist_transform/minMax.max_val;
     
     // 画像(ofImage)に変換
-    ofxCv::toOf(sure_bg.clone(), outputOfImg);
-    outputOfImg.update();
-    //    ofxCv::toOf(sure_fg.clone(), outputOfImg2);
-    //    outputOfImg2.update();
+    ofxCv::toOf(sure_bg.clone(), outputOfBackgroundImg);
+    outputOfBackgroundImg.update();
     
     // 不明領域抽出
     cv::Mat unknown, sure_fg_uc1;
@@ -93,8 +90,8 @@ void ofApp::setup(){
     cv::subtract(sure_bg, sure_fg_uc1, unknown);
     
     // 画像(ofImage)に変換
-    ofxCv::toOf(unknown.clone(), outputOfImg2);
-    outputOfImg2.update();
+    ofxCv::toOf(unknown.clone(), outputOfUnknownImg);
+    outputOfUnknownImg.update();
     
     // 前景ラベリング
     int compCount = 0;
@@ -196,14 +193,14 @@ void ofApp::setup(){
     dividB = dividB*0.5 + imgG*0.5;
     
     // 画像(ofImage)に変換
-    ofxCv::toOf(wshed.clone(), outputOfImg3);
-    outputOfImg3.update();
-    ofxCv::toOf(dividA.clone(), outputOfImg4);
-    outputOfImg4.update();
-    ofxCv::toOf(dividB.clone(), outputOfImg5);
-    outputOfImg5.update();
-    ofxCv::toOf(mat_copy.clone(), outputOfImg6);
-    outputOfImg6.update();
+    ofxCv::toOf(wshed.clone(), outputOfWatershedImg);
+    outputOfWatershedImg.update();
+    ofxCv::toOf(dividA.clone(), outputOfWatershedAfterImg);
+    outputOfWatershedAfterImg.update();
+    ofxCv::toOf(dividB.clone(), outputOfWatershedHighestImg);
+    outputOfWatershedHighestImg.update();
+    ofxCv::toOf(mat_copy.clone(), outputOfSaliencyMapHighestImg);
+    outputOfSaliencyMapHighestImg.update();
     
     markersSave = markers.clone();
     
@@ -218,7 +215,7 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    if (state) {
+    if (enterState) {
         
         //        for(int i = 0; i < markersSave.rows; i++ ){
         //            for(int j = 0; j < markersSave.cols; j++ )
@@ -260,12 +257,12 @@ void ofApp::update(){
         dividB = dividB*0.5 + imgG*0.5;
         
         // 画像(ofImage)に変換
-        ofxCv::toOf(dividB.clone(), outputOfImg5);
-        outputOfImg5.update();
-        ofxCv::toOf(mat_copy.clone(), outputOfImg6);
-        outputOfImg6.update();
+        ofxCv::toOf(dividB.clone(), outputOfWatershedHighestImg);
+        outputOfWatershedHighestImg.update();
+        ofxCv::toOf(mat_copy.clone(), outputOfSaliencyMapHighestImg);
+        outputOfSaliencyMapHighestImg.update();
         
-        state = false;
+        enterState = false;
     }
     
 }
@@ -273,19 +270,22 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
+    // Label
+    ofDrawBitmapStringHighlight("keyPressed\n\n・Z: RELEASE\n・X: DEBUG\n・Enter: Next HighSaliency Place", ofGetWidth()-ofGetWidth()/4-40, 20);
+
     switch (use) {
-        case release:
+        case ConstTools::RELEASE:
             // 元画像
             inputOfImg.draw(0,0,ofGetWidth()/2, ofGetHeight()/2);
             // 領域分割（特定箇所）を出力
-            outputOfImg6.draw(0,ofGetHeight()/2,ofGetWidth()/2, ofGetHeight()/2);
+            outputOfSaliencyMapHighestImg.draw(0,ofGetHeight()/2,ofGetWidth()/2, ofGetHeight()/2);
 
             // Label
             ofDrawBitmapStringHighlight("original", ofGetWidth()/2+20, 20);
             ofDrawBitmapStringHighlight("saliencyMap-watershed", ofGetWidth()/2+20, ofGetHeight()/2+20);
             break;
 
-        case debug:
+        case ConstTools::DEBUG:
             // 元画像
             inputOfImg.draw(0,0,ofGetWidth()/3, ofGetHeight()/3);
             // 顕著性マップを出力
@@ -293,17 +293,17 @@ void ofApp::draw(){
             // 顕著性マップのヒートマップを出力
             outputOfHeatMapImg.draw(ofGetWidth()-ofGetWidth()/3,0,ofGetWidth()/3, ofGetHeight()/3);
             // 分水嶺を出力
-            outputOfImg.draw(0,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+            outputOfBackgroundImg.draw(0,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
             // 領域分割を出力
-            outputOfImg2.draw(ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+            outputOfUnknownImg.draw(ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
             // 分水嶺を出力
-            outputOfImg3.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+            outputOfWatershedImg.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
             // 領域分割を出力
-            outputOfImg4.draw(0,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+            outputOfWatershedAfterImg.draw(0,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
             // 領域分割を出力
-            outputOfImg5.draw(ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+            outputOfWatershedHighestImg.draw(ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
             // 領域分割（特定箇所）を出力
-            outputOfImg6.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+            outputOfSaliencyMapHighestImg.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
 
 
             // Label
@@ -314,8 +314,8 @@ void ofApp::draw(){
             ofDrawBitmapStringHighlight("unknown", ofGetWidth()/3+20, ofGetHeight()/3+20);
             ofDrawBitmapStringHighlight("watershed", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()/3+20);
             ofDrawBitmapStringHighlight("watershed-after", 20, ofGetHeight()-ofGetHeight()/3+20);
-            ofDrawBitmapStringHighlight("watershed-index", ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
-            ofDrawBitmapStringHighlight("saliencyMap-index", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
+            ofDrawBitmapStringHighlight("watershed-highest", ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
+            ofDrawBitmapStringHighlight("saliencyMap-highest", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
             break;
     }
 }
@@ -335,19 +335,19 @@ void ofApp::keyPressed(int key){
             //                    }
             //                }
             //            }
-            
+
             saliencyPointSave[saliencyPointMaxIndex] = 0;
             
-            state = true;
+            enterState = true;
             break;
             //-------------   環境   ------------------
         case 122:
             // "Z"を押した時: release
-            use = release;
+            use = ConstTools::RELEASE;
             break;
         case 120:
             // "X"を押した時: debug
-            use = debug;
+            use = ConstTools::DEBUG;
             break;
     }
 

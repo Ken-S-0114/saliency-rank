@@ -15,6 +15,7 @@
 #include "algorithm"
 
 #include "saliencyTools.hpp"
+#include "constTools.hpp"
 
 class ofApp : public ofBaseApp{
 
@@ -42,7 +43,8 @@ public:
     
     // 出力データ
     ofImage outputOfSaliencyImg, outputOfHeatMapImg;
-    ofImage outputOfImg, outputOfImg2, outputOfImg3, outputOfImg4, outputOfImg5, outputOfImg6;
+    ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg;
+
     // 顕著性マップ
     cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap, saliencyMap_color;
 
@@ -54,7 +56,7 @@ public:
     cv::Mat imgG;
 
     // 最小と最大の要素値とそれらの位置
-    SaliencyTool::MinMax minMax;
+    SaliencyTools::MinMax minMax;
 //    std::vector<int> pixelsList;
 
     std::vector<int> saliencyPointSave;
@@ -62,20 +64,9 @@ public:
     // vector内の最大値の要素番号
     std::vector<int>::iterator iter;
     int saliencyPointMaxIndex;
-
-    bool state;
-
-    // 環境指定
-    enum Use {
-        release,
-        debug
-    };
     
-    Use use;
+    bool enterState;
 
-    struct FileName {
-        std::string christmas = "sample.jpg";
-        std::string cardboard = "sample2.jpg";
-    };
+    ConstTools::Use use;
 
 };
