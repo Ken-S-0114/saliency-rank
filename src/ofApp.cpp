@@ -126,8 +126,8 @@ void ofApp::setup(){
     cv::watershed(mat, markers);
     
     // 背景黒のMat画像
-    dividA = cv::Mat::zeros(mat.size(), CV_8UC3);
-    dividB = cv::Mat::zeros(mat.size(), CV_8UC3);
+    watershedHighest = cv::Mat::zeros(mat.size(), CV_8UC3);
+    saliencyHighest = cv::Mat::zeros(mat.size(), CV_8UC3);
     
     cv::Mat wshed(markers.size(), CV_8UC3);
     //    std::vector<cv::Vec3b> colorTab;
@@ -161,7 +161,7 @@ void ofApp::setup(){
                 wshed.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             }
             else {
-                dividA.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+                watershedHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
                 saliencyPoint[index-1] += (int)saliencyMap.at<uchar>(i, j);
             }
         }
@@ -180,7 +180,7 @@ void ofApp::setup(){
         {
             int index = markers.at<int>(i,j);
             if( index == saliencyPointMaxIndex+1 ) {
-                dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+                saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             } else {
                 mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
             }
@@ -189,15 +189,15 @@ void ofApp::setup(){
     
     cvtColor(saliencyMap.clone(), imgG, cv::COLOR_GRAY2BGR);
     wshed = wshed*0.5 + imgG*0.5;
-    dividA = dividA*0.5 + imgG*0.5;
-    dividB = dividB*0.5 + imgG*0.5;
+    watershedHighest = watershedHighest*0.5 + imgG*0.5;
+    saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
     
     // 画像(ofImage)に変換
     ofxCv::toOf(wshed.clone(), outputOfWatershedImg);
     outputOfWatershedImg.update();
-    ofxCv::toOf(dividA.clone(), outputOfWatershedAfterImg);
+    ofxCv::toOf(watershedHighest.clone(), outputOfWatershedAfterImg);
     outputOfWatershedAfterImg.update();
-    ofxCv::toOf(dividB.clone(), outputOfWatershedHighestImg);
+    ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
     outputOfWatershedHighestImg.update();
     ofxCv::toOf(mat_copy.clone(), outputOfSaliencyMapHighestImg);
     outputOfSaliencyMapHighestImg.update();
@@ -238,7 +238,7 @@ void ofApp::update(){
         ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
         
         // 初期化
-        dividB = cv::Mat::zeros(dividB.size(), CV_8UC3);
+        saliencyHighest = cv::Mat::zeros(saliencyHighest.size(), CV_8UC3);
         mat_copy = mat.clone();
         
         // 画像に書き込む
@@ -247,17 +247,17 @@ void ofApp::update(){
             {
                 int index = markersSave.at<int>(i,j);
                 if( index == saliencyPointMaxIndex+1 ) {
-                    dividB.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+                    saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
                 } else {
                     mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
                 }
             }
         }
         
-        dividB = dividB*0.5 + imgG*0.5;
+        saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
         
         // 画像(ofImage)に変換
-        ofxCv::toOf(dividB.clone(), outputOfWatershedHighestImg);
+        ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
         outputOfWatershedHighestImg.update();
         ofxCv::toOf(mat_copy.clone(), outputOfSaliencyMapHighestImg);
         outputOfSaliencyMapHighestImg.update();

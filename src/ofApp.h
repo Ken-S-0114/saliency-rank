@@ -38,7 +38,7 @@ public:
 
     // 画像
     ofImage inputOfImg;
-
+    // 画像からMat画像に変換
     cv::Mat mat, mat_copy;
     
     // 出力データ
@@ -48,25 +48,30 @@ public:
     // 顕著性マップ
     cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap, saliencyMap_color;
 
+    // 顕著箇所に対しての色配分
     std::vector<cv::Vec3b> colorTab;
+    // watershedに流し込む用のマーカー画像
     cv::Mat markersSave;
-    
-    cv::Mat dividA, dividB;
-    
+    // 顕著箇所の出力
+    cv::Mat watershedHighest, saliencyHighest;
+    // 顕著性マップのグレースケール画像
     cv::Mat imgG;
 
     // 最小と最大の要素値とそれらの位置
     SaliencyTools::MinMax minMax;
 //    std::vector<int> pixelsList;
 
+    // 顕著性マップの画素値格納
     std::vector<int> saliencyPointSave;
 
     // vector内の最大値の要素番号
     std::vector<int>::iterator iter;
     int saliencyPointMaxIndex;
-    
+
+    // エンターキーを押したか
     bool enterState;
 
+    // 環境選択
     ConstTools::Use use;
 
 };
