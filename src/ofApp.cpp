@@ -41,7 +41,7 @@ void ofApp::setup(){
     // 画像(ofImage)に変換
     ofxCv::toOf(saliencyMap.clone(), outputOfSaliencyImg);
     outputOfSaliencyImg.update();
-//    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
+    //    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
 
     // 画素値の反転（現状 : 0:黒:顕著性が低い, 255:白:顕著性が高い）
     for(int x = 0; x < saliency_copy.rows; ++x){
@@ -172,7 +172,8 @@ void ofApp::setup(){
     for (int i=0; i<saliencyPoint.size(); i++) {
         ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPoint[i];
     }
-    
+
+    // 最大値の要素番号を取得
     iter = std::max_element(saliencyPoint.begin(), saliencyPoint.end());
     saliencyPointMaxIndex = std::distance(saliencyPoint.begin(), iter);
     ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
@@ -185,7 +186,7 @@ void ofApp::setup(){
                 saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             } else {
                 mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-//                mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
+                //                mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
             }
         }
     }
@@ -237,11 +238,12 @@ void ofApp::update(){
         //                }
         //            }
         //        }
-        
+
         for (int i=0; i<saliencyPointSave.size(); i++) {
             ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPointSave[i];
         }
-        
+
+        // 最大値の要素番号を取得
         iter = std::max_element(saliencyPointSave.begin(), saliencyPointSave.end());
         saliencyPointMaxIndex = std::distance(saliencyPointSave.begin(), iter);
         ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
@@ -259,7 +261,7 @@ void ofApp::update(){
                     saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
                 } else {
                     mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-//                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
+                    //                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
                 }
             }
         }
@@ -274,7 +276,7 @@ void ofApp::update(){
         // 画像(ofImage)に変換
         ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
         outputOfSaliencyMapHighestImg.update();
-//        outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
+        //        outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
 
         enterState = false;
     }
@@ -284,9 +286,11 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
+    int count = 0;
     // Label
     ofDrawBitmapStringHighlight("keyPressed\n\n・Z: RELEASE\n・X: DEBUG\n・C: SALIENCY\n・Enter: Next HighSaliency Place", ofGetWidth()-ofGetWidth()/4-40, 20);
 
+    //    ofDrawBitmapStringHighlight("Enter key count: %d", ofGetWidth()-ofGetWidth()/4-40, ofGetHeight()/2+20);
     switch (use) {
         case ConstTools::RELEASE:
             // 元画像
@@ -347,6 +351,10 @@ void ofApp::keyPressed(int key){
     
     switch (key) {
         case 13:
+
+            //            if (!saliencyPointSave.empty()) {
+            //                saliencyPointSave.clear();
+            //            }
             //            for(int i = 0; i < markersSave.rows; i++ ){
             //                for(int j = 0; j < markersSave.cols; j++ )
             //                {
@@ -358,7 +366,7 @@ void ofApp::keyPressed(int key){
             //            }
 
             saliencyPointSave[saliencyPointMaxIndex] = 0;
-            
+
             enterState = true;
             break;
             //-------------   環境   ------------------
