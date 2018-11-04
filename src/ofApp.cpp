@@ -9,9 +9,9 @@ void ofApp::setup(){
     enterCountString << "The " << enterCount+1 << " most saliency place";
 
     // 画像の読み込み
-    ConstTools::FileName fileName;
-
-    inputOfImg.load(fileName.lenna);
+    ConstTools::InputFileName inputFileName;
+    ConstTools::OutputFileName outputfileName;
+    inputOfImg.load(inputFileName.lenna);
     inputOfImg.update();
 
     //    saliencyCreated(inputOfImg);
@@ -60,7 +60,7 @@ void ofApp::setup(){
     // 画像(ofImage)に変換
     ofxCv::toOf(saliencyMap_color.clone(), outputOfHeatMapImg);
     outputOfHeatMapImg.update();
-    outputOfHeatMapImg.save("outputOfSaliencyImg.png");
+    outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
 
     //    watershedCreated(saliencyMap.clone());
     // 二値化
@@ -206,7 +206,7 @@ void ofApp::setup(){
     outputOfWatershedImg.update();
     ofxCv::toOf(watershedHighest.clone(), outputOfWatershedAfterImg);
     outputOfWatershedAfterImg.update();
-    outputOfWatershedAfterImg.save("outputOfWatershedAfterImg.png");
+    outputOfWatershedAfterImg.save(outputfileName.outputOfWatershedAfterImg);
     ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
     outputOfWatershedHighestImg.update();
 
@@ -215,7 +215,7 @@ void ofApp::setup(){
     // 画像(ofImage)に変換
     ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
     outputOfSaliencyMapHighestImg.update();
-    outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
+    outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);
 
 
     markersSave = markers.clone();
