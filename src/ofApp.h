@@ -37,6 +37,11 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
 
+
+    void saliencyCreated(ofImage img);
+
+    void watershedCreated(cv::Mat saliency);
+
     // 画像
     ofImage inputOfImg;
     // 画像からMat画像に変換
@@ -64,6 +69,7 @@ public:
     
     // 顕著性マップの画素値格納
     std::vector<int> saliencyPointSave;
+    std::vector<int> saliencyPointBackUp;
 
     // vector内の最大値の要素番号
     std::vector<int>::iterator iter;
@@ -73,6 +79,7 @@ public:
     bool enterState;
     int enterCount;
     std::stringstream enterCountString;
+    
     // 環境選択
     ConstTools::Use use;
 
