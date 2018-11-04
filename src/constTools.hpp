@@ -15,6 +15,7 @@ class ConstTools {
     public:
 
     struct FileName {
+        std::string lenna = "lenna.png";
         std::string christmas = "sample.jpg";
         std::string cardboard = "sample2.jpg";
     };
@@ -22,7 +23,8 @@ class ConstTools {
     // 環境指定
     enum Use {
         RELEASE,
-        DEBUG
+        DEBUG,
+        SALIENCY
     };
     
 };

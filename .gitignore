@@ -2,8 +2,12 @@
 # Created by https://www.gitignore.io/api/c,c++,cmake,opencv,openframeworks
 
 ### saliency-rank ###
+lenna.png
 sample.jpg
 sample2.jpg
+
+outputOfSaliencyImg.png
+outputOfWatershedAfterImg.png
 
 ### C ###
 # Prerequisites

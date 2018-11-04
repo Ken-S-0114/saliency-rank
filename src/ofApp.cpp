@@ -8,7 +8,7 @@ void ofApp::setup(){
     // 画像の読み込み
     ConstTools::FileName fileName;
 
-    inputOfImg.load(fileName.christmas);
+    inputOfImg.load(fileName.lenna);
     inputOfImg.update();
     
     // Mat変換
@@ -40,7 +40,8 @@ void ofApp::setup(){
     // 画像(ofImage)に変換
     ofxCv::toOf(saliencyMap.clone(), outputOfSaliencyImg);
     outputOfSaliencyImg.update();
-    
+    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
+
     cv::Mat saliency_copy = saliencyMap.clone();
     // 画素値の反転（現状 : 0:黒:顕著性が低い, 255:白:顕著性が高い）
     for(int x = 0; x < saliency_copy.rows; ++x){
@@ -197,6 +198,7 @@ void ofApp::setup(){
     outputOfWatershedImg.update();
     ofxCv::toOf(watershedHighest.clone(), outputOfWatershedAfterImg);
     outputOfWatershedAfterImg.update();
+    outputOfWatershedAfterImg.save("outputOfWatershedAfterImg.png");
     ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
     outputOfWatershedHighestImg.update();
     ofxCv::toOf(mat_copy.clone(), outputOfSaliencyMapHighestImg);
@@ -261,7 +263,7 @@ void ofApp::update(){
         outputOfWatershedHighestImg.update();
         ofxCv::toOf(mat_copy.clone(), outputOfSaliencyMapHighestImg);
         outputOfSaliencyMapHighestImg.update();
-        
+
         enterState = false;
     }
     
@@ -271,7 +273,7 @@ void ofApp::update(){
 void ofApp::draw(){
 
     // Label
-    ofDrawBitmapStringHighlight("keyPressed\n\n・Z: RELEASE\n・X: DEBUG\n・Enter: Next HighSaliency Place", ofGetWidth()-ofGetWidth()/4-40, 20);
+    ofDrawBitmapStringHighlight("keyPressed\n\n・Z: RELEASE\n・X: DEBUG\n・C: SALIENCY\n・Enter: Next HighSaliency Place", ofGetWidth()-ofGetWidth()/4-40, 20);
 
     switch (use) {
         case ConstTools::RELEASE:
@@ -317,6 +319,13 @@ void ofApp::draw(){
             ofDrawBitmapStringHighlight("watershed-highest", ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
             ofDrawBitmapStringHighlight("saliencyMap-highest", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
             break;
+        case ConstTools::SALIENCY:
+            // 元画像
+            inputOfImg.draw(0,0,ofGetWidth()/2,ofGetHeight()/2);
+            // 顕著性マップを出力
+            outputOfSaliencyImg.draw(ofGetWidth()/2,0,ofGetWidth()/2,ofGetHeight()/2);
+
+            break;
     }
 }
 
@@ -348,6 +357,10 @@ void ofApp::keyPressed(int key){
         case 120:
             // "X"を押した時: debug
             use = ConstTools::DEBUG;
+            break;
+        case 99:
+            // "C"を押した時: saliency
+            use = ConstTools::SALIENCY;
             break;
     }
 
