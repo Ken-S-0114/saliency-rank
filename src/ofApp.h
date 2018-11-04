@@ -11,6 +11,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "iostream"
+#include "sstream"
 #include "vector"
 #include "algorithm"
 
@@ -60,7 +61,7 @@ public:
     // 最小と最大の要素値とそれらの位置
     SaliencyTools::MinMax minMax;
 //    std::vector<int> pixelsList;
-
+    
     // 顕著性マップの画素値格納
     std::vector<int> saliencyPointSave;
 
@@ -68,9 +69,10 @@ public:
     std::vector<int>::iterator iter;
     int saliencyPointMaxIndex;
 
-    // エンターキーを押したか
+    // エンターキー
     bool enterState;
-
+    int enterCount;
+    std::stringstream enterCountString;
     // 環境選択
     ConstTools::Use use;
 

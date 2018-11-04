@@ -4,6 +4,9 @@
 void ofApp::setup(){
     
     enterState = false;
+    enterCount = 0;
+
+    enterCountString << "The " << enterCount+1 << " most saliency place";
 
     // 画像の読み込み
     ConstTools::FileName fileName;
@@ -97,6 +100,7 @@ void ofApp::setup(){
     
     // 前景ラベリング
     int compCount = 0;
+
     // すべてのマーカーを取得
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
@@ -226,57 +230,70 @@ void ofApp::setup(){
 void ofApp::update(){
     
     if (enterState) {
-        
-        //        for(int i = 0; i < markersSave.rows; i++ ){
-        //            for(int j = 0; j < markersSave.cols; j++ )
-        //            {
-        //                //            ofLogNotice()<<"index: "<<index;
-        //                int index = markersSave.at<int>(i,j);
-        //
-        //                if( index != -1 && index > 0 && index != 1 ) {
-        //                    saliencyPointSave[index-1] += (int)saliencyMap.at<uchar>(i, j);
-        //                }
-        //            }
-        //        }
+        enterCountString.str("");
+        enterCountString.clear(stringstream::goodbit);
 
-        for (int i=0; i<saliencyPointSave.size(); i++) {
-            ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPointSave[i];
-        }
+        int maxValue = *std::max_element(saliencyPointSave.begin(), saliencyPointSave.end());
 
-        // 最大値の要素番号を取得
-        iter = std::max_element(saliencyPointSave.begin(), saliencyPointSave.end());
-        saliencyPointMaxIndex = std::distance(saliencyPointSave.begin(), iter);
-        ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
-        
-        // 初期化
-        saliencyHighest = cv::Mat::zeros(saliencyHighest.size(), CV_8UC3);
-        mat_copy = mat.clone();
-        
-        // 画像に書き込む
-        for(int i = 0; i < markersSave.rows; i++ ){
-            for(int j = 0; j < markersSave.cols; j++ )
-            {
-                int index = markersSave.at<int>(i,j);
-                if(index == saliencyPointMaxIndex+1) {
-                    saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
-                } else {
-                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-                    //                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
+        if (maxValue != 0) {
+
+            //        for(int i = 0; i < markersSave.rows; i++ ){
+            //            for(int j = 0; j < markersSave.cols; j++ )
+            //            {
+            //                //            ofLogNotice()<<"index: "<<index;
+            //                int index = markersSave.at<int>(i,j);
+            //
+            //                if( index != -1 && index > 0 && index != 1 ) {
+            //                    saliencyPointSave[index-1] += (int)saliencyMap.at<uchar>(i, j);
+            //                }
+            //            }
+            //        }
+
+            for (int i=0; i<saliencyPointSave.size(); i++) {
+                ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPointSave[i];
+            }
+
+            // 最大値の要素番号を取得
+            iter = std::max_element(saliencyPointSave.begin(), saliencyPointSave.end());
+            saliencyPointMaxIndex = std::distance(saliencyPointSave.begin(), iter);
+            ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
+
+            // 初期化
+            saliencyHighest = cv::Mat::zeros(saliencyHighest.size(), CV_8UC3);
+            mat_copy = mat.clone();
+
+            // 画像に書き込む
+            for(int i = 0; i < markersSave.rows; i++ ){
+                for(int j = 0; j < markersSave.cols; j++ )
+                {
+                    int index = markersSave.at<int>(i,j);
+                    if(index == saliencyPointMaxIndex+1) {
+                        saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+                    } else {
+                        mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
+                        //                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
+                    }
                 }
             }
+
+            saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
+            // 画像(ofImage)に変換
+            ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
+            outputOfWatershedHighestImg.update();
+
+
+            mat_mix = mat*0.2 + mat_copy*0.8;
+            // 画像(ofImage)に変換
+            ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
+            outputOfSaliencyMapHighestImg.update();
+            //        outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
+
+            enterCountString << "The " << enterCount+1 << " most saliency place";
+
         }
-        
-        saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
-        // 画像(ofImage)に変換
-        ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
-        outputOfWatershedHighestImg.update();
-
-
-        mat_mix = mat*0.2 + mat_copy*0.8;
-        // 画像(ofImage)に変換
-        ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
-        outputOfSaliencyMapHighestImg.update();
-        //        outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
+        else {
+            enterCountString << "Finish";
+        };
 
         enterState = false;
     }
@@ -286,11 +303,6 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    int count = 0;
-    // Label
-    ofDrawBitmapStringHighlight("keyPressed\n\n・Z: RELEASE\n・X: DEBUG\n・C: SALIENCY\n・Enter: Next HighSaliency Place", ofGetWidth()-ofGetWidth()/4-40, 20);
-
-    //    ofDrawBitmapStringHighlight("Enter key count: %d", ofGetWidth()-ofGetWidth()/4-40, ofGetHeight()/2+20);
     switch (use) {
         case ConstTools::RELEASE:
             // 元画像
@@ -301,6 +313,11 @@ void ofApp::draw(){
             // Label
             ofDrawBitmapStringHighlight("original", ofGetWidth()/2+20, 20);
             ofDrawBitmapStringHighlight("saliencyMap-watershed", ofGetWidth()/2+20, ofGetHeight()/2+20);
+
+            // Label
+            ofDrawBitmapStringHighlight("keyPressed\n\n・Z: RELEASE\n・X: DEBUG\n・C: SALIENCY\n・Enter: Next HighSaliency Place", ofGetWidth()-ofGetWidth()/4-40, 20);
+
+            ofDrawBitmapStringHighlight(enterCountString.str(), ofGetWidth()/2+20, ofGetHeight()/2+50);
             break;
 
         case ConstTools::DEBUG:
@@ -351,7 +368,6 @@ void ofApp::keyPressed(int key){
     
     switch (key) {
         case 13:
-
             //            if (!saliencyPointSave.empty()) {
             //                saliencyPointSave.clear();
             //            }
@@ -367,7 +383,9 @@ void ofApp::keyPressed(int key){
 
             saliencyPointSave[saliencyPointMaxIndex] = 0;
 
+            enterCount++;
             enterState = true;
+
             break;
             //-------------   環境   ------------------
         case 122:
