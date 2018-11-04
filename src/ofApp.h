@@ -39,7 +39,7 @@ public:
     // 画像
     ofImage inputOfImg;
     // 画像からMat画像に変換
-    cv::Mat mat, mat_copy;
+    cv::Mat mat, mat_copy, mat_mix;
     
     // 出力データ
     ofImage outputOfSaliencyImg, outputOfHeatMapImg;

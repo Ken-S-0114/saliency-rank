@@ -18,7 +18,7 @@ void ofApp::setup(){
     mat = ofxCv::toCv(inputOfImg);
     
     mat_copy = mat.clone();
-    
+
     // 白黒Mat画像に変換
     cvtColor(mat.clone(), mat_gray, cv::COLOR_BGR2GRAY);
     // ぼかし
@@ -36,13 +36,13 @@ void ofApp::setup(){
     
     // 最小と最大の要素値とそれらの位置を求める
     //    minMaxLoc(saliencyMap, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc, cv::Mat());
-    
+
+    cv::Mat saliency_copy = saliencyMap.clone();
     // 画像(ofImage)に変換
     ofxCv::toOf(saliencyMap.clone(), outputOfSaliencyImg);
     outputOfSaliencyImg.update();
-    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
+//    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
 
-    cv::Mat saliency_copy = saliencyMap.clone();
     // 画素値の反転（現状 : 0:黒:顕著性が低い, 255:白:顕著性が高い）
     for(int x = 0; x < saliency_copy.rows; ++x){
         for(int y = 0; y < saliency_copy.cols; ++y){
@@ -51,12 +51,13 @@ void ofApp::setup(){
         }
     }
     // ヒートマップへ変換 :（0:赤:顕著性が高い, 255:青:顕著性が低い）
-    applyColorMap(saliency_copy.clone(), saliencyMap_color, cv::COLORMAP_JET);
+    cv::applyColorMap(saliency_copy.clone(), saliencyMap_color, cv::COLORMAP_JET);
     
     // 画像(ofImage)に変換
     ofxCv::toOf(saliencyMap_color.clone(), outputOfHeatMapImg);
     outputOfHeatMapImg.update();
-    
+    outputOfHeatMapImg.save("outputOfSaliencyImg.png");
+
     // 二値化
     cv::Mat thresh;
     cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
@@ -175,7 +176,7 @@ void ofApp::setup(){
     iter = std::max_element(saliencyPoint.begin(), saliencyPoint.end());
     saliencyPointMaxIndex = std::distance(saliencyPoint.begin(), iter);
     ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
-    
+
     for(int i = 0; i < markers.rows; i++ ){
         for(int j = 0; j < markers.cols; j++ )
         {
@@ -184,6 +185,7 @@ void ofApp::setup(){
                 saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
             } else {
                 mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
+//                mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
             }
         }
     }
@@ -192,7 +194,6 @@ void ofApp::setup(){
     wshed = wshed*0.5 + imgG*0.5;
     watershedHighest = watershedHighest*0.5 + imgG*0.5;
     saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
-    
     // 画像(ofImage)に変換
     ofxCv::toOf(wshed.clone(), outputOfWatershedImg);
     outputOfWatershedImg.update();
@@ -201,9 +202,15 @@ void ofApp::setup(){
     outputOfWatershedAfterImg.save("outputOfWatershedAfterImg.png");
     ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
     outputOfWatershedHighestImg.update();
-    ofxCv::toOf(mat_copy.clone(), outputOfSaliencyMapHighestImg);
+
+
+    mat_mix = mat*0.2 + mat_copy*0.8;
+    // 画像(ofImage)に変換
+    ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
     outputOfSaliencyMapHighestImg.update();
-    
+    outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
+
+
     markersSave = markers.clone();
     
     
@@ -248,21 +255,26 @@ void ofApp::update(){
             for(int j = 0; j < markersSave.cols; j++ )
             {
                 int index = markersSave.at<int>(i,j);
-                if( index == saliencyPointMaxIndex+1 ) {
+                if(index == saliencyPointMaxIndex+1) {
                     saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
                 } else {
                     mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
+//                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
                 }
             }
         }
         
         saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
-        
         // 画像(ofImage)に変換
         ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
         outputOfWatershedHighestImg.update();
-        ofxCv::toOf(mat_copy.clone(), outputOfSaliencyMapHighestImg);
+
+
+        mat_mix = mat*0.2 + mat_copy*0.8;
+        // 画像(ofImage)に変換
+        ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
         outputOfSaliencyMapHighestImg.update();
+//        outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
 
         enterState = false;
     }
@@ -296,15 +308,15 @@ void ofApp::draw(){
             outputOfHeatMapImg.draw(ofGetWidth()-ofGetWidth()/3,0,ofGetWidth()/3, ofGetHeight()/3);
             // 分水嶺を出力
             outputOfBackgroundImg.draw(0,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
-            // 領域分割を出力
+            // 不明領域を出力
             outputOfUnknownImg.draw(ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
             // 分水嶺を出力
             outputOfWatershedImg.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
             // 領域分割を出力
             outputOfWatershedAfterImg.draw(0,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
-            // 領域分割を出力
-            outputOfWatershedHighestImg.draw(ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
             // 領域分割（特定箇所）を出力
+            outputOfWatershedHighestImg.draw(ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
+            // 領域分割（元画像から特定箇所）を出力
             outputOfSaliencyMapHighestImg.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
 
 
