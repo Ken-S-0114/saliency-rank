@@ -83,7 +83,7 @@ void ofApp::setup(){
     // 最小と最大の要素値とそれらの位置を求める
     cv::Mat sure_fg;
     cv::minMaxLoc(dist_transform, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc);
-    cv::threshold(dist_transform, sure_fg, 0.3*minMax.max_val, 255, 0);
+    cv::threshold(dist_transform, sure_fg, 0.5*minMax.max_val, 255, 0);
 
     dist_transform = dist_transform/minMax.max_val;
 
@@ -170,7 +170,9 @@ void ofApp::setup(){
             }
             else {
                 watershedHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
-                saliencyPoint[index-1] += (int)saliencyMap.at<uchar>(i, j);
+                if (saliencyPoint[index-1] < (int)saliencyMap.at<uchar>(i, j)) {
+                    saliencyPoint[index-1] = (int)saliencyMap.at<uchar>(i, j);
+                }
             }
         }
     }
