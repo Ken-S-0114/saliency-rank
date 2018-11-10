@@ -11,7 +11,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "iostream"
-#include "sstream"
+#include "sstream"9
 #include "vector"
 #include "algorithm"
 
@@ -36,11 +36,6 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
-
-
-    void saliencyCreated(ofImage img);
-
-    void watershedCreated(cv::Mat saliency);
 
     // 画像
     ofImage inputOfImg;
