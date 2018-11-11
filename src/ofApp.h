@@ -42,6 +42,8 @@ public:
 
 	cv::Mat mat, mat_copy, mat_mix;
 
+	cv::Mat sure_bg, unknown;
+
 	ofImage outputOfSaliencyImg, outputOfHeatMapImg;
 	ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg;
 
