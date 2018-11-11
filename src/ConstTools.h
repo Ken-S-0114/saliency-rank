@@ -5,9 +5,9 @@ class ConstTools {
 public:
 
 	struct InputFileName {
-		std::string lenna = "lenna.png";
-		std::string christmas = "sample.jpg";
-		std::string cardboard = "sample2.jpg";
+		std::string lenna = "lenna.jpg";
+		//std::string christmas = "sample.jpg";
+		//std::string cardboard = "sample2.jpg";
 	};
 
 	struct OutputFileName {
@@ -16,7 +16,6 @@ public:
 		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg.png";
 	};
 
-	// ŠÂ‹«Žw’è
 	enum Use {
 		RELEASE,
 		DEBUG,
