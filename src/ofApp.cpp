@@ -35,7 +35,7 @@ void ofApp::setup() {
 
 	//    minMaxLoc(saliencyMap, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc, cv::Mat());
 
-	ofxCv::toOf(saliencyMap.clone(), outputOfSaliencyImg);
+	//ofxCv::toOf(saliencyMap.clone(), outputOfSaliencyImg);
 	outputOfSaliencyImg.update();
 	//    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
 
@@ -194,9 +194,9 @@ void ofApp::setup() {
 
 	mat_mix = mat*0.2 + mat_copy*0.8;
 
-	/*ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
-	outputOfSaliencyMapHighestImg.update();
-	outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);*/
+	//ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
+	//outputOfSaliencyMapHighestImg.update();
+	//outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);*/
 
 
 	markersSave = markers.clone();
@@ -287,7 +287,7 @@ void ofApp::draw() {
 	switch (use) {
 	case ConstTools::RELEASE:
 		inputOfImg.draw(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
-		ofxCv::drawMat(saliencyMap_color.clone(), 0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
+		ofxCv::drawMat(mat_mix.clone(), 0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
 		//outputOfSaliencyMapHighestImg.draw(0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
 
 		// Label
@@ -360,8 +360,8 @@ void ofApp::keyPressed(int key) {
 		enterState = true;
 
 		break;
-	case 127:
-		// "delete"‚ð‰Ÿ‚µ‚½Žž:
+	case 8:
+		// "BackSpace"‚ð‰Ÿ‚µ‚½Žž:
 		saliencyPointSave = saliencyPointBackUp;
 		enterCount = 0;
 		enterState = true;
