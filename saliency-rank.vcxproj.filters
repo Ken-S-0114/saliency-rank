@@ -288,9 +288,6 @@
 		<Filter Include="addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\videostab">
 			<UniqueIdentifier>{EF5172A2-A48D-77EA-FEC8-C53A}</UniqueIdentifier>
 		</Filter>
-		<Filter Include="addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\xfeatures2d">
-			<UniqueIdentifier>{F30072E3-3A85-9428-184D-4158}</UniqueIdentifier>
-		</Filter>
 		<Filter Include="addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\ximgproc">
 			<UniqueIdentifier>{08ACCB0B-0D2C-B0C6-2285-71B6}</UniqueIdentifier>
 		</Filter>
@@ -1308,15 +1305,6 @@
 			<Filter>addons\ofxOpenCv-contrib\libs\opencv\include\opencv2</Filter>
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\world.hpp">
-			<Filter>addons\ofxOpenCv-contrib\libs\opencv\include\opencv2</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\xfeatures2d\cuda.hpp">
-			<Filter>addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\xfeatures2d</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\xfeatures2d\nonfree.hpp">
-			<Filter>addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\xfeatures2d</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\..\addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\xfeatures2d.hpp">
 			<Filter>addons\ofxOpenCv-contrib\libs\opencv\include\opencv2</Filter>
 		</ClInclude>
 		<ClInclude Include="..\..\..\addons\ofxOpenCv-contrib\libs\opencv\include\opencv2\ximgproc\brightedges.hpp">

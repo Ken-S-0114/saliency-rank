@@ -35,9 +35,12 @@ void ofApp::setup() {
 
 	//    minMaxLoc(saliencyMap, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc, cv::Mat());
 
-	//ofxCv::toOf(saliencyMap.clone(), outputOfSaliencyImg);
-	//outputOfSaliencyImg.update();
-	//    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
+	cv::Mat s1 = saliencyMap.clone();
+	ofxCv::toOf(s1, outputOfSaliencyImg);
+
+
+	outputOfSaliencyImg.update();
+    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
 
 	cv::Mat saliency_copy = saliencyMap.clone();
 
@@ -50,11 +53,13 @@ void ofApp::setup() {
 
 	cv::applyColorMap(saliency_copy.clone(), saliencyMap_color, cv::COLORMAP_JET);
 
-	//ofxCv::toOf(saliencyMap_color.clone(), outputOfHeatMapImg);
-	//outputOfHeatMapImg.update();
-	//outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
+	cv::Mat s2 = saliencyMap_color.clone();
 
-	////    watershedCreated(saliencyMap.clone());
+	ofxCv::toOf(s2, outputOfHeatMapImg);
+	outputOfHeatMapImg.update();
+	outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
+
+	//    watershedCreated(saliencyMap.clone());
 
 	cv::Mat thresh;
 	cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
@@ -63,7 +68,7 @@ void ofApp::setup() {
 	cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
 	cv::morphologyEx(thresh.clone(), opening, cv::MORPH_OPEN, kernel, cv::Point(-1, -1), 2);
 
-	//cv::Mat sure_bg;
+	cv::Mat sure_bg;
 	cv::dilate(opening.clone(), sure_bg, kernel, cv::Point(-1, -1), 3);
 
 	cv::Mat dist_transform;
@@ -76,16 +81,18 @@ void ofApp::setup() {
 
 	dist_transform = dist_transform / minMax.max_val;
 
-	//ofxCv::toOf(sure_bg.clone(), outputOfBackgroundImg);
-	//outputOfBackgroundImg.update();
+	cv::Mat s3 = sure_bg.clone();
+	ofxCv::toOf(s3, outputOfBackgroundImg);
+	outputOfBackgroundImg.update();
 
-	//cv::Mat unknown;
+	cv::Mat unknown;
 	cv::Mat sure_fg_uc1;
 	sure_fg.convertTo(sure_fg_uc1, CV_8UC1);
 	cv::subtract(sure_bg, sure_fg_uc1, unknown);
 
-	//ofxCv::toOf(unknown.clone(), outputOfUnknownImg);
-	//outputOfUnknownImg.update();
+	cv::Mat s4 = unknown.clone();
+	ofxCv::toOf(s4, outputOfUnknownImg);
+	outputOfUnknownImg.update();
 
 	int compCount = 0;
 
@@ -184,20 +191,26 @@ void ofApp::setup() {
 	watershedHighest = watershedHighest*0.5 + imgG*0.5;
 	saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
 
-	//ofxCv::toOf(wshed.clone(), outputOfWatershedImg);
-	//outputOfWatershedImg.update();
-	//ofxCv::toOf(watershedHighest.clone(), outputOfWatershedAfterImg);
-	//outputOfWatershedAfterImg.update();
-	//outputOfWatershedAfterImg.save(outputfileName.outputOfWatershedAfterImg);
-	//ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
-	//outputOfWatershedHighestImg.update();
+	cv::Mat s5 = wshed.clone();
+	ofxCv::toOf(s5, outputOfWatershedImg);
+	outputOfWatershedImg.update();
+
+	cv::Mat s6 = watershedHighest.clone();
+	ofxCv::toOf(s6, outputOfWatershedAfterImg);
+	outputOfWatershedAfterImg.update();
+	outputOfWatershedAfterImg.save(outputfileName.outputOfWatershedAfterImg);
+
+	cv::Mat s7 = saliencyHighest.clone();
+	ofxCv::toOf(s7, outputOfWatershedHighestImg);
+	outputOfWatershedHighestImg.update();
 
 
 	mat_mix = mat*0.2 + mat_copy*0.8;
 
-	//ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
-	//outputOfSaliencyMapHighestImg.update();
-	//outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);*/
+	cv::Mat s8 = mat_mix.clone();
+	ofxCv::toOf(s8, outputOfSaliencyMapHighestImg);
+	outputOfSaliencyMapHighestImg.update();
+	outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);
 
 
 	markersSave = markers.clone();
@@ -253,22 +266,24 @@ void ofApp::update() {
 					}
 					else {
 						mat_copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-						//                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
+		                //mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
 					}
 				}
 			}
 
 			saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
 
-			//ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
-			//outputOfWatershedHighestImg.update();
+			cv::Mat s7 = saliencyHighest.clone();
+			ofxCv::toOf(s7, outputOfWatershedHighestImg);
+			outputOfWatershedHighestImg.update();
 
 
 			mat_mix = mat*0.2 + mat_copy*0.8;
 
-			/*ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
-			outputOfSaliencyMapHighestImg.update();*/
-			//        outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
+			cv::Mat s8 = mat_mix.clone();
+			ofxCv::toOf(s8, outputOfSaliencyMapHighestImg);
+			outputOfSaliencyMapHighestImg.update();
+			outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
 
 			enterCountString << "The " << enterCount + 1 << " most saliency place";
 
@@ -288,8 +303,8 @@ void ofApp::draw() {
 	switch (use) {
 	case ConstTools::RELEASE:
 		inputOfImg.draw(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
-		ofxCv::drawMat(mat_mix.clone(), 0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
-		//outputOfSaliencyMapHighestImg.draw(0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
+		//ofxCv::drawMat(mat_mix.clone(), 0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
+		outputOfSaliencyMapHighestImg.draw(0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
 
 		// Label
 		ofDrawBitmapStringHighlight("original", ofGetWidth() / 2 + 20, 20);
@@ -303,22 +318,22 @@ void ofApp::draw() {
 
 	case ConstTools::DEBUG:
 		inputOfImg.draw(0, 0, ofGetWidth() / 3, ofGetHeight() / 3);
-		ofxCv::drawMat(saliencyMap.clone(), ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
-		//outputOfSaliencyImg.draw(ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
-		ofxCv::drawMat(saliencyMap_color.clone(), ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
-		//outputOfHeatMapImg.draw(ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
-		ofxCv::drawMat(sure_bg.clone(), 0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//outputOfBackgroundImg.draw(0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		ofxCv::drawMat(unknown.clone(), ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//outputOfUnknownImg.draw(ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		//ofxCv::drawMat(saliencyMap.clone(), ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfSaliencyImg.draw(ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+		//ofxCv::drawMat(saliencyMap_color.clone(), ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfHeatMapImg.draw(ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+		//ofxCv::drawMat(sure_bg.clone(), 0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfBackgroundImg.draw(0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		//ofxCv::drawMat(unknown.clone(), ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfUnknownImg.draw(ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		//ofxCv::drawMat(wshed.clone(), ofGetWidth() - ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//outputOfWatershedImg.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		ofxCv::drawMat(watershedHighest.clone(), 0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//outputOfWatershedAfterImg.draw(0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		ofxCv::drawMat(saliencyHighest.clone(), ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//outputOfWatershedHighestImg.draw(ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		ofxCv::drawMat(mat_mix.clone(), ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//outputOfSaliencyMapHighestImg.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfWatershedImg.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		//ofxCv::drawMat(watershedHighest.clone(), 0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfWatershedAfterImg.draw(0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		//ofxCv::drawMat(saliencyHighest.clone(), ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfWatershedHighestImg.draw(ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		//ofxCv::drawMat(mat_mix.clone(), ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfSaliencyMapHighestImg.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 
 
 		// Label
