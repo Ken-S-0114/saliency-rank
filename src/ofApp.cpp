@@ -1,5 +1,9 @@
 #include "ofApp.h"
 
+#define SEND_PORT 8001
+#define RECEIVE_PORT 8002
+#define HOST "127.0.0.1"
+
 //--------------------------------------------------------------
 void ofApp::setup() {
 
