@@ -22,4 +22,9 @@ public:
 		SALIENCY
 	};
 
+	enum EyeTrack {
+		STANDBY,
+		TRACKING
+	};
+
 };

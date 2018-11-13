@@ -7,11 +7,15 @@
 void ofApp::setup() {
 
 	receiver.setup(PORT);
+	eyeTrack = ConstTools::STANDBY;
 
 	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
 	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
 
 	eyeGazeMat = cv::Mat::zeros(WINHEIGHT, WINWIDTH, CV_8UC1);
+	cv::Mat s9 = eyeGazeMat.clone();
+	ofxCv::toOf(s9, outputOfEyeGazeImg);
+	outputOfEyeGazeImg.update();
 
 	enterState = false;
 	enterCount = 0;
@@ -242,50 +246,32 @@ void ofApp::update() {
 		receiver.getNextMessage(&m);
 
 		if (m.getAddress() == "/eyeGaze") {
+
 			remoteEyeGazeX = m.getArgAsFloat(0);
 			remoteEyeGazeY = m.getArgAsFloat(1);
 
-			/*ofLogNotice() << "remoteEyeGazeX: " << remoteEyeGazeX;
-			ofLogNotice() << "remoteEyeGazeY: " << remoteEyeGazeY;*/
-
-			//dumpOSC(m);
-
-			/*int remoteEyeGazeIntX = (int)remoteEyeGazeX;
-			int remoteEyeGazeIntY = (int)remoteEyeGazeY;
-
-			if ((0 <= remoteEyeGazeIntX) && (0 <= remoteEyeGazeIntY))
-			{
-				if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
-				{
-					ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
-					ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;
-					if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) < 255)
-					{
-						ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY);
-						eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) + 254;
-						cv::Mat s9 = eyeGazeMat.clone();
-						ofxCv::toOf(s9, outputOfEyeGazeImg);
-						outputOfEyeGazeImg.update();
-					}
-				}
-			}*/
+			ofLogNotice() << "remoteEyeGazeX: " << remoteEyeGazeX;
+			ofLogNotice() << "remoteEyeGazeY: " << remoteEyeGazeY;
 
 			int remoteEyeGazeIntX = (int)remoteEyeGazeX;
 			int remoteEyeGazeIntY = (int)remoteEyeGazeY;
 
-			if ((0 <= remoteEyeGazeIntX) && (0 <= remoteEyeGazeIntY))
+			if (eyeTrack == ConstTools::TRACKING)
 			{
-				if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
+				if ((0 <= remoteEyeGazeIntX) && (0 <= remoteEyeGazeIntY))
 				{
-					ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
-					ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;
-					if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) < 255)
+					if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
 					{
-						ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
-						eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
-						cv::Mat s9 = eyeGazeMat.clone();
-						ofxCv::toOf(s9, outputOfEyeGazeImg);
-						outputOfEyeGazeImg.update();
+						ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
+						ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;
+						if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) < 255)
+						{
+							ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
+							eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
+							cv::Mat s9 = eyeGazeMat.clone();
+							ofxCv::toOf(s9, outputOfEyeGazeImg);
+							outputOfEyeGazeImg.update();
+						}
 					}
 				}
 			}
@@ -420,6 +406,18 @@ void ofApp::draw() {
 		outputOfEyeGazeImg.draw(0, 0, WINWIDTH, WINHEIGHT);
 		//outputOfSaliencyImg.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
 
+		switch (eyeTrack)
+		{
+		case ConstTools::STANDBY:
+			ofDrawBitmapStringHighlight("STANDBY", 20, 20);
+			break;
+		case ConstTools::TRACKING:
+			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
+			break;
+		default:
+			break;
+		}
+
 		break;
 	}
 }
@@ -457,6 +455,16 @@ void ofApp::keyPressed(int key) {
 		enterCount = 0;
 		enterState = true;
 
+		break;
+	case 32:
+		// "Space"‚ð‰Ÿ‚µ‚½Žž:
+		if (eyeTrack == ConstTools::STANDBY)
+		{
+			eyeTrack = ConstTools::TRACKING;
+		}
+		else {
+			eyeTrack = ConstTools::STANDBY;
+		}
 		break;
 		//-------------   ŠÂ‹«   ------------------
 	case 122:
