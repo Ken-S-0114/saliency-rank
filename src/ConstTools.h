@@ -19,10 +19,10 @@ public:
 	enum Use {
 		RELEASE,
 		DEBUG,
-		SALIENCY
+		EYETRACK
 	};
 
-	enum EyeTrack {
+	enum EyeTrackState {
 		STANDBY,
 		TRACKING
 	};

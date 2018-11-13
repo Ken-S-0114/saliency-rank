@@ -7,7 +7,7 @@
 void ofApp::setup() {
 
 	receiver.setup(PORT);
-	eyeTrack = ConstTools::STANDBY;
+	eyeTrackState = ConstTools::STANDBY;
 
 	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
 	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
@@ -26,8 +26,6 @@ void ofApp::setup() {
 	ConstTools::OutputFileName outputfileName;
 	inputOfImg.load(inputFileName.lenna);
 	inputOfImg.update();
-
-	//    saliencyCreated(inputOfImg);
 
 	cv::Mat mat_gray, mat_gaus, saliencyMap_norm;
 
@@ -72,8 +70,6 @@ void ofApp::setup() {
 	ofxCv::toOf(s2, outputOfHeatMapImg);
 	outputOfHeatMapImg.update();
 	outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
-
-	//    watershedCreated(saliencyMap.clone());
 
 	cv::Mat thresh;
 	cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
@@ -140,7 +136,6 @@ void ofApp::setup() {
 	saliencyHighest = cv::Mat::zeros(mat.size(), CV_8UC3);
 
 	cv::Mat wshed(markers.size(), CV_8UC3);
-	//    std::vector<cv::Vec3b> colorTab;
 
 	std::vector<int> saliencyPoint(compCount, 0);
 
@@ -256,24 +251,26 @@ void ofApp::update() {
 			int remoteEyeGazeIntX = (int)remoteEyeGazeX;
 			int remoteEyeGazeIntY = (int)remoteEyeGazeY;
 
-			if (eyeTrack == ConstTools::TRACKING)
+			if (eyeTrackState == ConstTools::TRACKING)
 			{
-				if ((0 <= remoteEyeGazeIntX) && (0 <= remoteEyeGazeIntY))
+				if ((0 > remoteEyeGazeIntX) || (0 > remoteEyeGazeIntY))
 				{
+					return;
+				}
 					if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
 					{
 						ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
 						ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;
-						if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) < 255)
+						if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) >= 255)
 						{
-							ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
-							eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
-							cv::Mat s9 = eyeGazeMat.clone();
-							ofxCv::toOf(s9, outputOfEyeGazeImg);
-							outputOfEyeGazeImg.update();
+							return;
 						}
+						ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
+						eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
+						cv::Mat s9 = eyeGazeMat.clone();
+						ofxCv::toOf(s9, outputOfEyeGazeImg);
+						outputOfEyeGazeImg.update();
 					}
-				}
 			}
 
 		}
@@ -287,18 +284,6 @@ void ofApp::update() {
 		int maxValue = *std::max_element(saliencyPointSave.begin(), saliencyPointSave.end());
 
 		if (maxValue != 0) {
-
-			//        for(int i = 0; i < markersSave.rows; i++ ){
-			//            for(int j = 0; j < markersSave.cols; j++ )
-			//            {
-			//                //            ofLogNotice()<<"index: "<<index;
-			//                int index = markersSave.at<int>(i,j);
-			//
-			//                if( index != -1 && index > 0 && index != 1 ) {
-			//                    saliencyPointSave[index-1] += (int)saliencyMap.at<uchar>(i, j);
-			//                }
-			//            }
-			//        }
 
 			for (int i = 0; i<saliencyPointSave.size(); i++) {
 				ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPointSave[i];
@@ -365,7 +350,7 @@ void ofApp::draw() {
 		ofDrawBitmapStringHighlight("saliencyMap-watershed", ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 20);
 
 		// Label
-		ofDrawBitmapStringHighlight("KeyPressed\n\n・Z: RELEASE\n・X: DEBUG\n・C: SALIENCY\n\n・Enter: Next HighSaliency Place\n・Delete: Reset", ofGetWidth() - ofGetWidth() / 4 - 40, 20);
+		ofDrawBitmapStringHighlight("SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n\n  *Enter: Next HighSaliency Place  \n  *Delete: Reset", ofGetWidth() - ofGetWidth() / 4 - 40, 20);
 
 		ofDrawBitmapStringHighlight(enterCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
 		break;
@@ -401,15 +386,15 @@ void ofApp::draw() {
 		ofDrawBitmapStringHighlight("watershed-highest", ofGetWidth() / 3 + 20, ofGetHeight() - ofGetHeight() / 3 + 20);
 		ofDrawBitmapStringHighlight("saliencyMap-highest", ofGetWidth() - ofGetWidth() / 3 + 20, ofGetHeight() - ofGetHeight() / 3 + 20);
 		break;
-	case ConstTools::SALIENCY:
+	case ConstTools::EYETRACK:
 		//ofxCv::drawMat(eyeGazeMat.clone(),0,0);
 		outputOfEyeGazeImg.draw(0, 0, WINWIDTH, WINHEIGHT);
 		//outputOfSaliencyImg.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
 
-		switch (eyeTrack)
+		switch (eyeTrackState)
 		{
 		case ConstTools::STANDBY:
-			ofDrawBitmapStringHighlight("STANDBY", 20, 20);
+			ofDrawBitmapStringHighlight("STANDBY: Please Space Key", 20, 20);
 			break;
 		case ConstTools::TRACKING:
 			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
@@ -430,19 +415,6 @@ void ofApp::keyPressed(int key) {
 	case 13:
 		// "Enter"を押した時:
 
-		//            if (!saliencyPointSave.empty()) {
-		//                saliencyPointSave.clear();
-		//            }
-		//            for(int i = 0; i < markersSave.rows; i++ ){
-		//                for(int j = 0; j < markersSave.cols; j++ )
-		//                {
-		//                    int index = markersSave.at<int>(i,j);
-		//                    if( index == saliencyPointMaxIndex+1 ) {
-		//                        markersSave.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-		//                    }
-		//                }
-		//            }
-
 		saliencyPointSave[saliencyPointMaxIndex] = 0;
 
 		enterCount++;
@@ -458,12 +430,12 @@ void ofApp::keyPressed(int key) {
 		break;
 	case 32:
 		// "Space"を押した時:
-		if (eyeTrack == ConstTools::STANDBY)
+		if (eyeTrackState == ConstTools::STANDBY)
 		{
-			eyeTrack = ConstTools::TRACKING;
+			eyeTrackState = ConstTools::TRACKING;
 		}
 		else {
-			eyeTrack = ConstTools::STANDBY;
+			eyeTrackState = ConstTools::STANDBY;
 		}
 		break;
 		//-------------   環境   ------------------
@@ -477,7 +449,7 @@ void ofApp::keyPressed(int key) {
 		break;
 	case 99:
 		// "C"を押した時: saliency
-		use = ConstTools::SALIENCY;
+		use = ConstTools::EYETRACK;
 		break;
 	}
 

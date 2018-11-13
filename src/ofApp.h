@@ -84,5 +84,5 @@ private:
 	void dumpOSC(ofxOscMessage m);
 
 	cv::Mat eyeGazeMat;
-	ConstTools::EyeTrack eyeTrack;
+	ConstTools::EyeTrackState eyeTrackState;
 };
