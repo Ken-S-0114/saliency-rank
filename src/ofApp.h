@@ -45,7 +45,7 @@ private:
 	cv::Mat mat, mat_copy, mat_mix;
 
 	ofImage outputOfSaliencyImg, outputOfHeatMapImg;
-	ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg;
+	ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
 
 	cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap, saliencyMap_color;
 
@@ -77,4 +77,5 @@ private:
 
 	void dumpOSC(ofxOscMessage m);
 
+	cv::Mat eyeGazeMat;
 };

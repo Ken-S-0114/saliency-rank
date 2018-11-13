@@ -8,6 +8,11 @@ void ofApp::setup() {
 
 	receiver.setup(PORT);
 
+	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
+	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
+
+	eyeGazeMat = cv::Mat::zeros(ofGetScreenWidth(), ofGetScreenHeight(), CV_8UC1);
+
 	enterState = false;
 	enterCount = 0;
 
@@ -240,7 +245,24 @@ void ofApp::update() {
 			remoteEyeGazeX = m.getArgAsFloat(0);
 			remoteEyeGazeY = m.getArgAsFloat(1);
 
-			dumpOSC(m);
+			//dumpOSC(m);
+			int remoteEyeGazeIntX = (int)remoteEyeGazeX;
+			int remoteEyeGazeIntY = (int)remoteEyeGazeY;
+
+			ofLogNotice() << "remoteEyeGazeIntX: " << remoteEyeGazeIntX;
+			ofLogNotice() << "remoteEyeGazeIntY: " << remoteEyeGazeIntY;
+
+			if (0 <= remoteEyeGazeIntX <= ofGetScreenWidth() && 0 <= remoteEyeGazeIntY <= ofGetScreenHeight())
+			{
+				if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) < 255)
+				{
+					eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) + 1;
+					cv::Mat s9 = eyeGazeMat.clone();
+					ofxCv::toOf(s9, outputOfEyeGazeImg);
+					outputOfEyeGazeImg.update();
+				}
+			}
+
 		}
 	}
 
@@ -366,8 +388,9 @@ void ofApp::draw() {
 		ofDrawBitmapStringHighlight("saliencyMap-highest", ofGetWidth() - ofGetWidth() / 3 + 20, ofGetHeight() - ofGetHeight() / 3 + 20);
 		break;
 	case ConstTools::SALIENCY:
-		inputOfImg.draw(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
-		outputOfSaliencyImg.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
+		//ofxCv::drawMat(eyeGazeMat.clone(),0,0);
+		outputOfEyeGazeImg.draw(0, 0);
+		//outputOfSaliencyImg.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
 
 		break;
 	}
