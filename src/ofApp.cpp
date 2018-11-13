@@ -11,7 +11,7 @@ void ofApp::setup() {
 	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
 	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
 
-	eyeGazeMat = cv::Mat::zeros(ofGetScreenWidth(), ofGetScreenHeight(), CV_8UC1);
+	eyeGazeMat = cv::Mat::zeros(WINHEIGHT, WINWIDTH, CV_8UC1);
 
 	enterState = false;
 	enterCount = 0;
@@ -245,25 +245,53 @@ void ofApp::update() {
 			remoteEyeGazeX = m.getArgAsFloat(0);
 			remoteEyeGazeY = m.getArgAsFloat(1);
 
+			/*ofLogNotice() << "remoteEyeGazeX: " << remoteEyeGazeX;
+			ofLogNotice() << "remoteEyeGazeY: " << remoteEyeGazeY;*/
+
 			//dumpOSC(m);
+
+			/*int remoteEyeGazeIntX = (int)remoteEyeGazeX;
+			int remoteEyeGazeIntY = (int)remoteEyeGazeY;
+
+			if ((0 <= remoteEyeGazeIntX) && (0 <= remoteEyeGazeIntY))
+			{
+				if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
+				{
+					ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
+					ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;
+					if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) < 255)
+					{
+						ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY);
+						eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) + 254;
+						cv::Mat s9 = eyeGazeMat.clone();
+						ofxCv::toOf(s9, outputOfEyeGazeImg);
+						outputOfEyeGazeImg.update();
+					}
+				}
+			}*/
+
 			int remoteEyeGazeIntX = (int)remoteEyeGazeX;
 			int remoteEyeGazeIntY = (int)remoteEyeGazeY;
 
-			ofLogNotice() << "remoteEyeGazeIntX: " << remoteEyeGazeIntX;
-			ofLogNotice() << "remoteEyeGazeIntY: " << remoteEyeGazeIntY;
-
-			if (0 <= remoteEyeGazeIntX <= ofGetScreenWidth() && 0 <= remoteEyeGazeIntY <= ofGetScreenHeight())
+			if ((0 <= remoteEyeGazeIntX) && (0 <= remoteEyeGazeIntY))
 			{
-				if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) < 255)
+				if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
 				{
-					eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntX, remoteEyeGazeIntY) + 1;
-					cv::Mat s9 = eyeGazeMat.clone();
-					ofxCv::toOf(s9, outputOfEyeGazeImg);
-					outputOfEyeGazeImg.update();
+					ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
+					ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;
+					if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) < 255)
+					{
+						ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
+						eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
+						cv::Mat s9 = eyeGazeMat.clone();
+						ofxCv::toOf(s9, outputOfEyeGazeImg);
+						outputOfEyeGazeImg.update();
+					}
 				}
 			}
 
 		}
+
 	}
 
 	if (enterState) {
@@ -389,7 +417,7 @@ void ofApp::draw() {
 		break;
 	case ConstTools::SALIENCY:
 		//ofxCv::drawMat(eyeGazeMat.clone(),0,0);
-		outputOfEyeGazeImg.draw(0, 0);
+		outputOfEyeGazeImg.draw(0, 0, WINWIDTH, WINHEIGHT);
 		//outputOfSaliencyImg.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
 
 		break;

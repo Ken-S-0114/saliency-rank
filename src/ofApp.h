@@ -19,6 +19,12 @@
 #include "saliencyTools.h"
 #include "constTools.h"
 
+#define MACWIDTH 1024
+#define MACHEIGHT 768
+
+#define WINWIDTH 1920
+#define WINHEIGHT 1080
+
 class ofApp : public ofBaseApp {
 
 public:
