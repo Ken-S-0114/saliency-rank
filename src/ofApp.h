@@ -4,6 +4,7 @@
 #include "ofxOpenCv.h"
 #include "ofxCv.h"
 #include "ofxGui.h"
+#include "ofxOsc.h"
 
 #include "saliencySpecializedClasses.hpp"
 #include "opencv2/opencv.hpp"
@@ -38,6 +39,7 @@ public:
 	void gotMessage(ofMessage msg);
 
 
+private:
 	ofImage inputOfImg;
 
 	cv::Mat mat, mat_copy, mat_mix;
@@ -69,5 +71,10 @@ public:
 	std::stringstream enterCountString;
 
 	ConstTools::Use use;
+
+	ofxOscReceiver receiver;
+	float remoteEyeGazeX, remoteEyeGazeY;
+
+	void dumpOSC(ofxOscMessage m);
 
 };
