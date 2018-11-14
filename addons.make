@@ -1,5 +1,5 @@
 ofxCv
 ofxGui
-ofxHeatMap
+ofxHeatMap-0.8.4
 ofxOpenCv-contrib
 ofxOsc

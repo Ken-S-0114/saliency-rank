@@ -279,6 +279,7 @@ void ofApp::update() {
 		}
 	}
 
+	//heatmap.update();
 	heatmap.update(OFX_HEATMAP_CS_SPECTRAL_SOFT);
 
 	if (enterState) {
@@ -515,6 +516,7 @@ void ofApp::keyReleased(int key) {
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y) {
+	//heatmap.addPoint(x, y);
 
 }
 
