@@ -17,6 +17,8 @@ void ofApp::setup() {
 	ofxCv::toOf(s9, outputOfEyeGazeImg);
 	outputOfEyeGazeImg.update();
 
+	heatmap.setup(WINWIDTH, WINHEIGHT, 32);
+
 	enterState = false;
 	enterCount = 0;
 
@@ -270,6 +272,9 @@ void ofApp::update() {
 						cv::Mat s9 = eyeGazeMat.clone();
 						ofxCv::toOf(s9, outputOfEyeGazeImg);
 						outputOfEyeGazeImg.update();
+
+						heatmap.addPoint(remoteEyeGazeIntX, remoteEyeGazeIntY);
+						heatmap.update(OFX_HEATMAP_CS_SPECTRAL_SOFT);
 					}
 			}
 
@@ -351,7 +356,6 @@ void ofApp::draw() {
 
 		// Label
 		ofDrawBitmapStringHighlight("SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n\n  *Enter: Next HighSaliency Place  \n  *Delete: Reset", ofGetWidth() - ofGetWidth() / 4 - 40, 20);
-
 		ofDrawBitmapStringHighlight(enterCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
 		break;
 
@@ -414,7 +418,6 @@ void ofApp::keyPressed(int key) {
 	switch (key) {
 	case 13:
 		// "Enter"‚ð‰Ÿ‚µ‚½Žž:
-
 		saliencyPointSave[saliencyPointMaxIndex] = 0;
 
 		enterCount++;
@@ -428,7 +431,7 @@ void ofApp::keyPressed(int key) {
 		enterState = true;
 
 		break;
-	case 32:
+	case ' ':
 		// "Space"‚ð‰Ÿ‚µ‚½Žž:
 		if (eyeTrackState == ConstTools::STANDBY)
 		{
@@ -439,17 +442,21 @@ void ofApp::keyPressed(int key) {
 		}
 		break;
 		//-------------   ŠÂ‹«   ------------------
-	case 122:
+	case 'z':
 		// "Z"‚ð‰Ÿ‚µ‚½Žž: release
 		use = ConstTools::RELEASE;
 		break;
-	case 120:
+	case 'x':
 		// "X"‚ð‰Ÿ‚µ‚½Žž: debug
 		use = ConstTools::DEBUG;
 		break;
-	case 99:
-		// "C"‚ð‰Ÿ‚µ‚½Žž: saliency
+	case 'c':
+		// "C"‚ð‰Ÿ‚µ‚½Žž: eyeTrack
 		use = ConstTools::EYETRACK;
+		break;
+	case 'v':
+		// "V"‚ð‰Ÿ‚µ‚½Žž: eyeTrackHeatMap
+		use = ConstTools::EYETRACKHEATMAP;
 		break;
 	}
 

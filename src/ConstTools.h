@@ -19,7 +19,8 @@ public:
 	enum Use {
 		RELEASE,
 		DEBUG,
-		EYETRACK
+		EYETRACK,
+		EYETRACKHEATMAP
 	};
 
 	enum EyeTrackState {

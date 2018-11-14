@@ -5,6 +5,7 @@
 #include "ofxCv.h"
 #include "ofxGui.h"
 #include "ofxOsc.h"
+#include "ofxHeatMap.h"
 
 #include "saliencySpecializedClasses.hpp"
 #include "opencv2/opencv.hpp"
@@ -85,4 +86,6 @@ private:
 
 	cv::Mat eyeGazeMat;
 	ConstTools::EyeTrackState eyeTrackState;
+
+	ofxHeatMap heatmap;
 };
