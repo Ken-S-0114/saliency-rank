@@ -274,13 +274,15 @@ void ofApp::update() {
 						outputOfEyeGazeImg.update();
 
 						heatmap.addPoint(remoteEyeGazeIntX, remoteEyeGazeIntY);
-						heatmap.update(OFX_HEATMAP_CS_SPECTRAL_SOFT);
+
 					}
 			}
 
 		}
 
 	}
+
+	heatmap.update(OFX_HEATMAP_CS_SPECTRAL_SOFT);
 
 	if (enterState) {
 		enterCountString.str("");
@@ -357,6 +359,8 @@ void ofApp::draw() {
 		// Label
 		ofDrawBitmapStringHighlight("SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n\n  *Enter: Next HighSaliency Place  \n  *Delete: Reset", ofGetWidth() - ofGetWidth() / 4 - 40, 20);
 		ofDrawBitmapStringHighlight(enterCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
+
+		ofSetWindowTitle("RELEASE");
 		break;
 
 	case ConstTools::DEBUG:
@@ -389,11 +393,38 @@ void ofApp::draw() {
 		ofDrawBitmapStringHighlight("watershed-after", 20, ofGetHeight() - ofGetHeight() / 3 + 20);
 		ofDrawBitmapStringHighlight("watershed-highest", ofGetWidth() / 3 + 20, ofGetHeight() - ofGetHeight() / 3 + 20);
 		ofDrawBitmapStringHighlight("saliencyMap-highest", ofGetWidth() - ofGetWidth() / 3 + 20, ofGetHeight() - ofGetHeight() / 3 + 20);
+		
+		ofSetWindowTitle("DEBUG"); 
+		
 		break;
+
 	case ConstTools::EYETRACK:
 		//ofxCv::drawMat(eyeGazeMat.clone(),0,0);
 		outputOfEyeGazeImg.draw(0, 0, WINWIDTH, WINHEIGHT);
 		//outputOfSaliencyImg.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
+
+		ofSetWindowTitle("EYETRACK");
+
+		switch (eyeTrackState)
+		{
+		case ConstTools::STANDBY:
+			ofDrawBitmapStringHighlight("STANDBY: Please Space Key", 20, 20);
+			break;
+		case ConstTools::TRACKING:
+			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
+			break;
+		default:
+			break;
+		}
+
+		break;
+
+	case ConstTools::EYETRACKHEATMAP:
+		ofBackground(0, 0, 0);
+		ofSetColor(255, 255);
+		heatmap.draw(0, 0);
+
+		ofSetWindowTitle("EYETRACKHEATMAP");
 
 		switch (eyeTrackState)
 		{
@@ -437,7 +468,8 @@ void ofApp::keyPressed(int key) {
 		{
 			eyeTrackState = ConstTools::TRACKING;
 		}
-		else {
+		else 
+		{
 			eyeTrackState = ConstTools::STANDBY;
 		}
 		break;
