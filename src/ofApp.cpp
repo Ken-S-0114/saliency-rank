@@ -455,10 +455,13 @@ void ofApp::keyPressed(int key) {
 		break;
 	case ' ':
 		// "Space"‚ð‰Ÿ‚µ‚½Žž:
-		if (eyeTrackState == ConstTools::STANDBY) {
-			eyeTrackState = ConstTools::TRACKING;
-		} else {
-			eyeTrackState = ConstTools::STANDBY;
+		if ((use == ConstTools::EYETRACK) || (use == ConstTools::EYETRACKHEATMAP))
+		{
+			if (eyeTrackState == ConstTools::STANDBY) {
+				eyeTrackState = ConstTools::TRACKING;
+			} else {
+				eyeTrackState = ConstTools::STANDBY;
+			}
 		}
 		break;
 		//-------------   ŠÂ‹«   ------------------
