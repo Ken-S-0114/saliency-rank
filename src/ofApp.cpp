@@ -52,7 +52,6 @@ void ofApp::setup() {
 	cv::Mat s1 = saliencyMap.clone();
 	ofxCv::toOf(s1, outputOfSaliencyImg);
 
-
 	outputOfSaliencyImg.update();
     outputOfSaliencyImg.save("outputOfSaliencyImg.png");
 
@@ -215,7 +214,6 @@ void ofApp::setup() {
 	ofxCv::toOf(s7, outputOfWatershedHighestImg);
 	outputOfWatershedHighestImg.update();
 
-
 	mat_mix = mat*0.2 + mat_copy*0.8;
 
 	cv::Mat s8 = mat_mix.clone();
@@ -223,10 +221,10 @@ void ofApp::setup() {
 	outputOfSaliencyMapHighestImg.update();
 	outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);
 
-
 	markersSave = markers.clone();
 
-	if (!saliencyPoint.empty()) {
+	if (!saliencyPoint.empty()) 
+	{
 		saliencyPointSave = saliencyPoint;
 		saliencyPointBackUp = saliencyPoint;
 		saliencyPoint.clear();
@@ -413,8 +411,6 @@ void ofApp::draw() {
 		case ConstTools::TRACKING:
 			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
 			break;
-		default:
-			break;
 		}
 
 		break;
@@ -434,8 +430,6 @@ void ofApp::draw() {
 		case ConstTools::TRACKING:
 			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
 			break;
-		default:
-			break;
 		}
 
 		break;
@@ -450,26 +444,20 @@ void ofApp::keyPressed(int key) {
 	case 13:
 		// "Enter"‚ð‰Ÿ‚µ‚½Žž:
 		saliencyPointSave[saliencyPointMaxIndex] = 0;
-
 		enterCount++;
 		enterState = true;
-
 		break;
 	case 8:
 		// "BackSpace"‚ð‰Ÿ‚µ‚½Žž:
 		saliencyPointSave = saliencyPointBackUp;
 		enterCount = 0;
 		enterState = true;
-
 		break;
 	case ' ':
 		// "Space"‚ð‰Ÿ‚µ‚½Žž:
-		if (eyeTrackState == ConstTools::STANDBY)
-		{
+		if (eyeTrackState == ConstTools::STANDBY) {
 			eyeTrackState = ConstTools::TRACKING;
-		}
-		else 
-		{
+		} else {
 			eyeTrackState = ConstTools::STANDBY;
 		}
 		break;
