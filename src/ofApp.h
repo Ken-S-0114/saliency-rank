@@ -53,7 +53,7 @@ private:
 
 	ofImage outputOfSaliencyImg, outputOfHeatMapImg;
 	ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
-
+	//ofImage outputOfEyeGazeHeatMap;
 	cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap, saliencyMap_color;
 
 	std::vector<cv::Vec3b> colorTab;
