@@ -54,7 +54,7 @@ void ofApp::setup() {
 
 
 	outputOfSaliencyImg.update();
-    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
+    //outputOfSaliencyImg.save("outputOfSaliencyImg.png");
 
 	cv::Mat saliency_copy = saliencyMap.clone();
 
@@ -380,7 +380,6 @@ void ofApp::draw() {
 		//ofxCv::drawMat(mat_mix.clone(), ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfSaliencyMapHighestImg.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 
-
 		// Label
 		ofDrawBitmapStringHighlight("original", 20, 20);
 		ofDrawBitmapStringHighlight("saliencyMap", ofGetWidth() / 3 + 20, 20);
@@ -411,8 +410,6 @@ void ofApp::draw() {
 		case ConstTools::TRACKING:
 			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
 			break;
-		default:
-			break;
 		}
 
 		break;
@@ -431,8 +428,6 @@ void ofApp::draw() {
 			break;
 		case ConstTools::TRACKING:
 			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
-			break;
-		default:
 			break;
 		}
 
@@ -516,7 +511,6 @@ void ofApp::keyReleased(int key) {
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y) {
-	//heatmap.addPoint(x, y);
 
 }
 
