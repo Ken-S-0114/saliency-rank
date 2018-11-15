@@ -6,21 +6,25 @@ public:
 
 	struct InputFileName {
 		std::string lenna = "lenna.jpg";
-		//std::string christmas = "sample.jpg";
-		//std::string cardboard = "sample2.jpg";
+		//std::string lenna = "lenna-mac.png";
+		std::string mountain = "mountain.jpg";
+		std::string sea = "sea.jpg";
+		std::string sunflower = "sunflower.jpg";
 	};
 
 	struct OutputFileName {
 		std::string outputOfSaliencyImg = "outputOfSaliencyImg.png";
 		std::string outputOfWatershedAfterImg = "outputOfWatershedAfterImg.png";
 		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg.png";
+		std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg.png";
 	};
 
 	enum Use {
 		RELEASE,
 		DEBUG,
 		EYETRACK,
-		EYETRACKHEATMAP
+		EYETRACKHEATMAP,
+		IMAGEVIEW
 	};
 
 	enum EyeTrackState {

@@ -24,8 +24,6 @@ void ofApp::setup() {
 
 	enterCountString << "The " << enterCount + 1 << " most saliency place";
 
-	ConstTools::InputFileName inputFileName;
-	ConstTools::OutputFileName outputfileName;
 	inputOfImg.load(inputFileName.lenna);
 	inputOfImg.update();
 
@@ -37,7 +35,7 @@ void ofApp::setup() {
 
 	cvtColor(mat.clone(), mat_gray, cv::COLOR_BGR2GRAY);
 
-	cv::GaussianBlur(mat_gray.clone(), mat_gaus, cv::Size(5, 5), 1, 1);
+	cv::GaussianBlur(mat_gray.clone(), mat_gaus, cv::Size(3, 3), 1, 1);
 
 	cv::Ptr<cv::saliency::Saliency> saliencyAlgorithm;
 	saliencyAlgorithm = cv::saliency::StaticSaliencySpectralResidual::create();
@@ -54,7 +52,6 @@ void ofApp::setup() {
 
 
 	outputOfSaliencyImg.update();
-    //outputOfSaliencyImg.save("outputOfSaliencyImg.png");
 
 	cv::Mat saliency_copy = saliencyMap.clone();
 
@@ -89,7 +86,7 @@ void ofApp::setup() {
 	cv::Mat sure_fg;
 
 	cv::minMaxLoc(dist_transform, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc);
-	cv::threshold(dist_transform, sure_fg, 0.5*minMax.max_val, 255, 0);
+	cv::threshold(dist_transform.clone(), sure_fg, 0.3*minMax.max_val, 255, 0);
 
 	dist_transform = dist_transform / minMax.max_val;
 
@@ -114,14 +111,16 @@ void ofApp::setup() {
 	cv::findContours(sure_fg, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
 	if (contours.empty()) return;
 
-	//    ofLogNotice()<<"contours: "<<&contours;
+	ofLogNotice()<<"contours: "<<&contours;
 
 	cv::Mat markers = cv::Mat::zeros(sure_fg.rows, sure_fg.cols, CV_32SC1);
 
 	int idx = 0;
-	for (; idx >= 0; idx = hierarchy[idx][0], compCount++)
+	for (; idx >= 0; idx = hierarchy[idx][0], compCount++) {
 		cv::drawContours(markers, contours, idx, cv::Scalar::all(compCount + 1), -1, 8, hierarchy, INT_MAX);
+	}
 	markers = markers + 1;
+
 
 	for (int i = 0; i<markers.rows; i++) {
 		for (int j = 0; j<markers.cols; j++) {
@@ -198,7 +197,7 @@ void ofApp::setup() {
 	}
 
 	cvtColor(saliencyMap.clone(), imgG, cv::COLOR_GRAY2BGR);
-	wshed = wshed*0.5 + imgG*0.5;
+	//wshed = wshed*0.5 + imgG*0.5;
 	watershedHighest = watershedHighest*0.5 + imgG*0.5;
 	saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
 
@@ -279,8 +278,10 @@ void ofApp::update() {
 		}
 	}
 
-	//heatmap.update();
-	heatmap.update(OFX_HEATMAP_CS_SPECTRAL_SOFT);
+	if (eyeTrackState == ConstTools::TRACKING)
+	{
+		heatmap.update(OFX_HEATMAP_CS_SPECTRAL_SOFT);
+	}
 
 	if (enterState) {
 		enterCountString.str("");
@@ -432,6 +433,12 @@ void ofApp::draw() {
 		}
 
 		break;
+
+	case ConstTools::IMAGEVIEW:
+		inputOfImg.draw(0, 0, ofGetWidth(), ofGetHeight());
+		ofSetWindowTitle("IMAGEVIEW");
+		break;
+
 	}
 }
 
@@ -457,7 +464,7 @@ void ofApp::keyPressed(int key) {
 		break;
 	case ' ':
 		// "Space"‚ð‰Ÿ‚µ‚½Žž:
-		if ((use == ConstTools::EYETRACK) || (use == ConstTools::EYETRACKHEATMAP))
+		if ((use == ConstTools::EYETRACK) || (use == ConstTools::EYETRACKHEATMAP) || (use == ConstTools::IMAGEVIEW))
 		{
 			if (eyeTrackState == ConstTools::STANDBY) {
 				eyeTrackState = ConstTools::TRACKING;
@@ -466,6 +473,16 @@ void ofApp::keyPressed(int key) {
 				eyeTrackState = ConstTools::STANDBY;
 			}
 		}
+		break;
+
+	case 'g':
+		outputOfEyeGazeHeatMap = heatmap.getImage();
+		outputOfEyeGazeHeatMap.update();
+		outputOfSaliencyImg.save(outputfileName.outputOfEyeGazeHeatMapImg);
+		break;
+
+	case 'r':
+		heatmap.clear();
 		break;
 		//-------------   ŠÂ‹«   ------------------
 	case 'z':
@@ -483,6 +500,10 @@ void ofApp::keyPressed(int key) {
 	case 'v':
 		// "V"‚ð‰Ÿ‚µ‚½Žž: eyeTrackHeatMap
 		use = ConstTools::EYETRACKHEATMAP;
+		break;
+	case 'b':
+		// "B"‚ð‰Ÿ‚µ‚½Žž: imageView
+		use = ConstTools::IMAGEVIEW;
 		break;
 	}
 
