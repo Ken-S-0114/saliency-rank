@@ -3,35 +3,10 @@
 #define PORT 8000
 #define HOST "127.0.0.1"
 
-//--------------------------------------------------------------
-void ofApp::setup() {
-
-	receiver.setup(PORT);
-	eyeTrackState = ConstTools::STANDBY;
-
-	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
-	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
-
-	eyeGazeMat = cv::Mat::zeros(WINHEIGHT, WINWIDTH, CV_8UC1);
-	cv::Mat s9 = eyeGazeMat.clone();
-	ofxCv::toOf(s9, outputOfEyeGazeImg);
-	outputOfEyeGazeImg.update();
-
-	heatmap.setup(WINWIDTH, WINHEIGHT, 32);
-
-	enterState = false;
-	enterCount = 0;
-
-	enterCountString << "The " << enterCount + 1 << " most saliency place";
-
-	inputOfImg.load(inputFileName.lenna);
-	inputOfImg.update();
-
+void ofApp::createSaliencyMap(cv::Mat img) {
 	cv::Mat mat_gray, mat_gaus, saliencyMap_norm;
 
-	mat = ofxCv::toCv(inputOfImg);
-
-	mat_copy = mat.clone();
+	mat_copy = img.clone();
 
 	cvtColor(mat.clone(), mat_gray, cv::COLOR_BGR2GRAY);
 
@@ -68,6 +43,77 @@ void ofApp::setup() {
 	ofxCv::toOf(s2, outputOfHeatMapImg);
 	outputOfHeatMapImg.update();
 	outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
+}
+//--------------------------------------------------------------
+void ofApp::setup() {
+
+	receiver.setup(PORT);
+	eyeTrackState = ConstTools::STANDBY;
+
+	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
+	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
+
+	eyeGazeMat = cv::Mat::zeros(WINHEIGHT, WINWIDTH, CV_8UC1);
+	cv::Mat s9 = eyeGazeMat.clone();
+	ofxCv::toOf(s9, outputOfEyeGazeImg);
+	outputOfEyeGazeImg.update();
+
+	heatmap.setup(WINWIDTH, WINHEIGHT, 32);
+
+	enterState = false;
+	enterCount = 0;
+
+	enterCountString << "The " << enterCount + 1 << " most saliency place";
+
+	inputOfImg.load(inputFileName.lenna);
+	inputOfImg.update();
+
+	mat = ofxCv::toCv(inputOfImg);
+	mat_backup = mat.clone();
+
+	createSaliencyMap(mat);
+
+	//cv::Mat mat_gray, mat_gaus, saliencyMap_norm;
+
+	//mat = ofxCv::toCv(inputOfImg);
+
+	//mat_copy = mat.clone();
+
+	//cvtColor(mat.clone(), mat_gray, cv::COLOR_BGR2GRAY);
+
+	//cv::GaussianBlur(mat_gray.clone(), mat_gaus, cv::Size(3, 3), 1, 1);
+
+	//cv::Ptr<cv::saliency::Saliency> saliencyAlgorithm;
+	//saliencyAlgorithm = cv::saliency::StaticSaliencySpectralResidual::create();
+	//saliencyAlgorithm->computeSaliency(mat_gaus.clone(), saliencyMap_SPECTRAL_RESIDUAL);
+
+	//cv::normalize(saliencyMap_SPECTRAL_RESIDUAL.clone(), saliencyMap_norm, 0.0, 255.0, cv::NORM_MINMAX);
+
+	//saliencyMap_norm.convertTo(saliencyMap, CV_8UC3);
+
+	////    minMaxLoc(saliencyMap, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc, cv::Mat());
+
+	//cv::Mat s1 = saliencyMap.clone();
+	//ofxCv::toOf(s1, outputOfSaliencyImg);
+
+	//outputOfSaliencyImg.update();
+
+	//cv::Mat saliency_copy = saliencyMap.clone();
+
+	//for (int x = 0; x < saliency_copy.rows; ++x) {
+	//	for (int y = 0; y < saliency_copy.cols; ++y) {
+	//		saliency_copy.at<uchar>(x, y) = 255 - (int)saliency_copy.at<uchar>(x, y);
+	//		//ofLogNotice()<<"(int)saliency_copy.at<uchar>("<<x<<","<<y<< ") : "<<(int)saliency_copy.at<uchar>( x, y );
+	//	}
+	//}
+
+	//cv::applyColorMap(saliency_copy.clone(), saliencyMap_color, cv::COLORMAP_JET);
+
+	//cv::Mat s2 = saliencyMap_color.clone();
+
+	//ofxCv::toOf(s2, outputOfHeatMapImg);
+	//outputOfHeatMapImg.update();
+	//outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
 
 	cv::Mat thresh;
 	//cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
@@ -86,7 +132,7 @@ void ofApp::setup() {
 	cv::Mat sure_fg;
 
 	cv::minMaxLoc(dist_transform, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc);
-	cv::threshold(dist_transform.clone(), sure_fg, 0.4*minMax.max_val, 255, 0);
+	cv::threshold(dist_transform.clone(), sure_fg, 0.3*minMax.max_val, 255, 0);
 
 	dist_transform = dist_transform / minMax.max_val;
 
@@ -217,8 +263,8 @@ void ofApp::setup() {
 	ofxCv::toOf(s7, outputOfWatershedHighestImg);
 	outputOfWatershedHighestImg.update();
 
-
-	mat_mix = mat*0.2 + mat_copy*0.8;
+	mat_mix = mat_backup*0.2 + mat_copy*0.8;
+	//mat_mix = mat*0.2 + mat_copy*0.8;
 
 	cv::Mat s8 = mat_mix.clone();
 	ofxCv::toOf(s8, outputOfSaliencyMapHighestImg);
@@ -303,7 +349,8 @@ void ofApp::update() {
 			ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
 
 			saliencyHighest = cv::Mat::zeros(saliencyHighest.size(), CV_8UC3);
-			mat_copy = mat.clone();
+			//mat_copy = mat.clone();
+			mat_copy = mat_backup.clone();
 
 			for (int i = 0; i < markersSave.rows; i++) {
 				for (int j = 0; j < markersSave.cols; j++)
@@ -325,8 +372,8 @@ void ofApp::update() {
 			ofxCv::toOf(s7, outputOfWatershedHighestImg);
 			outputOfWatershedHighestImg.update();
 
-
-			mat_mix = mat*0.2 + mat_copy*0.8;
+			//mat_mix = mat*0.2 + mat_copy*0.8;
+			mat_mix = mat_backup*0.2 + mat_copy*0.8;
 
 			cv::Mat s8 = mat_mix.clone();
 			ofxCv::toOf(s8, outputOfSaliencyMapHighestImg);

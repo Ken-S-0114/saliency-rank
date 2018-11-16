@@ -45,12 +45,16 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
+	void createSaliencyMap(cv::Mat img);
+
 	ConstTools::InputFileName inputFileName;
 	ConstTools::OutputFileName outputfileName;
 
 	ofImage inputOfImg, loadOfImage;
 
 	cv::Mat mat, mat_copy, mat_mix;
+
+	cv::Mat mat_backup;
 
 	ofImage outputOfSaliencyImg, outputOfHeatMapImg;
 	ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
