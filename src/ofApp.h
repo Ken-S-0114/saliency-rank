@@ -54,8 +54,6 @@ public:
 
 	cv::Mat mat, mat_copy, mat_mix;
 
-	cv::Mat mat_backup;
-
 	ofImage outputOfSaliencyImg, outputOfHeatMapImg;
 	ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
 	ofImage outputOfEyeGazeHeatMapImg, outputOfResultImg;
