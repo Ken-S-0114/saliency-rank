@@ -24,12 +24,14 @@ public:
 		DEBUG,
 		EYETRACK,
 		EYETRACKHEATMAP,
-		IMAGEVIEW
+		IMAGEVIEW,
+		RESULT
 	};
 
 	enum EyeTrackState {
 		STANDBY,
-		TRACKING
+		TRACKING,
+		SAVE
 	};
 
 };

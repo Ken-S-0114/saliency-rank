@@ -45,18 +45,16 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
-private:
-
 	ConstTools::InputFileName inputFileName;
 	ConstTools::OutputFileName outputfileName;
 
-	ofImage inputOfImg;
+	ofImage inputOfImg, loadOfImage;
 
 	cv::Mat mat, mat_copy, mat_mix;
 
 	ofImage outputOfSaliencyImg, outputOfHeatMapImg;
 	ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
-	ofImage outputOfEyeGazeHeatMap;
+	ofImage outputOfEyeGazeHeatMapImg, outputOfResultImg;
 	cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap, saliencyMap_color;
 
 	std::vector<cv::Vec3b> colorTab;
