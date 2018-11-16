@@ -71,7 +71,8 @@ void ofApp::setup() {
 	outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
 
 	cv::Mat thresh;
-	cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+	//cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+	cv::threshold(saliencyMap.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
 	cv::Mat opening;
 	cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -86,7 +87,7 @@ void ofApp::setup() {
 	cv::Mat sure_fg;
 
 	cv::minMaxLoc(dist_transform, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc);
-	cv::threshold(dist_transform.clone(), sure_fg, 0.3*minMax.max_val, 255, 0);
+	cv::threshold(dist_transform.clone(), sure_fg, 0.4*minMax.max_val, 255, 0);
 
 	dist_transform = dist_transform / minMax.max_val;
 
@@ -138,7 +139,7 @@ void ofApp::setup() {
 
 	cv::Mat wshed(markers.size(), CV_8UC3);
 
-	std::vector<int> saliencyPoint(compCount, 0);
+	std::vector<int> saliencyPoint(compCount+1, 0);
 
 	ofLogNotice() << "count: " << compCount;
 	for (int i = 0; i < compCount; i++)
@@ -159,8 +160,11 @@ void ofApp::setup() {
 			if (index == -1) {
 				wshed.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 255, 255);
 			}
-			else if (index <= 0 || index > compCount) {
+			else if (index <= 0) {
 				wshed.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 0);
+			}
+			else if (index-1 > compCount) {
+				wshed.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 0, 0);
 			}
 			else if (index == 1) {
 				wshed.at<cv::Vec3b>(i, j) = colorTab[index - 1];
