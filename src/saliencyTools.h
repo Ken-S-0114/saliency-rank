@@ -9,10 +9,6 @@ public:
 		double min_val, max_val;
 	};
 
-	//    struct MinPlace {
-	//        int widthMin;
-	//        int heightMin;
-	//    };
 
 	//    void saliencyWatershed(ofImage img);
 

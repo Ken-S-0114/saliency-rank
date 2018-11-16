@@ -50,7 +50,6 @@ void ofApp::setup() {
 	cv::Mat s1 = saliencyMap.clone();
 	ofxCv::toOf(s1, outputOfSaliencyImg);
 
-
 	outputOfSaliencyImg.update();
 
 	cv::Mat saliency_copy = saliencyMap.clone();
@@ -142,7 +141,7 @@ void ofApp::setup() {
 	std::vector<int> saliencyPoint(compCount+1, 0);
 
 	ofLogNotice() << "count: " << compCount;
-	for (int i = 0; i < compCount; i++)
+	for (int i = 0; i < compCount+1; i++)
 	{
 		int b = cv::theRNG().uniform(0, 255);
 		int g = cv::theRNG().uniform(0, 255);
@@ -154,7 +153,7 @@ void ofApp::setup() {
 	for (int i = 0; i < markers.rows; i++) {
 		for (int j = 0; j < markers.cols; j++)
 		{
-			//            ofLogNotice()<<"index: "<<index;
+			//ofLogNotice()<<"index: "<<index;
 			int index = markers.at<int>(i, j);
 
 			if (index == -1) {
@@ -170,7 +169,7 @@ void ofApp::setup() {
 				wshed.at<cv::Vec3b>(i, j) = colorTab[index - 1];
 			}
 			else {
-				watershedHighest.at<cv::Vec3b>(i, j) = colorTab[index - 1];
+				watershedHighest.at<cv::Vec3b>(i, j) = colorTab[index-1];
 				if (saliencyPoint[index - 1] < (int)saliencyMap.at<uchar>(i, j)) {
 					saliencyPoint[index - 1] = (int)saliencyMap.at<uchar>(i, j);
 				}
@@ -195,7 +194,7 @@ void ofApp::setup() {
 			}
 			else {
 				mat_copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-				//                mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
+				//mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
 			}
 		}
 	}
@@ -360,7 +359,8 @@ void ofApp::draw() {
 		ofDrawBitmapStringHighlight("saliencyMap-watershed", ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 20);
 
 		// Label
-		ofDrawBitmapStringHighlight("SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n\n  *Enter: Next HighSaliency Place  \n  *Delete: Reset", ofGetWidth() - ofGetWidth() / 4 - 40, 20);
+		ofDrawBitmapStringHighlight("SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n  *V: EYETRACKHEATMAP\n  *B: IMAGEVIEW\n\n  *Enter: Next HighSaliency Place  \n  *Delete: Reset",
+			ofGetWidth() - ofGetWidth() / 4 - 40, 20);
 		ofDrawBitmapStringHighlight(enterCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
 
 		ofSetWindowTitle("RELEASE");
@@ -434,6 +434,9 @@ void ofApp::draw() {
 		case ConstTools::TRACKING:
 			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
 			break;
+		case ConstTools::SAVE:
+			ofDrawBitmapStringHighlight("Saved EyeGazeHeatMap", 20, 20);
+			break;
 		}
 
 		break;
@@ -441,7 +444,12 @@ void ofApp::draw() {
 	case ConstTools::IMAGEVIEW:
 		inputOfImg.draw(0, 0, ofGetWidth(), ofGetHeight());
 		ofSetWindowTitle("IMAGEVIEW");
+
 		break;
+
+	case ConstTools::RESULT:
+		outputOfResultImg.draw(0, 0, ofGetWidth(), ofGetHeight());
+		ofSetWindowTitle("RESULT");
 
 	}
 }
@@ -479,10 +487,13 @@ void ofApp::keyPressed(int key) {
 		}
 		break;
 
-	case 'g':
-		outputOfEyeGazeHeatMap = heatmap.getImage();
-		outputOfEyeGazeHeatMap.update();
-		outputOfSaliencyImg.save(outputfileName.outputOfEyeGazeHeatMapImg);
+	case 's':
+		// "S"‚ð‰Ÿ‚µ‚½Žž:
+		if (eyeTrackState == ConstTools::STANDBY)
+		{
+			heatmap.save(outputfileName.outputOfEyeGazeHeatMapImg);
+			eyeTrackState = ConstTools::SAVE;
+		}
 		break;
 
 	case 'r':
@@ -508,6 +519,22 @@ void ofApp::keyPressed(int key) {
 	case 'b':
 		// "B"‚ð‰Ÿ‚µ‚½Žž: imageView
 		use = ConstTools::IMAGEVIEW;
+		break;
+	case 'n':
+		// "N"‚ð‰Ÿ‚µ‚½Žž: result
+		use = ConstTools::RESULT;
+		if (loadOfImage.load(outputfileName.outputOfEyeGazeHeatMapImg))
+		{
+			loadOfImage.update();
+
+			cv::Mat loadMat = ofxCv::toCv(loadOfImage);
+			
+			cv::Mat s10 = loadMat.clone();
+
+			ofxCv::toOf(s10, outputOfResultImg);
+			outputOfResultImg.update();
+		}
+
 		break;
 	}
 
