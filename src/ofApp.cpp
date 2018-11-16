@@ -3,6 +3,7 @@
 #define PORT 8000
 #define HOST "127.0.0.1"
 
+//--------------------------------------------------------------
 void ofApp::createSaliencyMap(cv::Mat img) {
 	cv::Mat mat_gray, mat_gaus, saliencyMap_norm;
 
@@ -44,6 +45,7 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 	outputOfHeatMapImg.update();
 	outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
 }
+
 //--------------------------------------------------------------
 void ofApp::setup() {
 
