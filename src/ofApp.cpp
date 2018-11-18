@@ -413,7 +413,7 @@ void ofApp::draw() {
 		switch (eyeTrackState)
 		{
 		case ConstTools::STANDBY:
-			ofDrawBitmapStringHighlight("STANDBY: Please Space Key", 20, 20);
+			ofDrawBitmapStringHighlight("STANDBY(Pixels): Please Space Key", 20, 20);
 			break;
 		case ConstTools::TRACKING:
 			ofDrawBitmapStringHighlight("TRACKING", 20, 20);
@@ -432,10 +432,10 @@ void ofApp::draw() {
 		switch (eyeTrackState)
 		{
 		case ConstTools::STANDBY:
-			ofDrawBitmapStringHighlight("STANDBY: Please Space Key", 20, 20);
+			ofDrawBitmapStringHighlight("STANDBY(HeatMap): Please Space Key", 20, 20);
 			break;
 		case ConstTools::TRACKING:
-			ofDrawBitmapStringHighlight("TRACKING:\n S keypress Save", 20, 20);
+			ofDrawBitmapStringHighlight("TRACKING: Save S Key", 20, 20);
 			break;
 		case ConstTools::SAVE:
 			ofDrawBitmapStringHighlight("Saved EyeGazeHeatMap", 20, 20);
@@ -539,6 +539,9 @@ void ofApp::keyPressed(int key) {
 			outputOfResultImg.update();
 		}
 
+		break;
+
+	default:
 		break;
 	}
 
