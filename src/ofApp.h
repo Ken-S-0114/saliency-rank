@@ -46,7 +46,7 @@ public:
 	void gotMessage(ofMessage msg);
 
 	void createSaliencyMap(cv::Mat img);
-	void createWatershed(cv::Mat saliencyMap);
+	void createWatershed(cv::Mat saliencyImg);
 
 	ConstTools::InputFileName inputFileName;
 	ConstTools::OutputFileName_FIRST outputfileName;
@@ -54,7 +54,7 @@ public:
 
 	ofImage inputOfImg, loadOfImage;
 
-	cv::Mat mat, mat_copy, mat_mix;
+	cv::Mat mat_original, mat_copy, mat_mix;
 
 	struct OutputOfImg
 	{
@@ -104,4 +104,6 @@ public:
 
 	cv::Mat saliencyMap_second, saliencyMap_color_second;
 	cv::Mat s11;
+
+	ConstTools::Infomation infomation;
 };

@@ -46,4 +46,9 @@ public:
 		SECOND
 	};
 
+	enum Infomation {
+		VIEW,
+		HIDE
+	};
+
 };
