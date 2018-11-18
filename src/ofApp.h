@@ -46,18 +46,27 @@ public:
 	void gotMessage(ofMessage msg);
 
 	void createSaliencyMap(cv::Mat img);
+	void createWatershed(cv::Mat saliencyMap);
 
 	ConstTools::InputFileName inputFileName;
-	ConstTools::OutputFileName outputfileName;
+	ConstTools::OutputFileName_FIRST outputfileName;
+	ConstTools::OutputFileName_SECOND outputfileName2;
 
 	ofImage inputOfImg, loadOfImage;
 
 	cv::Mat mat, mat_copy, mat_mix;
 
-	ofImage outputOfSaliencyImg, outputOfHeatMapImg;
-	ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
-	ofImage outputOfEyeGazeHeatMapImg, outputOfResultImg;
-	cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap, saliencyMap_color;
+	struct OutputOfImg
+	{
+		ofImage outputOfSaliencyImg, outputOfHeatMapImg;
+		ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
+		ofImage outputOfEyeGazeHeatMapImg, outputOfResultImg;
+	};
+
+
+	OutputOfImg outputOfIMG_FIRST, outputOfIMG_SECOND;
+
+	cv::Mat saliencyMap, saliencyMap_color;
 
 	std::vector<cv::Vec3b> colorTab;
 
@@ -89,6 +98,10 @@ public:
 
 	cv::Mat eyeGazeMat;
 	ConstTools::EyeTrackState eyeTrackState;
+	ConstTools::LoadState loadState;
 
 	ofxHeatMap heatmap;
+
+	cv::Mat saliencyMap_second, saliencyMap_color_second;
+	cv::Mat s11;
 };

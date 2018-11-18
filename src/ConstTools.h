@@ -12,11 +12,18 @@ public:
 		std::string sunflower = "sunflower.jpg";
 	};
 
-	struct OutputFileName {
+	struct OutputFileName_FIRST {
 		std::string outputOfSaliencyImg = "outputOfSaliencyImg.png";
 		std::string outputOfWatershedAfterImg = "outputOfWatershedAfterImg.png";
 		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg.png";
 		std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg.png";
+	};
+
+	struct OutputFileName_SECOND {
+		std::string outputOfSaliencyImg = "outputOfSaliencyImg2.png";
+		std::string outputOfWatershedAfterImg = "outputOfWatershedAfterImg2.png";
+		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg2.png";
+		std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg2.png";
 	};
 
 	enum Use {
@@ -32,6 +39,11 @@ public:
 		STANDBY,
 		TRACKING,
 		SAVE
+	};
+
+	enum LoadState {
+		FIRST,
+		SECOND
 	};
 
 };
