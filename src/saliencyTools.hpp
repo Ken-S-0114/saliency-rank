@@ -19,13 +19,6 @@ public:
         cv::Point min_loc, max_loc;
         double min_val, max_val;
     };
-//    // 最小の位置
-//    struct MinPlace {
-//        int widthMin;
-//        int heightMin;
-//    };
-
-//    void saliencyWatershed(ofImage img);
 
 };
 

@@ -1,150 +1,174 @@
 #include "ofApp.h"
 
+#define PORT 8000
+#define HOST "127.0.0.1"
+
 //--------------------------------------------------------------
-void ofApp::setup(){
-    
-    enterState = false;
-    enterCount = 0;
-
-    enterCountString << "The " << enterCount+1 << " most saliency place";
-
-    // 画像の読み込み
-    ConstTools::InputFileName inputFileName;
-    ConstTools::OutputFileName outputfileName;
-    inputOfImg.load(inputFileName.lenna);
-    inputOfImg.update();
-
-    //    saliencyCreated(inputOfImg);
-    // Mat変換
+void ofApp::createSaliencyMap(cv::Mat img) {
     cv::Mat mat_gray, mat_gaus, saliencyMap_norm;
 
-    // Mat画像に変換
-    mat = ofxCv::toCv(inputOfImg);
-
-    mat_copy = mat.clone();
-
-    // 白黒Mat画像に変換
-    cvtColor(mat.clone(), mat_gray, cv::COLOR_BGR2GRAY);
-    // ぼかし
-    cv::GaussianBlur(mat_gray.clone(), mat_gaus, cv::Size(5, 5), 1, 1);
-
-    // 顕著性マップ(SPECTRAL_RESIDUAL)に変換(顕著性マップを求めるアルゴリズム)
     cv::Ptr<cv::saliency::Saliency> saliencyAlgorithm;
-    saliencyAlgorithm = cv::saliency::StaticSaliencySpectralResidual::create();
-    saliencyAlgorithm->computeSaliency(mat_gaus.clone(), saliencyMap_SPECTRAL_RESIDUAL);
 
-    // アルファチャンネルの正規化を行う
-    cv::normalize(saliencyMap_SPECTRAL_RESIDUAL.clone(), saliencyMap_norm, 0.0, 255.0, cv::NORM_MINMAX);
-    // Matの型（ビット深度）を変換する
-    saliencyMap_norm.convertTo(saliencyMap, CV_8UC3);
+    cv::Mat s1, s2, t1, t2;
+    cv::Mat saliency_copy, saliency_copy2;
+    cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap_SPECTRAL_RESIDUAL2;
 
-    // 最小と最大の要素値とそれらの位置を求める
-    //    minMaxLoc(saliencyMap, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc, cv::Mat());
+    switch (loadState)
+    {
+        case ConstTools::FIRST:
+            mat_copy = img.clone();
 
-    cv::Mat saliency_copy = saliencyMap.clone();
-    // 画像(ofImage)に変換
-    ofxCv::toOf(saliencyMap.clone(), outputOfSaliencyImg);
-    outputOfSaliencyImg.update();
-    //    outputOfSaliencyImg.save("outputOfSaliencyImg.png");
+            cvtColor(img.clone(), mat_gray, cv::COLOR_BGR2GRAY);
 
-    // 画素値の反転（現状 : 0:黒:顕著性が低い, 255:白:顕著性が高い）
-    for(int x = 0; x < saliency_copy.rows; ++x){
-        for(int y = 0; y < saliency_copy.cols; ++y){
-            saliency_copy.at<uchar>( x, y ) = 255 - (int)saliency_copy.at<uchar>(x, y);
-            //            ofLog()<<"(int)saliencyMap.at<uchar>("<<x<<","<<y<< ") : "<<(int)saliencyMap.at<uchar>( x, y );
-        }
+            cv::GaussianBlur(mat_gray.clone(), mat_gaus, cv::Size(3, 3), 1, 1);
+
+            saliencyAlgorithm = cv::saliency::StaticSaliencySpectralResidual::create();
+            saliencyAlgorithm->computeSaliency(mat_gaus.clone(), saliencyMap_SPECTRAL_RESIDUAL);
+
+            cv::normalize(saliencyMap_SPECTRAL_RESIDUAL.clone(), saliencyMap_norm, 0.0, 255.0, cv::NORM_MINMAX);
+
+            saliencyMap_norm.convertTo(saliencyMap, CV_8UC3);
+
+            //    minMaxLoc(saliencyMap, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc, cv::Mat());
+
+            s1 = saliencyMap.clone();
+            ofxCv::toOf(s1, outputOfIMG_FIRST.outputOfSaliencyImg);
+
+            outputOfIMG_FIRST.outputOfSaliencyImg.update();
+
+            saliency_copy = saliencyMap.clone();
+
+            for (int x = 0; x < saliency_copy.rows; ++x) {
+                for (int y = 0; y < saliency_copy.cols; ++y) {
+                    saliency_copy.at<uchar>(x, y) = 255 - (int)saliency_copy.at<uchar>(x, y);
+                    //ofLogNotice()<<"(int)saliency_copy.at<uchar>("<<x<<","<<y<< ") : "<<(int)saliency_copy.at<uchar>( x, y );
+                }
+            }
+
+            cv::applyColorMap(saliency_copy.clone(), saliencyMap_color, cv::COLORMAP_JET);
+
+            s2 = saliencyMap_color.clone();
+
+            ofxCv::toOf(s2, outputOfIMG_FIRST.outputOfHeatMapImg);
+            outputOfIMG_FIRST.outputOfHeatMapImg.update();
+            outputOfIMG_FIRST.outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
+            break;
+
+        case ConstTools::SECOND:
+            //mat_copy = img.clone();
+
+            cvtColor(s11.clone(), mat_gray, cv::COLOR_BGR2GRAY);
+
+            cv::GaussianBlur(mat_gray.clone(), mat_gaus, cv::Size(3, 3), 1, 1);
+
+            saliencyAlgorithm->computeSaliency(mat_gaus.clone(), saliencyMap_SPECTRAL_RESIDUAL2);
+
+            cv::normalize(saliencyMap_SPECTRAL_RESIDUAL2.clone(), saliencyMap_norm, 0.0, 255.0, cv::NORM_MINMAX);
+
+            saliencyMap_norm.convertTo(saliencyMap_second, CV_8UC3);
+
+            //    minMaxLoc(saliencyMap, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc, cv::Mat());
+
+            t1 = saliencyMap_second.clone();
+            ofxCv::toOf(t1, outputOfIMG_SECOND.outputOfSaliencyImg);
+
+            outputOfIMG_SECOND.outputOfSaliencyImg.update();
+
+            saliency_copy2 = saliencyMap.clone();
+
+            for (int x = 0; x < saliency_copy2.rows; ++x) {
+                for (int y = 0; y < saliency_copy2.cols; ++y) {
+                    saliency_copy2.at<uchar>(x, y) = 255 - (int)saliency_copy2.at<uchar>(x, y);
+                    //ofLogNotice()<<"(int)saliency_copy.at<uchar>("<<x<<","<<y<< ") : "<<(int)saliency_copy.at<uchar>( x, y );
+                }
+            }
+
+            cv::applyColorMap(saliency_copy2.clone(), saliencyMap_color_second, cv::COLORMAP_JET);
+
+            t2 = saliencyMap_color_second.clone();
+
+            ofxCv::toOf(t2, outputOfIMG_SECOND.outputOfHeatMapImg);
+            outputOfIMG_SECOND.outputOfHeatMapImg.update();
+            outputOfIMG_SECOND.outputOfHeatMapImg.save(outputfileName2.outputOfSaliencyImg);
+            break;
     }
-    // ヒートマップへ変換 :（0:赤:顕著性が高い, 255:青:顕著性が低い）
-    cv::applyColorMap(saliency_copy.clone(), saliencyMap_color, cv::COLORMAP_JET);
+}
 
-    // 画像(ofImage)に変換
-    ofxCv::toOf(saliencyMap_color.clone(), outputOfHeatMapImg);
-    outputOfHeatMapImg.update();
-    outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
-
-    //    watershedCreated(saliencyMap.clone());
-    // 二値化
+//--------------------------------------------------------------
+void ofApp::createWatershed(cv::Mat saliencyImg) {
     cv::Mat thresh;
-    cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+    //cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+    cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
-    // ノイズ除去
     cv::Mat opening;
     cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
-    cv::morphologyEx(thresh.clone(), opening, cv::MORPH_OPEN, kernel, cv::Point(-1,-1), 2);
+    cv::morphologyEx(thresh.clone(), opening, cv::MORPH_OPEN, kernel, cv::Point(-1, -1), 2);
 
-    // 背景領域抽出
     cv::Mat sure_bg;
-    cv::dilate(opening.clone(), sure_bg, kernel, cv::Point(-1,-1), 3);
+    cv::dilate(opening.clone(), sure_bg, kernel, cv::Point(-1, -1), 3);
 
-    // 前景領域抽出
     cv::Mat dist_transform;
     cv::distanceTransform(opening, dist_transform, CV_DIST_L2, 5);
 
-    // 最小と最大の要素値とそれらの位置を求める
     cv::Mat sure_fg;
+
     cv::minMaxLoc(dist_transform, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc);
-    // 特に顕著性の高いところのみ抽出(今回は0.7に設定)
-    cv::threshold(dist_transform, sure_fg, 0.7*minMax.max_val, 255, 0);
+    cv::threshold(dist_transform.clone(), sure_fg, 0.3*minMax.max_val, 255, 0);
 
-    dist_transform = dist_transform/minMax.max_val;
+    dist_transform = dist_transform / minMax.max_val;
 
-    // 画像(ofImage)に変換
-    ofxCv::toOf(sure_bg.clone(), outputOfBackgroundImg);
-    outputOfBackgroundImg.update();
+    cv::Mat s3 = sure_bg.clone();
+    ofxCv::toOf(s3, outputOfIMG_FIRST.outputOfBackgroundImg);
+    outputOfIMG_FIRST.outputOfBackgroundImg.update();
 
-    // 不明領域抽出
-    cv::Mat unknown, sure_fg_uc1;
+    cv::Mat unknown;
+    cv::Mat sure_fg_uc1;
     sure_fg.convertTo(sure_fg_uc1, CV_8UC1);
     cv::subtract(sure_bg, sure_fg_uc1, unknown);
 
-    // 画像(ofImage)に変換
-    ofxCv::toOf(unknown.clone(), outputOfUnknownImg);
-    outputOfUnknownImg.update();
+    cv::Mat s4 = unknown.clone();
+    ofxCv::toOf(s4, outputOfIMG_FIRST.outputOfUnknownImg);
+    outputOfIMG_FIRST.outputOfUnknownImg.update();
 
-    // 前景ラベリング
     int compCount = 0;
 
-    // すべてのマーカーを取得
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
     sure_fg.convertTo(sure_fg, CV_32SC1, 1.0);
     cv::findContours(sure_fg, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
-    if( contours.empty() ) return;
+    if (contours.empty()) return;
 
-    //    ofLogNotice()<<"contours: "<<&contours;
+    ofLogNotice() << "contours: " << &contours;
 
-    // watershedに流し込む用のマーカー画像作成
     cv::Mat markers = cv::Mat::zeros(sure_fg.rows, sure_fg.cols, CV_32SC1);
-    // マーカーを描画
-    int idx = 0;
-    for( ; idx >= 0; idx = hierarchy[idx][0], compCount++ )
-        cv::drawContours(markers, contours, idx, cv::Scalar::all(compCount+1), -1, 8, hierarchy, INT_MAX);
-    markers = markers+1;
 
-    // 不明領域は今のところゼロ
-    for(int i=0; i<markers.rows; i++){
-        for(int j=0; j<markers.cols; j++){
+    int idx = 0;
+    for (; idx >= 0; idx = hierarchy[idx][0], compCount++) {
+        cv::drawContours(markers, contours, idx, cv::Scalar::all(compCount + 1), -1, 8, hierarchy, INT_MAX);
+    }
+    markers = markers + 1;
+
+
+    for (int i = 0; i<markers.rows; i++) {
+        for (int j = 0; j<markers.cols; j++) {
             unsigned char &v = unknown.at<unsigned char>(i, j);
-            if(v==255){
+            if (v == 255) {
                 markers.at<int>(i, j) = 0;
             }
         }
     }
 
-    // 分水嶺
-    cv::watershed(mat, markers);
+    cv::watershed(mat_original.clone(), markers);
 
-    // 背景黒のMat画像
-    watershedHighest = cv::Mat::zeros(mat.size(), CV_8UC3);
-    saliencyHighest = cv::Mat::zeros(mat.size(), CV_8UC3);
+    watershedHighest = cv::Mat::zeros(mat_original.size(), CV_8UC3);
+    saliencyHighest = cv::Mat::zeros(mat_original.size(), CV_8UC3);
 
     cv::Mat wshed(markers.size(), CV_8UC3);
-    //    std::vector<cv::Vec3b> colorTab;
 
-    std::vector<int> saliencyPoint(compCount, 0);
+    std::vector<int> saliencyPoint(compCount + 1, 0);
 
-    ofLogNotice()<<"count: "<<compCount;
-    for(int i = 0; i < compCount; i++ )
+    ofLogNotice() << "count: " << compCount;
+    for (int i = 0; i < compCount + 1; i++)
     {
         int b = cv::theRNG().uniform(0, 255);
         int g = cv::theRNG().uniform(0, 255);
@@ -153,73 +177,79 @@ void ofApp::setup(){
         colorTab.push_back(cv::Vec3b((uchar)b, (uchar)g, (uchar)r));
     }
 
-    // 分割した画像をそれぞれの画像に書き込む
-    for(int i = 0; i < markers.rows; i++ ){
-        for(int j = 0; j < markers.cols; j++ )
+    for (int i = 0; i < markers.rows; i++) {
+        for (int j = 0; j < markers.cols; j++)
         {
-            //            ofLogNotice()<<"index: "<<index;
-            int index = markers.at<int>(i,j);
+            //ofLogNotice()<<"index: "<<index;
+            int index = markers.at<int>(i, j);
 
-            if( index == -1 ) {
-                wshed.at<cv::Vec3b>(i,j) = cv::Vec3b(255,255,255);
+            if (index == -1) {
+                wshed.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 255, 255);
             }
-            else if( index <= 0 || index > compCount ) {
-                wshed.at<cv::Vec3b>(i,j) = cv::Vec3b(0,0,0);
+            else if (index <= 0) {
+                wshed.at<cv::Vec3b>(i, j) = cv::Vec3b(0, 0, 0);
             }
-            else if( index == 1 ) {
-                wshed.at<cv::Vec3b>(i,j) = colorTab[index - 1];
+            else if (index - 1 > compCount) {
+                wshed.at<cv::Vec3b>(i, j) = cv::Vec3b(255, 0, 0);
+            }
+            else if (index == 1) {
+                wshed.at<cv::Vec3b>(i, j) = colorTab[index - 1];
             }
             else {
-                watershedHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
-                if (saliencyPoint[index-1] < (int)saliencyMap.at<uchar>(i, j)) {
-                    saliencyPoint[index-1] = (int)saliencyMap.at<uchar>(i, j);
+                watershedHighest.at<cv::Vec3b>(i, j) = colorTab[index - 1];
+                if (saliencyPoint[index - 1] < (int)saliencyMap.at<uchar>(i, j)) {
+                    saliencyPoint[index - 1] = (int)saliencyMap.at<uchar>(i, j);
                 }
             }
         }
     }
 
-    for (int i=0; i<saliencyPoint.size(); i++) {
+    for (int i = 0; i<saliencyPoint.size(); i++) {
         ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPoint[i];
     }
 
-    // 最大値の要素番号を取得
     iter = std::max_element(saliencyPoint.begin(), saliencyPoint.end());
     saliencyPointMaxIndex = std::distance(saliencyPoint.begin(), iter);
     ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
 
-    for(int i = 0; i < markers.rows; i++ ){
-        for(int j = 0; j < markers.cols; j++ )
+    for (int i = 0; i < markers.rows; i++) {
+        for (int j = 0; j < markers.cols; j++)
         {
-            int index = markers.at<int>(i,j);
-            if( index == saliencyPointMaxIndex+1 ) {
-                saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
-            } else {
-                mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-                //                mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
+            int index = markers.at<int>(i, j);
+            if (index == saliencyPointMaxIndex + 1) {
+                saliencyHighest.at<cv::Vec3b>(i, j) = colorTab[index - 1];
+            }
+            else {
+                mat_copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
+                //mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
             }
         }
     }
 
     cvtColor(saliencyMap.clone(), imgG, cv::COLOR_GRAY2BGR);
-    wshed = wshed*0.5 + imgG*0.5;
+    //wshed = wshed*0.5 + imgG*0.5;
     watershedHighest = watershedHighest*0.5 + imgG*0.5;
     saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
-    // 画像(ofImage)に変換
-    ofxCv::toOf(wshed.clone(), outputOfWatershedImg);
-    outputOfWatershedImg.update();
-    ofxCv::toOf(watershedHighest.clone(), outputOfWatershedAfterImg);
-    outputOfWatershedAfterImg.update();
-    outputOfWatershedAfterImg.save(outputfileName.outputOfWatershedAfterImg);
-    ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
-    outputOfWatershedHighestImg.update();
 
+    cv::Mat s5 = wshed.clone();
+    ofxCv::toOf(s5, outputOfIMG_FIRST.outputOfWatershedImg);
+    outputOfIMG_FIRST.outputOfWatershedImg.update();
 
-    mat_mix = mat*0.2 + mat_copy*0.8;
-    // 画像(ofImage)に変換
-    ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
-    outputOfSaliencyMapHighestImg.update();
-    outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);
+    cv::Mat s6 = watershedHighest.clone();
+    ofxCv::toOf(s6, outputOfIMG_FIRST.outputOfWatershedAfterImg);
+    outputOfIMG_FIRST.outputOfWatershedAfterImg.update();
+    outputOfIMG_FIRST.outputOfWatershedAfterImg.save(outputfileName.outputOfWatershedAfterImg);
 
+    cv::Mat s7 = saliencyHighest.clone();
+    ofxCv::toOf(s7, outputOfIMG_FIRST.outputOfWatershedHighestImg);
+    outputOfIMG_FIRST.outputOfWatershedHighestImg.update();
+
+    mat_mix = mat_original*0.2 + mat_copy*0.8;
+
+    cv::Mat s8 = mat_mix.clone();
+    ofxCv::toOf(s8, outputOfIMG_FIRST.outputOfSaliencyMapHighestImg);
+    outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.update();
+    outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);
 
     markersSave = markers.clone();
 
@@ -228,12 +258,93 @@ void ofApp::setup(){
         saliencyPointBackUp = saliencyPoint;
         saliencyPoint.clear();
     }
+}
+
+//--------------------------------------------------------------
+void ofApp::setup() {
+
+    receiver.setup(PORT);
+    eyeTrackState = ConstTools::STANDBY;
+    loadState = ConstTools::FIRST;
+    infomation = ConstTools::VIEW;
+
+    ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
+    ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
+
+    eyeGazeMat = cv::Mat::zeros(WINHEIGHT, WINWIDTH, CV_8UC1);
+    cv::Mat s9 = eyeGazeMat.clone();
+    ofxCv::toOf(s9, outputOfIMG_FIRST.outputOfEyeGazeImg);
+    outputOfIMG_FIRST.outputOfEyeGazeImg.update();
+
+    heatmap.setup(WINWIDTH, WINHEIGHT, 32);
+
+    enterState = false;
+    enterCount = 0;
+
+    enterCountString << "The " << enterCount + 1 << " most saliency place";
+
+    inputOfImg.load(inputFileName.christmas);
+    //inputOfImg.load(outputfileName.outputOfEyeGazeHeatMapImg);
+    inputOfImg.update();
+
+    mat_original = ofxCv::toCv(inputOfImg);
+
+    createSaliencyMap(mat_original.clone());
+
+    createWatershed(saliencyMap.clone());
 
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
-    
+void ofApp::update() {
+
+    while (receiver.hasWaitingMessages())
+    {
+        ofxOscMessage m;
+        receiver.getNextMessage(&m);
+
+        if (m.getAddress() == "/eyeGaze") {
+
+            remoteEyeGazeX = m.getArgAsFloat(0);
+            remoteEyeGazeY = m.getArgAsFloat(1);
+
+            ofLogNotice() << "remoteEyeGazeX: " << remoteEyeGazeX;
+            ofLogNotice() << "remoteEyeGazeY: " << remoteEyeGazeY;
+
+            int remoteEyeGazeIntX = (int)remoteEyeGazeX;
+            int remoteEyeGazeIntY = (int)remoteEyeGazeY;
+
+            if (eyeTrackState == ConstTools::TRACKING)
+            {
+                if ((0 > remoteEyeGazeIntX) || (0 > remoteEyeGazeIntY))
+                {
+                    return;
+                }
+                if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
+                {
+                    ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
+                    ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;
+                    if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) >= 255)
+                    {
+                        return;
+                    }
+                    ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
+                    eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
+                    cv::Mat s9 = eyeGazeMat.clone();
+                    ofxCv::toOf(s9, outputOfIMG_FIRST.outputOfEyeGazeImg);
+                    outputOfIMG_FIRST.outputOfEyeGazeImg.update();
+
+                    heatmap.addPoint(remoteEyeGazeIntX, remoteEyeGazeIntY);
+                }
+            }
+        }
+    }
+
+    if (eyeTrackState == ConstTools::TRACKING)
+    {
+        heatmap.update(OFX_HEATMAP_CS_SPECTRAL_SOFT);
+    }
+
     if (enterState) {
         enterCountString.str("");
         enterCountString.clear(stringstream::goodbit);
@@ -242,58 +353,45 @@ void ofApp::update(){
 
         if (maxValue != 0) {
 
-            //        for(int i = 0; i < markersSave.rows; i++ ){
-            //            for(int j = 0; j < markersSave.cols; j++ )
-            //            {
-            //                //            ofLogNotice()<<"index: "<<index;
-            //                int index = markersSave.at<int>(i,j);
-            //
-            //                if( index != -1 && index > 0 && index != 1 ) {
-            //                    saliencyPointSave[index-1] += (int)saliencyMap.at<uchar>(i, j);
-            //                }
-            //            }
-            //        }
-
-            for (int i=0; i<saliencyPointSave.size(); i++) {
+            for (int i = 0; i<saliencyPointSave.size(); i++) {
                 ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPointSave[i];
             }
 
-            // 最大値の要素番号を取得
             iter = std::max_element(saliencyPointSave.begin(), saliencyPointSave.end());
             saliencyPointMaxIndex = std::distance(saliencyPointSave.begin(), iter);
             ofLogNotice() << "Index of max element: " << saliencyPointMaxIndex;
 
-            // 初期化
             saliencyHighest = cv::Mat::zeros(saliencyHighest.size(), CV_8UC3);
-            mat_copy = mat.clone();
+            mat_copy = mat_original.clone();
 
-            // 画像に書き込む
-            for(int i = 0; i < markersSave.rows; i++ ){
-                for(int j = 0; j < markersSave.cols; j++ )
+            for (int i = 0; i < markersSave.rows; i++) {
+                for (int j = 0; j < markersSave.cols; j++)
                 {
-                    int index = markersSave.at<int>(i,j);
-                    if(index == saliencyPointMaxIndex+1) {
-                        saliencyHighest.at<cv::Vec3b>(i,j) = colorTab[index - 1];
-                    } else {
-                        mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-                        //                    mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
+                    int index = markersSave.at<int>(i, j);
+                    if (index == saliencyPointMaxIndex + 1) {
+                        saliencyHighest.at<cv::Vec3b>(i, j) = colorTab[index - 1];
+                    }
+                    else {
+                        mat_copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
+                        //mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
                     }
                 }
             }
 
             saliencyHighest = saliencyHighest*0.5 + imgG*0.5;
-            // 画像(ofImage)に変換
-            ofxCv::toOf(saliencyHighest.clone(), outputOfWatershedHighestImg);
-            outputOfWatershedHighestImg.update();
 
+            cv::Mat s7 = saliencyHighest.clone();
+            ofxCv::toOf(s7, outputOfIMG_FIRST.outputOfWatershedHighestImg);
+            outputOfIMG_FIRST.outputOfWatershedHighestImg.update();
 
-            mat_mix = mat*0.2 + mat_copy*0.8;
-            // 画像(ofImage)に変換
-            ofxCv::toOf(mat_mix.clone(), outputOfSaliencyMapHighestImg);
-            outputOfSaliencyMapHighestImg.update();
-            //        outputOfSaliencyMapHighestImg.save("outputOfSaliencyMapHighestImg.png");
+            mat_mix = mat_original*0.2 + mat_copy*0.8;
 
-            enterCountString << "The " << enterCount+1 << " most saliency place";
+            cv::Mat s8 = mat_mix.clone();
+            ofxCv::toOf(s8, outputOfIMG_FIRST.outputOfSaliencyMapHighestImg);
+            outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.update();
+            outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);
+
+            enterCountString << "The " << enterCount + 1 << " most saliency place";
 
         }
         else {
@@ -302,168 +400,298 @@ void ofApp::update(){
 
         enterState = false;
     }
-    
+
 }
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw() {
 
     switch (use) {
         case ConstTools::RELEASE:
-            // 元画像
-            inputOfImg.draw(0,0,ofGetWidth()/2, ofGetHeight()/2);
-            // 領域分割（特定箇所）を出力
-            outputOfSaliencyMapHighestImg.draw(0,ofGetHeight()/2,ofGetWidth()/2, ofGetHeight()/2);
+            inputOfImg.draw(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
+            //ofxCv::drawMat(mat_mix.clone(), 0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
+            outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.draw(0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
 
             // Label
-            ofDrawBitmapStringHighlight("original", ofGetWidth()/2+20, 20);
-            ofDrawBitmapStringHighlight("saliencyMap-watershed", ofGetWidth()/2+20, ofGetHeight()/2+20);
+            ofDrawBitmapStringHighlight("original", ofGetWidth() / 2 + 20, 20);
+            ofDrawBitmapStringHighlight("saliencyMap-watershed", ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 20);
 
             // Label
-            ofDrawBitmapStringHighlight("KeyPressed\n\n・Z: RELEASE\n・X: DEBUG\n・C: SALIENCY\n\n・Enter: Next HighSaliency Place\n・Delete: Reset", ofGetWidth()-ofGetWidth()/4-40, 20);
+            ofDrawBitmapStringHighlight("Enter: Next HighSaliency Place\nDelete: Reset",
+                                        ofGetWidth() - ofGetWidth() / 3 -20, 20);
+            ofDrawBitmapStringHighlight(enterCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
 
-            ofDrawBitmapStringHighlight(enterCountString.str(), ofGetWidth()/2+20, ofGetHeight()/2+50);
+            ofSetWindowTitle("RELEASE");
             break;
 
         case ConstTools::DEBUG:
-            // 元画像
-            inputOfImg.draw(0,0,ofGetWidth()/3, ofGetHeight()/3);
-            // 顕著性マップを出力
-            outputOfSaliencyImg.draw(ofGetWidth()/3,0,ofGetWidth()/3, ofGetHeight()/3);
-            // 顕著性マップのヒートマップを出力
-            outputOfHeatMapImg.draw(ofGetWidth()-ofGetWidth()/3,0,ofGetWidth()/3, ofGetHeight()/3);
-            // 分水嶺を出力
-            outputOfBackgroundImg.draw(0,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
-            // 不明領域を出力
-            outputOfUnknownImg.draw(ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
-            // 分水嶺を出力
-            outputOfWatershedImg.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
-            // 領域分割を出力
-            outputOfWatershedAfterImg.draw(0,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
-            // 領域分割（特定箇所）を出力
-            outputOfWatershedHighestImg.draw(ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
-            // 領域分割（元画像から特定箇所）を出力
-            outputOfSaliencyMapHighestImg.draw(ofGetWidth()-ofGetWidth()/3,ofGetHeight()-ofGetHeight()/3,ofGetWidth()/3, ofGetHeight()/3);
-
+            inputOfImg.draw(0, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+            //ofxCv::drawMat(saliencyMap.clone(), ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+            outputOfIMG_FIRST.outputOfSaliencyImg.draw(ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+            //ofxCv::drawMat(saliencyMap_color.clone(), ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+            outputOfIMG_FIRST.outputOfHeatMapImg.draw(ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+            //ofxCv::drawMat(sure_bg.clone(), 0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            outputOfIMG_FIRST.outputOfBackgroundImg.draw(0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            //ofxCv::drawMat(unknown.clone(), ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            outputOfIMG_FIRST.outputOfUnknownImg.draw(ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            //ofxCv::drawMat(wshed.clone(), ofGetWidth() - ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            outputOfIMG_FIRST.outputOfWatershedImg.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            //ofxCv::drawMat(watershedHighest.clone(), 0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            outputOfIMG_FIRST.outputOfWatershedAfterImg.draw(0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            //ofxCv::drawMat(saliencyHighest.clone(), ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            outputOfIMG_FIRST.outputOfWatershedHighestImg.draw(ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            //ofxCv::drawMat(mat_mix.clone(), ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+            outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 
             // Label
             ofDrawBitmapStringHighlight("original", 20, 20);
-            ofDrawBitmapStringHighlight("saliencyMap", ofGetWidth()/3+20, 20);
-            ofDrawBitmapStringHighlight("saliencyMap-heatMap", ofGetWidth()-ofGetWidth()/3+20, 20);
-            ofDrawBitmapStringHighlight("background", 20, ofGetHeight()/3+20);
-            ofDrawBitmapStringHighlight("unknown", ofGetWidth()/3+20, ofGetHeight()/3+20);
-            ofDrawBitmapStringHighlight("watershed", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()/3+20);
-            ofDrawBitmapStringHighlight("watershed-after", 20, ofGetHeight()-ofGetHeight()/3+20);
-            ofDrawBitmapStringHighlight("watershed-highest", ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
-            ofDrawBitmapStringHighlight("saliencyMap-highest", ofGetWidth()-ofGetWidth()/3+20, ofGetHeight()-ofGetHeight()/3+20);
-            break;
-        case ConstTools::SALIENCY:
-            // 元画像
-            inputOfImg.draw(0,0,ofGetWidth()/2,ofGetHeight()/2);
-            // 顕著性マップを出力
-            outputOfSaliencyImg.draw(ofGetWidth()/2,0,ofGetWidth()/2,ofGetHeight()/2);
+            ofDrawBitmapStringHighlight("saliencyMap", ofGetWidth() / 3 + 20, 20);
+            ofDrawBitmapStringHighlight("saliencyMap-heatMap", ofGetWidth() - ofGetWidth() / 3 + 20, 20);
+            ofDrawBitmapStringHighlight("background", 20, ofGetHeight() / 3 + 20);
+            ofDrawBitmapStringHighlight("unknown", ofGetWidth() / 3 + 20, ofGetHeight() / 3 + 20);
+            ofDrawBitmapStringHighlight("watershed", ofGetWidth() - ofGetWidth() / 3 + 20, ofGetHeight() / 3 + 20);
+            ofDrawBitmapStringHighlight("watershed-after", 20, ofGetHeight() - ofGetHeight() / 3 + 20);
+            ofDrawBitmapStringHighlight("watershed-highest", ofGetWidth() / 3 + 20, ofGetHeight() - ofGetHeight() / 3 + 20);
+            ofDrawBitmapStringHighlight("saliencyMap-highest", ofGetWidth() - ofGetWidth() / 3 + 20, ofGetHeight() - ofGetHeight() / 3 + 20);
+
+            ofSetWindowTitle("DEBUG");
 
             break;
+
+        case ConstTools::EYETRACK:
+            //ofxCv::drawMat(eyeGazeMat.clone(),0,0);
+            outputOfIMG_FIRST.outputOfEyeGazeImg.draw(0, 0, WINWIDTH, WINHEIGHT);
+            //outputOfSaliencyImg.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
+
+            ofSetWindowTitle("EYETRACK");
+
+            switch (eyeTrackState)
+        {
+            case ConstTools::STANDBY:
+                ofDrawBitmapStringHighlight("STANDBY(Pixels): Please Space Key", 20, 20);
+                break;
+            case ConstTools::TRACKING:
+                ofDrawBitmapStringHighlight("TRACKING", 20, 20);
+                break;
+        }
+
+            break;
+
+        case ConstTools::EYETRACKHEATMAP:
+            ofBackground(0, 0, 0);
+            ofSetColor(255, 255);
+            heatmap.draw(0, 0);
+
+            ofSetWindowTitle("EYETRACKHEATMAP");
+
+            switch (eyeTrackState)
+        {
+            case ConstTools::STANDBY:
+                ofDrawBitmapStringHighlight("STANDBY(HeatMap): Please Space Key", 20, 20);
+                break;
+            case ConstTools::TRACKING:
+                ofDrawBitmapStringHighlight("TRACKING: Save S Key", 20, 20);
+                break;
+            case ConstTools::SAVE:
+                ofDrawBitmapStringHighlight("Saved EyeGazeHeatMap", 20, 20);
+                break;
+        }
+
+            break;
+
+        case ConstTools::IMAGEVIEW:
+            inputOfImg.draw(0, 0, ofGetWidth(), ofGetHeight());
+            ofSetWindowTitle("IMAGEVIEW");
+
+            break;
+
+        case ConstTools::RESULT:
+            outputOfIMG_FIRST.outputOfResultImg.draw(0, 0, ofGetWidth()/2, ofGetHeight()/2);
+            outputOfIMG_FIRST.outputOfHeatMapImg.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
+            outputOfIMG_SECOND.outputOfHeatMapImg.draw(0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
+            ofDrawBitmapStringHighlight("View EyeGazeHeatMap", 20, 20);
+            ofSetWindowTitle("RESULT");
+
+    }
+
+    switch (infomation)
+    {
+        case ConstTools::VIEW:
+            ofDrawBitmapStringHighlight("SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n  *V: EYETRACKHEATMAP \n  *B: RESULT\n  *N: IMAGEVIEW",
+                                        ofGetWidth() - ofGetWidth() / 6, 20);
+            break;
+        case ConstTools::HIDE:
+            break;
+
     }
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key) {
     ofLogNotice() << "keyPressed: " << key;
-    
+
     switch (key) {
         case 13:
             // "Enter"を押した時:
-
-            //            if (!saliencyPointSave.empty()) {
-            //                saliencyPointSave.clear();
-            //            }
-            //            for(int i = 0; i < markersSave.rows; i++ ){
-            //                for(int j = 0; j < markersSave.cols; j++ )
-            //                {
-            //                    int index = markersSave.at<int>(i,j);
-            //                    if( index == saliencyPointMaxIndex+1 ) {
-            //                        markersSave.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-            //                    }
-            //                }
-            //            }
-
             saliencyPointSave[saliencyPointMaxIndex] = 0;
 
             enterCount++;
             enterState = true;
 
             break;
-        case 127:
-            // "delete"を押した時:
+        case 8:
+            // "BackSpace"を押した時:
             saliencyPointSave = saliencyPointBackUp;
             enterCount = 0;
             enterState = true;
 
             break;
+        case ' ':
+            // "Space"を押した時:
+            if ((use == ConstTools::EYETRACK) || (use == ConstTools::EYETRACKHEATMAP) || (use == ConstTools::IMAGEVIEW))
+            {
+                if (eyeTrackState == ConstTools::STANDBY) {
+                    eyeTrackState = ConstTools::TRACKING;
+                }
+                else {
+                    eyeTrackState = ConstTools::STANDBY;
+                }
+            }
+            break;
+
+        case 's':
+            // "S"を押した時:
+            if (eyeTrackState == ConstTools::STANDBY && ((use == ConstTools::EYETRACK) || (use == ConstTools::EYETRACKHEATMAP)))
+            {
+                heatmap.save(outputfileName.outputOfEyeGazeHeatMapImg);
+                eyeTrackState = ConstTools::SAVE;
+            }
+            break;
+
+        case 'r':
+            heatmap.clear();
+            break;
+        case 'i':
+            switch (infomation)
+        {
+            case ConstTools::VIEW:
+                infomation = ConstTools::HIDE;
+                break;
+            case ConstTools::HIDE:
+                infomation = ConstTools::VIEW;
+                break;
+        }
+            break;
             //-------------   環境   ------------------
-        case 122:
+        case 'z':
             // "Z"を押した時: release
             use = ConstTools::RELEASE;
             break;
-        case 120:
+        case 'x':
             // "X"を押した時: debug
             use = ConstTools::DEBUG;
             break;
-        case 99:
-            // "C"を押した時: saliency
-            use = ConstTools::SALIENCY;
+        case 'c':
+            // "C"を押した時: eyeTrack
+            use = ConstTools::EYETRACK;
+            break;
+        case 'v':
+            // "V"を押した時: eyeTrackHeatMap
+            use = ConstTools::EYETRACKHEATMAP;
+            break;
+        case 'b':
+            // "B"を押した時: result
+            use = ConstTools::RESULT;
+            if (loadOfImage.load(outputfileName.outputOfEyeGazeHeatMapImg))
+            {
+                loadOfImage.update();
+
+                cv::Mat loadMat = ofxCv::toCv(loadOfImage);
+
+                cv::Mat s10 = loadMat.clone();
+
+                ofxCv::toOf(s10, outputOfIMG_FIRST.outputOfResultImg);
+                outputOfIMG_FIRST.outputOfResultImg.update();
+
+                //loadState = ConstTools::SECOND;
+                //s11 = s10.clone();
+                //createSaliencyMap(s11);
+            }
+            break;
+        case 'n':
+            // "N"を押した時: imageView
+            use = ConstTools::IMAGEVIEW;
+
+            break;
+
+        default:
             break;
     }
 
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-    
+void ofApp::dumpOSC(ofxOscMessage m) {
+    string msg_string;
+    msg_string = m.getAddress();
+    for (int i = 0; i<m.getNumArgs(); i++) {
+        msg_string += " ";
+        if (m.getArgType(i) == OFXOSC_TYPE_INT32)
+            msg_string += ofToString(m.getArgAsInt32(i));
+        else if (m.getArgType(i) == OFXOSC_TYPE_FLOAT)
+            msg_string += ofToString(m.getArgAsFloat(i));
+        else if (m.getArgType(i) == OFXOSC_TYPE_STRING)
+            msg_string += m.getArgAsString(i);
+    }
+    cout << msg_string << endl;
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-    
+void ofApp::keyReleased(int key) {
+
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button){
-    
+void ofApp::mouseMoved(int x, int y) {
+
 }
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-    
+void ofApp::mouseDragged(int x, int y, int button) {
+
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button){
-    
+void ofApp::mousePressed(int x, int y, int button) {
+
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseEntered(int x, int y){
-    
+void ofApp::mouseReleased(int x, int y, int button) {
+
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseExited(int x, int y){
-    
+void ofApp::mouseEntered(int x, int y) {
+
 }
 
 //--------------------------------------------------------------
-void ofApp::windowResized(int w, int h){
-    
+void ofApp::mouseExited(int x, int y) {
+
 }
 
 //--------------------------------------------------------------
-void ofApp::gotMessage(ofMessage msg){
-    
+void ofApp::windowResized(int w, int h) {
+
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::gotMessage(ofMessage msg) {
+
+}
+
+//--------------------------------------------------------------
+void ofApp::dragEvent(ofDragInfo dragInfo) {
     
 }
