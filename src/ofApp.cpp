@@ -53,44 +53,6 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 		outputOfIMG_FIRST.outputOfHeatMapImg.update();
 		outputOfIMG_FIRST.outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
 		break;
-
-	case ConstTools::SECOND:
-		//mat_copy = img.clone();
-
-		cvtColor(s11.clone(), mat_gray, cv::COLOR_BGR2GRAY);
-
-		cv::GaussianBlur(mat_gray.clone(), mat_gaus, cv::Size(3, 3), 1, 1);
-
-		saliencyAlgorithm->computeSaliency(mat_gaus.clone(), saliencyMap_SPECTRAL_RESIDUAL2);
-
-		cv::normalize(saliencyMap_SPECTRAL_RESIDUAL2.clone(), saliencyMap_norm, 0.0, 255.0, cv::NORM_MINMAX);
-
-		saliencyMap_norm.convertTo(saliencyMap_second, CV_8UC3);
-
-		//    minMaxLoc(saliencyMap, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc, cv::Mat());
-
-		t1 = saliencyMap_second.clone();
-		ofxCv::toOf(t1, outputOfIMG_SECOND.outputOfSaliencyImg);
-
-		outputOfIMG_SECOND.outputOfSaliencyImg.update();
-
-		saliency_copy2 = saliencyMap.clone();
-
-		for (int x = 0; x < saliency_copy2.rows; ++x) {
-			for (int y = 0; y < saliency_copy2.cols; ++y) {
-				saliency_copy2.at<uchar>(x, y) = 255 - (int)saliency_copy2.at<uchar>(x, y);
-				//ofLogNotice()<<"(int)saliency_copy.at<uchar>("<<x<<","<<y<< ") : "<<(int)saliency_copy.at<uchar>( x, y );
-			}
-		}
-
-		cv::applyColorMap(saliency_copy2.clone(), saliencyMap_color_second, cv::COLORMAP_JET);
-
-		t2 = saliencyMap_color_second.clone();
-
-		ofxCv::toOf(t2, outputOfIMG_SECOND.outputOfHeatMapImg);
-		outputOfIMG_SECOND.outputOfHeatMapImg.update();
-		outputOfIMG_SECOND.outputOfHeatMapImg.save(outputfileName2.outputOfSaliencyImg);
-		break;
 	}
 }
 
@@ -308,8 +270,8 @@ void ofApp::update() {
 			remoteEyeGazeX = m.getArgAsFloat(0);
 			remoteEyeGazeY = m.getArgAsFloat(1);
 
-			ofLogNotice() << "remoteEyeGazeX: " << remoteEyeGazeX;
-			ofLogNotice() << "remoteEyeGazeY: " << remoteEyeGazeY;
+			/*ofLogNotice() << "remoteEyeGazeX: " << remoteEyeGazeX;
+			ofLogNotice() << "remoteEyeGazeY: " << remoteEyeGazeY;*/
 
 			int remoteEyeGazeIntX = (int)remoteEyeGazeX;
 			int remoteEyeGazeIntY = (int)remoteEyeGazeY;
@@ -322,13 +284,13 @@ void ofApp::update() {
 				}
 				if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
 				{
-					ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
-					ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;
+					/*ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
+					ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;*/
 					if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) >= 255)
 					{
 						return;
 					}
-					ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
+					//ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
 					eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
 					cv::Mat s9 = eyeGazeMat.clone();
 					ofxCv::toOf(s9, outputOfIMG_FIRST.outputOfEyeGazeImg);
@@ -608,14 +570,26 @@ void ofApp::keyPressed(int key) {
 
 			cv::Mat loadMat = ofxCv::toCv(loadOfImage);
 
-			cv::Mat s10 = loadMat.clone();
+			cv::Mat loadMat_gray, loadMat_gray8UC3;
+
+			cvtColor(loadMat.clone(), loadMat_gray, cv::COLOR_BGR2GRAY);
+
+			loadMat_gray.convertTo(loadMat_gray8UC3, CV_8UC3);
+
+			cv::Mat s10 = loadMat_gray8UC3.clone();
 
 			ofxCv::toOf(s10, outputOfIMG_FIRST.outputOfResultImg);
 			outputOfIMG_FIRST.outputOfResultImg.update();
 
 			//loadState = ConstTools::SECOND; 
-			//s11 = s10.clone();
-			//createSaliencyMap(s11);
+
+			
+			/*ofxCv::toOf(loadMat_gray.clone(), outputOfIMG_FIRST.outputOfResultImg);
+			outputOfIMG_FIRST.outputOfResultImg.update();*/
+
+		}
+		else {
+			ofLogWarning() << "Can not load EyeGazeHeatMap file.";
 		}
 		break;
 	case 'n':
