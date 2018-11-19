@@ -70,7 +70,7 @@ public:
 
 	std::vector<cv::Vec3b> colorTab;
 
-	cv::Mat markersSave;
+	cv::Mat markersSave, markersSave_SECOND;
 
 	cv::Mat watershedHighest, saliencyHighest;
 
@@ -79,8 +79,8 @@ public:
 	SaliencyTools::MinMax minMax;
 	//    std::vector<int> pixelsList;
 
-	std::vector<int> saliencyPointSave;
-	std::vector<int> saliencyPointBackUp;
+	std::vector<int> saliencyPointSave, saliencyPointSave_SECOND;
+	std::vector<int> saliencyPointBackUp, saliencyPointBackUp_SECOND;
 
 	std::vector<int>::iterator iter;
 	int saliencyPointMaxIndex;
@@ -106,4 +106,8 @@ public:
 	cv::Mat s11;
 
 	ConstTools::Infomation infomation;
+
+	cv::Mat mat_original_SECOND, mat_copy_SECOND;
+
+	cv::Mat saliencyMap2;
 };
