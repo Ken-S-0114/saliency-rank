@@ -66,30 +66,41 @@ public:
 
 	OutputOfImg outputOfIMG_FIRST, outputOfIMG_SECOND;
 
-	cv::Mat saliencyMap, saliencyMap_color;
+	struct ViewMat
+	{
+		cv::Mat saliencyMap, saliencyMapColor;
+		cv::Mat watershedHighest, saliencyHighest;
+	};
 
-	std::vector<cv::Vec3b> colorTab;
+	ViewMat viewMatSaliency, viewMatEyeGaze;
+
+	std::vector<cv::Vec3b> colorTabSaliency, colorTabEyeGaze;
 
 	cv::Mat markersSave, markersSave_SECOND;
 
-	cv::Mat watershedHighest, saliencyHighest;
-
-	cv::Mat imgG;
+	cv::Mat imgG, imgG2;
 
 	SaliencyTools::MinMax minMax;
 	//    std::vector<int> pixelsList;
 
-	std::vector<int> saliencyPointSave, saliencyPointSave_SECOND;
-	std::vector<int> saliencyPointBackUp, saliencyPointBackUp_SECOND;
+	struct SaliencyPoint
+	{
+		std::vector<int> save, backup;
+	};
+	SaliencyPoint saliencyPointPicture, saliencyPointEyeGaze;
 
-	std::vector<int>::iterator iter;
-	int saliencyPointMaxIndex;
+	struct MaxSaliencyPoint
+	{
+		std::vector<int>::iterator iter;
+		int maxIndex;
+	};
+	MaxSaliencyPoint maxSaliencyPointPicture, maxSaliencyPointEyeGaze;
 
-	bool enterState;
+	ConstTools::EnterState enterState;
 	int enterCount;
 	std::stringstream enterCountString;
 
-	ConstTools::Use use;
+	ConstTools::Mode mode;
 
 	ofxOscReceiver receiver;
 	float remoteEyeGazeX, remoteEyeGazeY;
@@ -102,12 +113,10 @@ public:
 
 	ofxHeatMap heatmap;
 
-	cv::Mat saliencyMap_second, saliencyMap_color_second;
 	cv::Mat s11;
 
 	ConstTools::Infomation infomation;
 
 	cv::Mat mat_original_SECOND, mat_copy_SECOND;
 
-	cv::Mat saliencyMap2;
 };

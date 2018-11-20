@@ -26,7 +26,7 @@ public:
 		std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg2.png";
 	};
 
-	enum Use {
+	enum Mode {
 		RELEASE,
 		DEBUG,
 		EYETRACK,
@@ -51,4 +51,9 @@ public:
 		HIDE
 	};
 
+	enum EnterState {
+		NONE,
+		SALIENCYMAP,
+		EYEGAZE
+	};
 };
