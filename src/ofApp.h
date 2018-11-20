@@ -54,7 +54,10 @@ public:
 
 	ofImage inputOfImg, loadOfImage;
 
-	cv::Mat mat_original, mat_copy, mat_mix;
+	struct OriginalMat {
+		cv::Mat original, copy;
+	};
+	OriginalMat originalMatPicture, originalMatEyeGaze;
 
 	struct OutputOfImg
 	{
@@ -62,16 +65,14 @@ public:
 		ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
 		ofImage outputOfEyeGazeHeatMapImg, outputOfResultImg;
 	};
-
-
 	OutputOfImg outputOfIMG_FIRST, outputOfIMG_SECOND;
 
 	struct ViewMat
 	{
 		cv::Mat saliencyMap, saliencyMapColor;
 		cv::Mat watershedHighest, saliencyHighest;
+		cv::Mat mat_mix;
 	};
-
 	ViewMat viewMatSaliency, viewMatEyeGaze;
 
 	std::vector<cv::Vec3b> colorTabSaliency, colorTabEyeGaze;
@@ -97,8 +98,8 @@ public:
 	MaxSaliencyPoint maxSaliencyPointPicture, maxSaliencyPointEyeGaze;
 
 	ConstTools::EnterState enterState;
-	int enterCount;
-	std::stringstream enterCountString;
+	int enterCountPicture, enterCountEyeGaze;
+	std::stringstream enterCountStringPicture, enterCountStringEyeGaze;
 
 	ConstTools::Mode mode;
 
@@ -116,7 +117,5 @@ public:
 	cv::Mat s11;
 
 	ConstTools::Infomation infomation;
-
-	cv::Mat mat_original_SECOND, mat_copy_SECOND;
 
 };
