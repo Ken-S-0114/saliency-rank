@@ -49,7 +49,7 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 
 	ofxCv::toOf(s2, outputOfIMG_FIRST.outputOfHeatMapImg);
 	outputOfIMG_FIRST.outputOfHeatMapImg.update();
-	outputOfIMG_FIRST.outputOfHeatMapImg.save(outputfileName.outputOfSaliencyImg);
+	//outputOfIMG_FIRST.outputOfHeatMapImg.save(outputfileNamePic.outputOfSaliencyImg);
 
 }
 
@@ -58,7 +58,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 	if (loadState == ConstTools::FIRST)
 	{
 		cv::Mat thresh;
-		//cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+		//cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
 		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
 		cv::Mat opening;
@@ -210,7 +210,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s6, outputOfIMG_FIRST.outputOfWatershedAfterImg);
 		outputOfIMG_FIRST.outputOfWatershedAfterImg.update();
-		outputOfIMG_FIRST.outputOfWatershedAfterImg.save(outputfileName.outputOfWatershedAfterImg);
+		//outputOfIMG_FIRST.outputOfWatershedAfterImg.save(outputfileNamePic.outputOfWatershedAfterImg);
 
 		ofxCv::toOf(s7, outputOfIMG_FIRST.outputOfWatershedHighestImg);
 		outputOfIMG_FIRST.outputOfWatershedHighestImg.update();
@@ -221,7 +221,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s8, outputOfIMG_FIRST.outputOfSaliencyMapHighestImg);
 		outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.update();
-		outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);
+		outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNamePic.outputOfSaliencyMapHighestImg);
 
 		markersSave = markers.clone();
 
@@ -234,7 +234,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 	else if (loadState == ConstTools::SECOND)
 	{
 		cv::Mat thresh;
-		//cv::threshold(saliencyMap.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+		//cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
 		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
 		cv::Mat opening;
@@ -381,7 +381,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		outputOfIMG_SECOND.outputOfWatershedImg.update();
 		ofxCv::toOf(s6, outputOfIMG_SECOND.outputOfWatershedAfterImg);
 		outputOfIMG_SECOND.outputOfWatershedAfterImg.update();
-		outputOfIMG_SECOND.outputOfWatershedAfterImg.save(outputfileName2.outputOfWatershedAfterImg);
+		//outputOfIMG_SECOND.outputOfWatershedAfterImg.save(outputfileNameEye.outputOfWatershedAfterImg);
 		ofxCv::toOf(s7, outputOfIMG_SECOND.outputOfWatershedHighestImg);
 		outputOfIMG_SECOND.outputOfWatershedHighestImg.update();
 		viewMatEyeGaze.mat_mix = originalMatEyeGaze.original*0.2 + originalMatEyeGaze.copy*0.8;
@@ -390,7 +390,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s8, outputOfIMG_SECOND.outputOfSaliencyMapHighestImg);
 		outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.update();
-		outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.save(outputfileName2.outputOfSaliencyMapHighestImg);
+		outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNameEye.outputOfSaliencyMapHighestImg);
 
 		markersSave_SECOND = markers.clone();
 
@@ -428,7 +428,9 @@ void ofApp::setup() {
 	enterCountEyeGaze = 0;
 	enterCountStringPicture << "The " << enterCountPicture + 1 << " most saliency place";
 	enterCountStringEyeGaze << "The " << enterCountEyeGaze + 1 << " most saliency place";
-	inputOfImg.load(inputFileName.lenna);
+
+
+	inputOfImg.load(prefixSampleImagePath + "/" + inputFileName.lenna);
 	//inputOfImg.load(outputfileName.outputOfEyeGazeHeatMapImg);
 	inputOfImg.update();
 
@@ -531,10 +533,14 @@ void ofApp::update() {
 
 			viewMatSaliency.mat_mix = originalMatPicture.original*0.2 + originalMatPicture.copy*0.8;
 
+			std::ostringstream number;
+			number << enterCountPicture+1;
+
 			cv::Mat s8 = viewMatSaliency.mat_mix.clone();
 			ofxCv::toOf(s8, outputOfIMG_FIRST.outputOfSaliencyMapHighestImg);
 			outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.update();
-			outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(outputfileName.outputOfSaliencyMapHighestImg);
+			outputOfIMG_FIRST.outputOfSaliencyMapHighestImg
+				.save(prefixResultPath + "/" + outputfileNamePic.outputOfSaliencyMapHighestImg + "_" + number.str() + ".png");
 
 			enterCountStringPicture << "The " << enterCountPicture + 1 << " most saliency place";
 
@@ -587,10 +593,14 @@ void ofApp::update() {
 
 			viewMatEyeGaze.mat_mix = originalMatEyeGaze.original*0.2 + originalMatEyeGaze.copy*0.8;
 
+			std::ostringstream number;
+			number << enterCountEyeGaze + 1;
+
 			cv::Mat s8 = viewMatEyeGaze.mat_mix.clone();
 			ofxCv::toOf(s8, outputOfIMG_SECOND.outputOfSaliencyMapHighestImg);
 			outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.update();
-			outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.save(outputfileName2.outputOfSaliencyMapHighestImg);
+			outputOfIMG_SECOND.outputOfSaliencyMapHighestImg
+				.save(prefixResultPath + "/" + outputfileNameEye.outputOfSaliencyMapHighestImg + "_" + number.str() + ".png");
 
 			enterCountStringEyeGaze << "The " << enterCountEyeGaze + 1 << " most saliency place";
 
@@ -799,7 +809,7 @@ void ofApp::keyPressed(int key) {
 		// "S"‚ð‰Ÿ‚µ‚½Žž:
 		if (eyeTrackState == ConstTools::STANDBY && ((mode == ConstTools::EYETRACK) || (mode == ConstTools::EYETRACKHEATMAP)))
 		{
-			heatmap.save(outputfileName.outputOfEyeGazeHeatMapImg);
+			heatmap.save(outputfileNameEye.outputOfEyeGazeHeatMapImg);
 			eyeTrackState = ConstTools::SAVE;
 		}
 		break;
@@ -840,7 +850,7 @@ void ofApp::keyPressed(int key) {
 	case 'b':
 		// "B"‚ð‰Ÿ‚µ‚½Žž: result
 		mode = ConstTools::RESULT;
-		if (loadOfImage.load(outputfileName.outputOfEyeGazeHeatMapImg))
+		if (loadOfImage.load(outputfileNameEye.outputOfEyeGazeHeatMapImg))
 		{
 			loadOfImage.update();
 

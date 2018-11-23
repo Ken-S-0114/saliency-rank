@@ -49,8 +49,8 @@ public:
 	void createWatershed(cv::Mat saliencyImg);
 
 	ConstTools::InputFileName inputFileName;
-	ConstTools::OutputFileName_FIRST outputfileName;
-	ConstTools::OutputFileName_SECOND outputfileName2;
+	ConstTools::OutputFileName_Picture outputfileNamePic;
+	ConstTools::OutputFileName_EyeGaze outputfileNameEye;
 
 	ofImage inputOfImg, loadOfImage;
 
@@ -99,6 +99,7 @@ public:
 
 	ConstTools::EnterState enterState;
 	int enterCountPicture, enterCountEyeGaze;
+
 	std::stringstream enterCountStringPicture, enterCountStringEyeGaze;
 
 	ConstTools::Mode mode;
@@ -114,8 +115,8 @@ public:
 
 	ofxHeatMap heatmap;
 
-	cv::Mat s11;
-
 	ConstTools::Infomation infomation;
 
+	std::string prefixSampleImagePath = "sampleImage";
+	std::string prefixResultPath = "result";
 };
