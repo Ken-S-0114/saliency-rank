@@ -19,28 +19,37 @@ public:
         std::string christmas = "sample.jpg";
         std::string cardboard = "sample2.jpg";
 
-//        std::string lenna = "lenna.jpg";
-//        //std::string lenna = "lenna-mac.png";
-//        std::string mountain = "mountain.jpg";
-//        std::string sea = "sea.jpg";
-//        std::string sunflower = "sunflower.jpg";
+        std::string fireworks2 = "fireworks2.jpg";
+        std::string castle = "castle.jpg";
+        std::string landscape = "landscape.jpg";
+        std::string forest = "forest.jpg";
+
+        std::string dandelion = "dandelion.jpg";
+        std::string group = "group.jpg";
+        std::string fireworks = "fireworks.jpg";
+
+        std::string snowylandscape = "snowylandscape.jpg";
+        std::string hotellandscape = "hotellandscape.jpg";
+        std::string cherryblossoms = "cherryblossoms.jpg";
+        std::string hotel = "hotel.jpg";
     };
 
-    struct OutputFileName_FIRST {
+    struct OutputFileName_Picture {
         std::string outputOfSaliencyImg = "outputOfSaliencyImg.png";
         std::string outputOfWatershedAfterImg = "outputOfWatershedAfterImg.png";
-        std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg.png";
+        std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg";
+        //std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg.png";
+    };
+
+    struct OutputFileName_EyeGaze {
+        std::string outputOfSaliencyImg = "outputOfSaliencyImg2.png";
+        std::string outputOfWatershedAfterImg = "outputOfWatershedAfterImg2.png";
+        std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg2";
+        //std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg2.png";
         std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg.png";
     };
 
-    struct OutputFileName_SECOND {
-        std::string outputOfSaliencyImg = "outputOfSaliencyImg2.png";
-        std::string outputOfWatershedAfterImg = "outputOfWatershedAfterImg2.png";
-        std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg2.png";
-        std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg2.png";
-    };
-
-    enum Use {
+    enum Mode {
         RELEASE,
         DEBUG,
         EYETRACK,
@@ -65,5 +74,10 @@ public:
         HIDE
     };
 
+    enum EnterState {
+        NONE,
+        SALIENCYMAP,
+        EYEGAZE
+    };
 };
 #endif /* constTools_hpp */

@@ -3,9 +3,8 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "ofxCv.h"
-#include "ofxGui.h"
 #include "ofxOsc.h"
-#include "ofxHeatMap.h"
+//#include "ofxHeatMap.h"
 
 #include "saliencySpecializedClasses.hpp"
 #include "opencv2/opencv.hpp"
@@ -17,7 +16,6 @@
 #include "vector"
 #include "algorithm"
 
-#include "saliencyTools.hpp"
 #include "constTools.hpp"
 
 #define MACWIDTH 1024
@@ -49,12 +47,15 @@ public:
     void createWatershed(cv::Mat saliencyImg);
 
     ConstTools::InputFileName inputFileName;
-    ConstTools::OutputFileName_FIRST outputfileName;
-    ConstTools::OutputFileName_SECOND outputfileName2;
+    ConstTools::OutputFileName_Picture outputfileNamePic;
+    ConstTools::OutputFileName_EyeGaze outputfileNameEye;
 
     ofImage inputOfImg, loadOfImage;
 
-    cv::Mat mat_original, mat_copy, mat_mix;
+    struct OriginalMat {
+        cv::Mat original, copy;
+    };
+    OriginalMat originalMatPicture, originalMatEyeGaze;
 
     struct OutputOfImg
     {
@@ -62,34 +63,44 @@ public:
         ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
         ofImage outputOfEyeGazeHeatMapImg, outputOfResultImg;
     };
-
-
     OutputOfImg outputOfIMG_FIRST, outputOfIMG_SECOND;
 
-    cv::Mat saliencyMap, saliencyMap_color;
+    struct ViewMat
+    {
+        cv::Mat saliencyMap, saliencyMapColor;
+        cv::Mat watershedHighest, saliencyHighest;
+        cv::Mat mat_mix;
+    };
+    ViewMat viewMatSaliency, viewMatEyeGaze;
 
-    std::vector<cv::Vec3b> colorTab;
+    std::vector<cv::Vec3b> colorTabSaliency, colorTabEyeGaze;
 
-    cv::Mat markersSave;
+    cv::Mat markersSave, markersSave_SECOND;
 
-    cv::Mat watershedHighest, saliencyHighest;
+    cv::Mat imgG, imgG2;
 
-    cv::Mat imgG;
-
-    SaliencyTools::MinMax minMax;
+//    SaliencyTools::MinMax minMax;
     //    std::vector<int> pixelsList;
 
-    std::vector<int> saliencyPointSave;
-    std::vector<int> saliencyPointBackUp;
+    struct SaliencyPoint
+    {
+        std::vector<int> save, backup;
+    };
+    SaliencyPoint saliencyPointPicture, saliencyPointEyeGaze;
 
-    std::vector<int>::iterator iter;
-    int saliencyPointMaxIndex;
+    struct MaxSaliencyPoint
+    {
+        std::vector<int>::iterator iter;
+        int maxIndex;
+    };
+    MaxSaliencyPoint maxSaliencyPointPicture, maxSaliencyPointEyeGaze;
 
-    bool enterState;
-    int enterCount;
-    std::stringstream enterCountString;
+    ConstTools::EnterState enterState;
+    int enterCountPicture, enterCountEyeGaze;
 
-    ConstTools::Use use;
+    std::stringstream enterCountStringPicture, enterCountStringEyeGaze;
+
+    ConstTools::Mode mode;
 
     ofxOscReceiver receiver;
     float remoteEyeGazeX, remoteEyeGazeY;
@@ -100,10 +111,10 @@ public:
     ConstTools::EyeTrackState eyeTrackState;
     ConstTools::LoadState loadState;
 
-    ofxHeatMap heatmap;
-
-    cv::Mat saliencyMap_second, saliencyMap_color_second;
-    cv::Mat s11;
+    //ofxHeatMap heatmap;
 
     ConstTools::Infomation infomation;
+
+    std::string prefixSampleImagePath = "sampleImage";
+    std::string prefixResultPath = "result";
 };
