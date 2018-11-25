@@ -16,22 +16,17 @@ public:
 
     struct InputFileName {
         std::string lenna = "lenna.png";
-        std::string christmas = "sample.jpg";
+        std::string christmas = "sample";
         std::string cardboard = "sample2.jpg";
 
-        std::string fireworks2 = "fireworks2.jpg";
-        std::string castle = "castle.jpg";
-        std::string landscape = "landscape.jpg";
-        std::string forest = "forest.jpg";
+        std::string landscape = "landscape";
 
-        std::string dandelion = "dandelion.jpg";
-        std::string group = "group.jpg";
-        std::string fireworks = "fireworks.jpg";
-
-        std::string snowylandscape = "snowylandscape.jpg";
-        std::string hotellandscape = "hotellandscape.jpg";
-        std::string cherryblossoms = "cherryblossoms.jpg";
-        std::string hotel = "hotel.jpg";
+        std::string dog = "dog";
+        std::string nightview = "nightview";
+        std::string groupphoto = "groupphoto";
+        std::string lighttower = "lighttower";
+        std::string sea = "sea";
+        std::string hotellandscape = "hotellandscape";
     };
 
     struct OutputFileName_Picture {

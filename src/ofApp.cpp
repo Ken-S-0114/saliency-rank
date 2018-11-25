@@ -3,7 +3,7 @@
 #define PORT 8000
 #define HOST "127.0.0.1"
 
-#define THRESH 0.3
+#define THRESH 0.6
 
 //--------------------------------------------------------------
 void ofApp::createSaliencyMap(cv::Mat img) {
@@ -33,7 +33,7 @@ void ofApp::createSaliencyMap(cv::Mat img) {
     s1 = viewMatSaliency.saliencyMap.clone();
     ofxCv::toOf(s1, outputOfIMG_FIRST.outputOfSaliencyImg);
     outputOfIMG_FIRST.outputOfSaliencyImg.update();
-
+    outputOfIMG_FIRST.outputOfSaliencyImg.save(prefixResultPath+"/"+name+"_saliencyMap"+pngPath);
     saliency_copy = viewMatSaliency.saliencyMap.clone();
 
     for (int x = 0; x < saliency_copy.rows; ++x) {
@@ -49,6 +49,7 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 
     ofxCv::toOf(s2, outputOfIMG_FIRST.outputOfHeatMapImg);
     outputOfIMG_FIRST.outputOfHeatMapImg.update();
+    outputOfIMG_FIRST.outputOfHeatMapImg.save(prefixResultPath+"/"+name+"_heatMap"+pngPath);
     //outputOfIMG_FIRST.outputOfHeatMapImg.save(outputfileNamePic.outputOfSaliencyImg);
 
 }
@@ -58,8 +59,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
     if (loadState == ConstTools::FIRST)
     {
         cv::Mat thresh;
-        //cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
-        cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+        cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+        //cv::threshold(saliencyImg.clone(), thresh, 255/4, 255, CV_THRESH_BINARY);
 
         cv::Mat opening;
         cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -141,7 +142,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
             int g = cv::theRNG().uniform(0, 255);
             int r = cv::theRNG().uniform(0, 255);
 
-            colorTabSaliency.push_back(cv::Vec3b((uchar)b, (uchar)g, (uchar)r));
+            colorTabSaliency.push_back(cv::Vec3b((uchar)r, (uchar)g, (uchar)b));
         }
 
         for (int i = 0; i < markers.rows; i++) {
@@ -213,6 +214,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
         ofxCv::toOf(s6, outputOfIMG_FIRST.outputOfWatershedAfterImg);
         outputOfIMG_FIRST.outputOfWatershedAfterImg.update();
+        outputOfIMG_FIRST.outputOfWatershedAfterImg.save(prefixResultPath+"/"+name+"_watershed"+pngPath);
         //outputOfIMG_FIRST.outputOfWatershedAfterImg.save(outputfileNamePic.outputOfWatershedAfterImg);
 
         ofxCv::toOf(s7, outputOfIMG_FIRST.outputOfWatershedHighestImg);
@@ -224,7 +226,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
         ofxCv::toOf(s8, outputOfIMG_FIRST.outputOfSaliencyMapHighestImg);
         outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.update();
-        outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNamePic.outputOfSaliencyMapHighestImg);
+        outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(prefixResultPath+"/"+name+"_number1"+pngPath);
+        //outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNamePic.outputOfSaliencyMapHighestImg+pngPath);
 
         markersSave = markers.clone();
 
@@ -396,7 +399,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
         ofxCv::toOf(s8, outputOfIMG_SECOND.outputOfSaliencyMapHighestImg);
         outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.update();
-        outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNameEye.outputOfSaliencyMapHighestImg);
+        outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNameEye.outputOfSaliencyMapHighestImg+pngPath);
 
         markersSave_SECOND = markers.clone();
 
@@ -414,7 +417,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 //--------------------------------------------------------------
 void ofApp::setup() {
 
-    receiver.setup(PORT);
+    //receiver.setup(PORT);
     eyeTrackState = ConstTools::STANDBY;
     loadState = ConstTools::FIRST;
     infomation = ConstTools::VIEW;
@@ -436,7 +439,8 @@ void ofApp::setup() {
     enterCountStringEyeGaze << "The " << enterCountEyeGaze + 1 << " most saliency place";
 
 
-    inputOfImg.load(prefixSampleImagePath + "/" + inputFileName.fireworks);
+    inputOfImg.load(prefixSampleImagePath + "/" + inputFileName.groupphoto+jpgPath);
+    name = inputFileName.groupphoto;
     //inputOfImg.load(outputfileName.outputOfEyeGazeHeatMapImg);
     inputOfImg.update();
 
@@ -451,47 +455,47 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::update() {
 
-    while (receiver.hasWaitingMessages())
-    {
-        ofxOscMessage m;
-        receiver.getNextMessage(&m);
-
-        if (m.getAddress() == "/eyeGaze") {
-
-            remoteEyeGazeX = m.getArgAsFloat(0);
-            remoteEyeGazeY = m.getArgAsFloat(1);
-
-            /*ofLogNotice() << "remoteEyeGazeX: " << remoteEyeGazeX;
-             ofLogNotice() << "remoteEyeGazeY: " << remoteEyeGazeY;*/
-
-            int remoteEyeGazeIntX = (int)remoteEyeGazeX;
-            int remoteEyeGazeIntY = (int)remoteEyeGazeY;
-
-            if (eyeTrackState == ConstTools::TRACKING)
-            {
-                if ((0 > remoteEyeGazeIntX) || (0 > remoteEyeGazeIntY))
-                {
-                    return;
-                }
-                if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
-                {
-                    /*ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
-                     ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;*/
-                    if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) >= 255)
-                    {
-                        return;
-                    }
-                    //ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
-                    eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
-                    cv::Mat s9 = eyeGazeMat.clone();
-                    ofxCv::toOf(s9, outputOfIMG_FIRST.outputOfEyeGazeImg);
-                    outputOfIMG_FIRST.outputOfEyeGazeImg.update();
-
-                    //heatmap.addPoint(remoteEyeGazeIntX, remoteEyeGazeIntY);
-                }
-            }
-        }
-    }
+//    while (receiver.hasWaitingMessages())
+//    {
+//        ofxOscMessage m;
+//        receiver.getNextMessage(&m);
+//
+//        if (m.getAddress() == "/eyeGaze") {
+//
+//            remoteEyeGazeX = m.getArgAsFloat(0);
+//            remoteEyeGazeY = m.getArgAsFloat(1);
+//
+//            /*ofLogNotice() << "remoteEyeGazeX: " << remoteEyeGazeX;
+//             ofLogNotice() << "remoteEyeGazeY: " << remoteEyeGazeY;*/
+//
+//            int remoteEyeGazeIntX = (int)remoteEyeGazeX;
+//            int remoteEyeGazeIntY = (int)remoteEyeGazeY;
+//
+//            if (eyeTrackState == ConstTools::TRACKING)
+//            {
+//                if ((0 > remoteEyeGazeIntX) || (0 > remoteEyeGazeIntY))
+//                {
+//                    return;
+//                }
+//                if ((remoteEyeGazeIntX <= WINWIDTH) && (remoteEyeGazeIntY <= WINHEIGHT))
+//                {
+//                    /*ofLogNotice() << "remoteEyeGazeIntX(after): " << remoteEyeGazeIntX;
+//                     ofLogNotice() << "remoteEyeGazeIntY(after): " << remoteEyeGazeIntY;*/
+//                    if ((int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) >= 255)
+//                    {
+//                        return;
+//                    }
+//                    //ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX);
+//                    eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) = (int)eyeGazeMat.at<uchar>(remoteEyeGazeIntY, remoteEyeGazeIntX) + 254;
+//                    cv::Mat s9 = eyeGazeMat.clone();
+//                    ofxCv::toOf(s9, outputOfIMG_FIRST.outputOfEyeGazeImg);
+//                    outputOfIMG_FIRST.outputOfEyeGazeImg.update();
+//
+//                    //heatmap.addPoint(remoteEyeGazeIntX, remoteEyeGazeIntY);
+//                }
+//            }
+//        }
+//    }
 
     if (eyeTrackState == ConstTools::TRACKING)
     {
@@ -546,7 +550,9 @@ void ofApp::update() {
             ofxCv::toOf(s8, outputOfIMG_FIRST.outputOfSaliencyMapHighestImg);
             outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.update();
             outputOfIMG_FIRST.outputOfSaliencyMapHighestImg
-            .save(prefixResultPath + "/" + outputfileNamePic.outputOfSaliencyMapHighestImg + "_" + number.str() + ".png");
+            .save(prefixResultPath+"/"+name+"_number"+number.str()+pngPath);
+//            outputOfIMG_FIRST.outputOfSaliencyMapHighestImg
+//            .save(prefixResultPath + "/" + outputfileNamePic.outputOfSaliencyMapHighestImg + "_" + number.str() + ".png");
 
             enterCountStringPicture << "The " << enterCountPicture + 1 << " most saliency place";
 
@@ -899,20 +905,20 @@ void ofApp::keyPressed(int key) {
 }
 
 //--------------------------------------------------------------
-void ofApp::dumpOSC(ofxOscMessage m) {
-    string msg_string;
-    msg_string = m.getAddress();
-    for (int i = 0; i < m.getNumArgs(); i++) {
-        msg_string += " ";
-        if (m.getArgType(i) == OFXOSC_TYPE_INT32)
-            msg_string += ofToString(m.getArgAsInt32(i));
-        else if (m.getArgType(i) == OFXOSC_TYPE_FLOAT)
-            msg_string += ofToString(m.getArgAsFloat(i));
-        else if (m.getArgType(i) == OFXOSC_TYPE_STRING)
-            msg_string += m.getArgAsString(i);
-    }
-    cout << msg_string << endl;
-}
+//void ofApp::dumpOSC(ofxOscMessage m) {
+//    string msg_string;
+//    msg_string = m.getAddress();
+//    for (int i = 0; i < m.getNumArgs(); i++) {
+//        msg_string += " ";
+//        if (m.getArgType(i) == OFXOSC_TYPE_INT32)
+//            msg_string += ofToString(m.getArgAsInt32(i));
+//        else if (m.getArgType(i) == OFXOSC_TYPE_FLOAT)
+//            msg_string += ofToString(m.getArgAsFloat(i));
+//        else if (m.getArgType(i) == OFXOSC_TYPE_STRING)
+//            msg_string += m.getArgAsString(i);
+//    }
+//    cout << msg_string << endl;
+//}
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key) {

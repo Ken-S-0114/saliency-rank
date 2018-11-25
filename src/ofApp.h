@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "ofxCv.h"
-#include "ofxOsc.h"
+//#include "ofxOsc.h"
 //#include "ofxHeatMap.h"
 
 #include "saliencySpecializedClasses.hpp"
@@ -102,10 +102,10 @@ public:
 
     ConstTools::Mode mode;
 
-    ofxOscReceiver receiver;
+    //ofxOscReceiver receiver;
     float remoteEyeGazeX, remoteEyeGazeY;
 
-    void dumpOSC(ofxOscMessage m);
+    //void dumpOSC(ofxOscMessage m);
 
     cv::Mat eyeGazeMat;
     ConstTools::EyeTrackState eyeTrackState;
@@ -117,4 +117,9 @@ public:
 
     std::string prefixSampleImagePath = "sampleImage";
     std::string prefixResultPath = "result";
+
+    std::string pngPath = ".png";
+    std::string jpgPath = ".jpg";
+
+    std::string name;
 };
