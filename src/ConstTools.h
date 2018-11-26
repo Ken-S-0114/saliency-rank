@@ -8,12 +8,18 @@ public:
 		std::string lenna = "lenna.jpg";
 		std::string lennamac = "lenna-mac.png";
 		std::string mountain = "mountain.jpg";
-		std::string sea = "sea.jpg";
 		std::string sunflower = "sunflower.jpg";
 		std::string group = "group.jpg";
 		std::string outdoors = "outdoors.jpg";
 		std::string board = "board.jpg";
 		std::string fireworks = "fireworks.jpg";
+
+		//std::string dog = "dog";
+		//std::string nightview = "nightview";
+		//std::string groupphoto = "groupphoto";
+		//std::string lighttower = "lighttower";
+		//std::string sea = "sea";
+		//std::string hotellandscape = "hotellandscape";
 	};
 
 	struct OutputFileName_Picture {
@@ -47,8 +53,8 @@ public:
 	};
 
 	enum LoadState {
-		FIRST,
-		SECOND
+		SALLOAD,
+		EYELOAD
 	};
 
 	enum Infomation {

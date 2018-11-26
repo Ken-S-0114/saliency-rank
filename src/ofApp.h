@@ -17,7 +17,6 @@
 #include "vector"
 #include "algorithm"
 
-#include "saliencyTools.h"
 #include "constTools.h"
 
 #define MACWIDTH 1024
@@ -81,7 +80,6 @@ public:
 
 	cv::Mat imgG, imgG2;
 
-	SaliencyTools::MinMax minMax;
 	//    std::vector<int> pixelsList;
 
 	struct SaliencyPoint
@@ -119,4 +117,6 @@ public:
 
 	std::string prefixSampleImagePath = "sampleImage";
 	std::string prefixResultPath = "result";
+
+	std::string name;
 };

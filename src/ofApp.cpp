@@ -50,16 +50,17 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 	ofxCv::toOf(s2, outputOfIMG_FIRST.outputOfHeatMapImg);
 	outputOfIMG_FIRST.outputOfHeatMapImg.update();
 	//outputOfIMG_FIRST.outputOfHeatMapImg.save(outputfileNamePic.outputOfSaliencyImg);
+	outputOfIMG_FIRST.outputOfHeatMapImg.save(prefixResultPath + "/" + name + "_heatMap" + ".png");
 
 }
 
 //--------------------------------------------------------------
 void ofApp::createWatershed(cv::Mat saliencyImg) {
-	if (loadState == ConstTools::FIRST)
+	if (loadState == ConstTools::SALLOAD)
 	{
 		cv::Mat thresh;
-		//cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
-		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+		cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+		//cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
 		cv::Mat opening;
 		cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -73,10 +74,13 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		cv::Mat sure_fg;
 
-		cv::minMaxLoc(dist_transform, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc);
-		cv::threshold(dist_transform.clone(), sure_fg, THRESH*minMax.max_val, 255, 0);
+		cv::Point min_loc, max_loc;
+		double min_val, max_val;
 
-		dist_transform = dist_transform / minMax.max_val;
+		cv::minMaxLoc(dist_transform, &min_val, &max_val, &min_loc, &max_loc);
+		cv::threshold(dist_transform.clone(), sure_fg, THRESH*max_val, 255, 0);
+
+		dist_transform = dist_transform / max_val;
 
 		cv::Mat s3 = sure_bg.clone();
 
@@ -221,7 +225,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s8, outputOfIMG_FIRST.outputOfSaliencyMapHighestImg);
 		outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.update();
-		outputOfIMG_FIRST.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNamePic.outputOfSaliencyMapHighestImg);
+		outputOfIMG_FIRST.outputOfSaliencyMapHighestImg
+			.save(prefixResultPath + "/" + outputfileNamePic.outputOfSaliencyMapHighestImg + ".png");
 
 		markersSave = markers.clone();
 
@@ -231,11 +236,11 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 			saliencyPoint.clear();
 		}
 	}
-	else if (loadState == ConstTools::SECOND)
+	else if (loadState == ConstTools::EYELOAD)
 	{
 		cv::Mat thresh;
-		//cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
-		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+		cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+		//cv::threshold(saliencyImg.clone(), thresh, 255/2, 255, CV_THRESH_BINARY);
 
 		cv::Mat opening;
 		cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -248,11 +253,13 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		cv::distanceTransform(opening, dist_transform, CV_DIST_L2, 5);
 
 		cv::Mat sure_fg;
+		cv::Point min_loc, max_loc;
+		double min_val, max_val;
 
-		cv::minMaxLoc(dist_transform, &minMax.min_val, &minMax.max_val, &minMax.min_loc, &minMax.max_loc);
-		cv::threshold(dist_transform.clone(), sure_fg, THRESH*minMax.max_val, 255, 0);
+		cv::minMaxLoc(dist_transform, &min_val, &max_val, &min_loc, &max_loc);
+		cv::threshold(dist_transform.clone(), sure_fg, (THRESH-0.2)*max_val, 255, 0);
 
-		dist_transform = dist_transform / minMax.max_val;
+		dist_transform = dist_transform / max_val;
 
 		cv::Mat s3 = sure_bg.clone();
 
@@ -382,6 +389,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s6, outputOfIMG_SECOND.outputOfWatershedAfterImg);
 		outputOfIMG_SECOND.outputOfWatershedAfterImg.update();
 		//outputOfIMG_SECOND.outputOfWatershedAfterImg.save(outputfileNameEye.outputOfWatershedAfterImg);
+		outputOfIMG_SECOND.outputOfWatershedAfterImg.save(prefixResultPath + "/" + name + "_watershed" + ".png");
+
 		ofxCv::toOf(s7, outputOfIMG_SECOND.outputOfWatershedHighestImg);
 		outputOfIMG_SECOND.outputOfWatershedHighestImg.update();
 		viewMatEyeGaze.mat_mix = originalMatEyeGaze.original*0.2 + originalMatEyeGaze.copy*0.8;
@@ -390,8 +399,9 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s8, outputOfIMG_SECOND.outputOfSaliencyMapHighestImg);
 		outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.update();
-		outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNameEye.outputOfSaliencyMapHighestImg);
-
+		//outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.save(prefixResultPath + "/" + outputfileNameEye.outputOfSaliencyMapHighestImg + ".png");
+		outputOfIMG_SECOND.outputOfSaliencyMapHighestImg
+			.save(prefixResultPath + "/" + name + "_number1" + ".png");
 		markersSave_SECOND = markers.clone();
 
 		if (!saliencyPoint.empty()) {
@@ -409,8 +419,9 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 void ofApp::setup() {
 
 	receiver.setup(PORT);
+
 	eyeTrackState = ConstTools::STANDBY;
-	loadState = ConstTools::FIRST;
+	loadState = ConstTools::SALLOAD;
 	infomation = ConstTools::VIEW;
 
 	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
@@ -430,9 +441,11 @@ void ofApp::setup() {
 	enterCountStringEyeGaze << "The " << enterCountEyeGaze + 1 << " most saliency place";
 
 
-	inputOfImg.load(prefixSampleImagePath + "/" + inputFileName.lenna);
+	inputOfImg.load(prefixSampleImagePath + "/" + inputFileName.lighttower+".jpg");
 	//inputOfImg.load(outputfileName.outputOfEyeGazeHeatMapImg);
 	inputOfImg.update();
+
+	name = prefixSampleImagePath + "/" + inputFileName.lighttower;
 
 	originalMatPicture.original = ofxCv::toCv(inputOfImg);
 
@@ -600,8 +613,8 @@ void ofApp::update() {
 			ofxCv::toOf(s8, outputOfIMG_SECOND.outputOfSaliencyMapHighestImg);
 			outputOfIMG_SECOND.outputOfSaliencyMapHighestImg.update();
 			outputOfIMG_SECOND.outputOfSaliencyMapHighestImg
-				.save(prefixResultPath + "/" + outputfileNameEye.outputOfSaliencyMapHighestImg + "_" + number.str() + ".png");
-
+				//.save(prefixResultPath + "/" + outputfileNameEye.outputOfSaliencyMapHighestImg + "_" + number.str() + ".png");
+			.save(prefixResultPath + "/" + name + "_number" + number.str() + ".png");
 			enterCountStringEyeGaze << "The " << enterCountEyeGaze + 1 << " most saliency place";
 
 		}
@@ -832,12 +845,12 @@ void ofApp::keyPressed(int key) {
 	case 'z':
 		// "Z"‚ð‰Ÿ‚µ‚½Žž: release
 		mode = ConstTools::RELEASE;
-		//loadState = ConstTools::FIRST;
+		loadState = ConstTools::SALLOAD;
 		break;
 	case 'x':
 		// "X"‚ð‰Ÿ‚µ‚½Žž: debug
 		mode = ConstTools::DEBUG;
-		//loadState = ConstTools::FIRST;
+		loadState = ConstTools::SALLOAD;
 		break;
 	case 'c':
 		// "C"‚ð‰Ÿ‚µ‚½Žž: eyeTrack
@@ -850,16 +863,15 @@ void ofApp::keyPressed(int key) {
 	case 'b':
 		// "B"‚ð‰Ÿ‚µ‚½Žž: result
 		mode = ConstTools::RESULT;
+		loadState = ConstTools::EYELOAD;
 		if (loadOfImage.load(outputfileNameEye.outputOfEyeGazeHeatMapImg))
 		{
 			loadOfImage.update();
 
 			cv::Mat loadMat, loadMat_gray, loadMat8UC3;
-
 			loadMat = ofxCv::toCv(loadOfImage);
 
 			cv::Mat s10 = loadMat.clone();
-
 			ofxCv::toOf(s10, outputOfIMG_FIRST.outputOfResultImg);
 			outputOfIMG_FIRST.outputOfResultImg.update();
 
@@ -872,7 +884,6 @@ void ofApp::keyPressed(int key) {
 
 			viewMatEyeGaze.saliencyMap = loadMat_gray.clone();
 
-			loadState = ConstTools::SECOND;
 			createWatershed(viewMatEyeGaze.saliencyMap.clone());
 
 		}
