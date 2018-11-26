@@ -119,4 +119,6 @@ public:
 	std::string prefixResultPath = "result";
 
 	std::string name;
+
+	ConstTools::FileNameExtension fileNameExtension;
 };

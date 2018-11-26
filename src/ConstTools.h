@@ -7,6 +7,7 @@ public:
 	struct InputFileName {
 		std::string lenna = "lenna.jpg";
 		std::string lennamac = "lenna-mac.png";
+
 		std::string mountain = "mountain.jpg";
 		std::string sunflower = "sunflower.jpg";
 		std::string group = "group.jpg";
@@ -14,12 +15,12 @@ public:
 		std::string board = "board.jpg";
 		std::string fireworks = "fireworks.jpg";
 
-		//std::string dog = "dog";
-		//std::string nightview = "nightview";
-		//std::string groupphoto = "groupphoto";
-		//std::string lighttower = "lighttower";
-		//std::string sea = "sea";
-		//std::string hotellandscape = "hotellandscape";
+		std::string dog = "dog";
+		std::string nightview = "nightview";
+		std::string groupphoto = "groupphoto";
+		std::string lighttower = "lighttower";
+		std::string sea = "sea";
+		std::string hotellandscape = "hotellandscape";
 	};
 
 	struct OutputFileName_Picture {
@@ -35,6 +36,11 @@ public:
 		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg2";
 		//std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg2.png";
 		std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg.png";
+	};
+
+	struct FileNameExtension {
+		std::string jpgPath = ".jpg";
+		std::string pngPath = ".png";
 	};
 
 	enum Mode {
