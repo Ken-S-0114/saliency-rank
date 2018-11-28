@@ -3,7 +3,8 @@
 #define PORT 8000
 #define HOST "127.0.0.1"
 
-#define THRESH 0.3
+#define THRESH_PIC 0.3
+#define THRESH_EYE 0.3
 
 //--------------------------------------------------------------
 void ofApp::createSaliencyMap(cv::Mat img) {
@@ -77,7 +78,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		double min_val, max_val;
 
 		cv::minMaxLoc(dist_transform, &min_val, &max_val, &min_loc, &max_loc);
-		cv::threshold(dist_transform.clone(), sure_fg, THRESH*max_val, 255, 0);
+		cv::threshold(dist_transform.clone(), sure_fg, THRESH_PIC*max_val, 255, 0);
 
 		dist_transform = dist_transform / max_val;
 
@@ -238,8 +239,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 	else if (loadState == ConstTools::EYELOAD)
 	{
 		cv::Mat thresh;
-		cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
-		//cv::threshold(saliencyImg.clone(), thresh, 255/3, 255, CV_THRESH_BINARY);
+		//cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY);
 
 		cv::Mat opening;
 		cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -256,7 +257,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		double min_val, max_val;
 
 		cv::minMaxLoc(dist_transform, &min_val, &max_val, &min_loc, &max_loc);
-		cv::threshold(dist_transform.clone(), sure_fg, THRESH*max_val, 255, 0);
+		cv::threshold(dist_transform.clone(), sure_fg, THRESH_EYE*max_val, 255, 0);
 
 		dist_transform = dist_transform / max_val;
 
