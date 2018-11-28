@@ -6,14 +6,6 @@ public:
 
 	struct InputFileName {
 		std::string lenna = "lenna.jpg";
-		std::string lennamac = "lenna-mac.png";
-
-		std::string mountain = "mountain.jpg";
-		std::string sunflower = "sunflower.jpg";
-		std::string group = "group.jpg";
-		std::string outdoors = "outdoors.jpg";
-		std::string board = "board.jpg";
-		std::string fireworks = "fireworks.jpg";
 
 		std::string dog = "dog";
 		std::string nightview = "nightview";
@@ -24,18 +16,15 @@ public:
 	};
 
 	struct OutputFileName_Picture {
-		std::string outputOfSaliencyImg = "outputOfSaliencyImg.png";
-		std::string outputOfWatershedAfterImg = "outputOfWatershedAfterImg.png";
+		std::string outputOfSaliencyImg = "outputOfSaliencyImg";
+		std::string outputOfWatershedImg = "outputOfWatershedImg";
 		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg";
-		//std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg.png";
 	};
 
 	struct OutputFileName_EyeGaze {
-		std::string outputOfSaliencyImg = "outputOfSaliencyImg2.png";
-		std::string outputOfWatershedAfterImg = "outputOfWatershedAfterImg2.png";
-		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg2";
-		//std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg2.png";
-		std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg.png";
+		std::string outputOfWatershedImg = "outputOfWatershedImg";
+		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg";
+		std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg";
 	};
 
 	struct FileNameExtension {

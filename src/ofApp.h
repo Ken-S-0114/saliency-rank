@@ -115,10 +115,15 @@ public:
 
 	ConstTools::Infomation infomation;
 
-	std::string prefixSampleImagePath = "sampleImage";
-	std::string prefixResultPath = "result";
+	struct PrefixPath 
+	{
+		std::string sampleImage = "sampleImage";
+		std::string picture = "result/picture";
+		std::string eyeGaze = "result/eyeGaze";
+	};
+	PrefixPath prefixPath;
 
-	std::string name;
+	std::string fileName;
 
 	ConstTools::FileNameExtension fileNameExtension;
 };
