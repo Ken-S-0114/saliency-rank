@@ -744,6 +744,11 @@ void ofApp::draw() {
 		ofDrawBitmapStringHighlight("View EyeGazeHeatMap", 20, 20);
 		ofDrawBitmapStringHighlight(enterCountStringEyeGaze.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
 		ofSetWindowTitle("RESULT");
+		break;
+
+	case ConstTools::SLEEP:
+		ofBackground(0, 0, 0);
+		break;
 
 	}
 
@@ -905,7 +910,9 @@ void ofApp::keyPressed(int key) {
 			ofLogWarning() << "Can not load EyeGazeHeatMap file.";
 		}
 		break;
-
+	case 'm':
+		mode = ConstTools::SLEEP;
+		break;
 	default:
 		break;
 	}

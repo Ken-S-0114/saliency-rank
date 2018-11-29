@@ -38,7 +38,8 @@ public:
 		EYETRACK,
 		EYETRACKHEATMAP,
 		IMAGEVIEW,
-		RESULT
+		RESULT,
+		SLEEP
 	};
 
 	enum EyeTrackState {
