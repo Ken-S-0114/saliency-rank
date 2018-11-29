@@ -837,6 +837,7 @@ void ofApp::keyPressed(int key) {
 	case 'r':
 		heatmap.clear();
 		break;
+
 	case 'i':
 		switch (infomation)
 		{

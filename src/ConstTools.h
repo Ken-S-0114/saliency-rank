@@ -5,7 +5,7 @@ class ConstTools {
 public:
 
 	struct InputFileName {
-		std::string lenna = "lenna.jpg";
+		std::string lenna = "lenna";
 
 		std::string dog = "dog";
 		std::string nightview = "nightview";
