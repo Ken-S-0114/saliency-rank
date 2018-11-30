@@ -47,7 +47,10 @@ public:
 	void createSaliencyMap(cv::Mat img);
 	void createWatershed(cv::Mat saliencyImg);
 
+	void loadEyeGaze(bool path);
+
 	ConstTools::InputFileName inputFileName;
+	ConstTools::InputMockFileName inputMockFileName;
 	ConstTools::OutputFileName_Picture outputfileNamePic;
 	ConstTools::OutputFileName_EyeGaze outputfileNameEye;
 
@@ -118,12 +121,14 @@ public:
 	struct PrefixPath 
 	{
 		std::string sampleImage = "sampleImage";
+		std::string image = "image";
 		std::string picture = "result/picture";
 		std::string eyeGaze = "result/eyeGaze";
 	};
 	PrefixPath prefixPath;
 
 	std::string fileName;
+	std::string eyeGazePath = prefixPath.eyeGaze + "/" + outputfileNameEye.outputOfEyeGazeHeatMapImg + fileNameExtension.pngPath;
 
 	ConstTools::FileNameExtension fileNameExtension;
 };

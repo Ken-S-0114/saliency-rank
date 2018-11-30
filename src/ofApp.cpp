@@ -59,8 +59,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 	if (loadState == ConstTools::SALLOAD)
 	{
 		cv::Mat thresh;
-		cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
-		//cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+		//cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 
 		cv::Mat opening;
 		cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -439,9 +439,10 @@ void ofApp::setup() {
 	enterCountStringPicture << "The " << enterCountPicture + 1 << " most saliency place";
 	enterCountStringEyeGaze << "The " << enterCountEyeGaze + 1 << " most saliency place";
 
-	fileName = inputFileName.hotellandscape;
+	fileName = inputFileName.architecture;
+	//fileName = inputMockFileName.dog;
 
-	if (inputOfImg.load(prefixPath.sampleImage + "/" + fileName + fileNameExtension.jpgPath))
+	if (inputOfImg.load(prefixPath.image + "/" + fileName + fileNameExtension.jpgPath))
 	{
 		inputOfImg.update();
 

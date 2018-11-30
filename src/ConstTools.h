@@ -5,6 +5,21 @@ class ConstTools {
 public:
 
 	struct InputFileName {
+		std::string architecture = "architecture";
+		std::string balloon = "balloon";
+		std::string field = "field";
+		std::string furniture = "furniture";
+		std::string lion = "lion";
+		std::string livingRoom = "living-room";
+		std::string loadLine = "load-line";
+		std::string moon = "moon";
+		std::string sibling = "sibling";
+		std::string sunset = "sunset";
+		std::string waterfall = "waterfall";
+		std::string weather = "weather";
+	};
+
+	struct InputMockFileName {
 		std::string lenna = "lenna";
 
 		std::string dog = "dog";
