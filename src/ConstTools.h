@@ -17,6 +17,8 @@ public:
 		std::string sunset = "sunset";
 		std::string waterfall = "waterfall";
 		std::string weather = "weather";
+		std::string football = "football";
+		std::string brick = "brick";
 	};
 
 	struct InputMockFileName {
