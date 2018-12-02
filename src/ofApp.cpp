@@ -31,18 +31,18 @@ void ofApp::setup() {
 	enterPicCountString << "The " << enterPicCount + 1 << " most saliency place";
 	enterEyeCountString << "The " << enterEyeCount + 1 << " most saliency place";
 
-	eyeGazePath = prefixPath.eyeGaze + "/" + outputfileNameEye.eyeGazeHeatMap + fileNameExtension.pngPath;
+	eyeGazePath = prefixPath.eyeGaze + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png;
 
 	std::string inputFilePath;
 
 	fileName = inputFileName.non.brick;
-	inputFilePath = prefixPath.image + "/" + fileName + fileNameExtension.jpgPath;
+	inputFilePath = prefixPath.image + "/" + fileName + ext.jpg;
 
 	/*fileName = inputIPUFileName.landscape;
-	inputFilePath = prefixPath.image_IPU + "/" + fileName + fileNameExtension.jpgPath;*/
+	inputFilePath = prefixPath.image_IPU + "/" + fileName + ext.jpg;*/
 
 	//fileName = inputMockFileName.dog;
-	//inputFilePath = prefixPath.sampleImage + "/" + fileName + fileNameExtension.jpgPath;
+	//inputFilePath = prefixPath.sampleImage + "/" + fileName + ext.jpg;
 
 	if (inputOfImg.load(inputFilePath))
 	{
@@ -154,7 +154,7 @@ void ofApp::update() {
 			ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
 			outputOfPicIMG.saliencyMapHighest.update();
 			outputOfPicIMG.saliencyMapHighest
-				.save(prefixPath.picture + "/" + outputfileNamePic.saliencyMapHighest + "_" + number.str() + ".png");
+				.save(prefixPath.picture + "/" + outputOfPicFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 
 			enterPicCountString << "The " << enterPicCount + 1 << " most saliency place";
 
@@ -177,8 +177,10 @@ void ofApp::update() {
 				ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyEyePoint.save[i];
 			}
 
-			maxSaliencyEyePoint.iter = std::max_element(saliencyEyePoint.save.begin(), saliencyEyePoint.save.end());
-			maxSaliencyEyePoint.maxIndex = std::distance(saliencyEyePoint.save.begin(), maxSaliencyEyePoint.iter);
+			maxSaliencyEyePoint.iter = 
+				std::max_element(saliencyEyePoint.save.begin(), saliencyEyePoint.save.end());
+			maxSaliencyEyePoint.maxIndex = 
+				std::distance(saliencyEyePoint.save.begin(), maxSaliencyEyePoint.iter);
 			ofLogNotice() << "Index of max element: " << maxSaliencyEyePoint.maxIndex;
 
 
@@ -214,7 +216,7 @@ void ofApp::update() {
 			ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
 			outputOfEyeIMG.saliencyMapHighest.update();
 			outputOfEyeIMG.saliencyMapHighest
-				.save(prefixPath.eyeGaze + "/" + outputfileNameEye.saliencyMapHighest + "_" + number.str() + ".png");
+				.save(prefixPath.eyeGaze + "/" + outputOfEyeFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 
 			enterEyeCountString << "The " << enterEyeCount + 1 << " most saliency place";
 
@@ -233,7 +235,6 @@ void ofApp::draw() {
 	switch (mode) {
 	case ConstTools::RELEASE:
 		inputOfImg.draw(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
-		//ofxCv::drawMat(matMix.clone(), 0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
 		outputOfPicIMG.saliencyMapHighest.draw(0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
 
 		// Label
@@ -251,21 +252,13 @@ void ofApp::draw() {
 
 	case ConstTools::DEBUG:
 		inputOfImg.draw(0, 0, ofGetWidth() / 3, ofGetHeight() / 3);
-		//ofxCv::drawMat(saliencyMap.clone(), ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfPicIMG.saliencyMap.draw(ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
-		//ofxCv::drawMat(saliencyMapColor.clone(), ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfPicIMG.heatMap.draw(ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
-		//ofxCv::drawMat(sure_bg.clone(), 0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfPicIMG.background.draw(0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//ofxCv::drawMat(unknown.clone(), ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfPicIMG.unknown.draw(ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//ofxCv::drawMat(wshed.clone(), ofGetWidth() - ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfPicIMG.watershed.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//ofxCv::drawMat(watershedHighest.clone(), 0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfPicIMG.watershedAfter.draw(0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//ofxCv::drawMat(saliencyHighest.clone(), ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfPicIMG.watershedHighest.draw(ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
-		//ofxCv::drawMat(matMix.clone(), ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		outputOfPicIMG.saliencyMapHighest.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 
 		// Label
@@ -284,7 +277,6 @@ void ofApp::draw() {
 		break;
 
 	case ConstTools::EYETRACK:
-		//ofxCv::drawMat(eyeGazeMat.clone(),0,0);
 		outputOfEyeIMG.eyeGaze.draw(0, 0, WINWIDTH, WINHEIGHT);
 		//saliencyMap.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
 
@@ -337,12 +329,19 @@ void ofApp::draw() {
 		break;
 
 	case ConstTools::RESULT:
-		outputOfEyeIMG.eyeGazeResult.draw(0, 0, ofGetWidth() / 2, ofGetHeight() / 2);
-		outputOfPicIMG.heatMap.draw(ofGetWidth() / 2, 0, ofGetWidth() / 2, ofGetHeight() / 2);
-		outputOfEyeIMG.watershedAfter.draw(0, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
-		outputOfEyeIMG.saliencyMapHighest.draw(ofGetWidth() / 2, ofGetHeight() / 2, ofGetWidth() / 2, ofGetHeight() / 2);
+
+		outputOfEyeIMG.eyeGazeResult.draw(0, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfPicIMG.heatMap.draw(ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+		//outputOfEyeIMG.heatMap.draw(ofGetWidth() - ofGetWidth() / 3, 0, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfEyeIMG.background.draw(0, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfEyeIMG.unknown.draw(ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfEyeIMG.watershed.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfEyeIMG.watershedAfter.draw(0, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfEyeIMG.watershedHighest.draw(ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		outputOfEyeIMG.saliencyMapHighest.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
+		
 		ofDrawBitmapStringHighlight("View EyeGazeHeatMap", 20, 20);
-		ofDrawBitmapStringHighlight(enterEyeCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
+		//ofDrawBitmapStringHighlight(enterEyeCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
 		ofSetWindowTitle("RESULT");
 		break;
 
@@ -355,8 +354,10 @@ void ofApp::draw() {
 	switch (infomation)
 	{
 	case ConstTools::VIEW:
-		ofDrawBitmapStringHighlight("SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n  *V: EYETRACKHEATMAP \n  *B: IMAGEVIEW\n  *N: RESULT",
-			ofGetWidth() - ofGetWidth() / 6, 20);
+		ofDrawBitmapStringHighlight(
+			"SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n  *V: EYETRACKHEATMAP \n  *B: IMAGEVIEW\n  *N: RESULT",
+			ofGetWidth() - ofGetWidth() / 6, 20
+		);
 		break;
 	case ConstTools::HIDE:
 		break;
@@ -370,9 +371,9 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 
 	cv::Ptr<cv::saliency::Saliency> saliencyAlgorithm;
 
-	cv::Mat s1, s2, t1, t2;
-	cv::Mat saliency_copy, saliency_copy2;
-	cv::Mat saliencyMap_SPECTRAL_RESIDUAL, saliencyMap_SPECTRAL_RESIDUAL2;
+	cv::Mat s1, s2;
+	cv::Mat saliency_copy;
+	cv::Mat saliencyMap_SPECTRAL_RESIDUAL;
 
 	originalPicMat.copy = img.clone();
 
@@ -408,7 +409,7 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 
 	ofxCv::toOf(s2, outputOfPicIMG.heatMap);
 	outputOfPicIMG.heatMap.update();
-	outputOfPicIMG.heatMap.save(prefixPath.picture + "/" + outputfileNamePic.saliencyMap + fileNameExtension.jpgPath);
+	outputOfPicIMG.heatMap.save(prefixPath.picture + "/" + outputOfPicFileName.saliencyMap + ext.jpg);
 
 }
 
@@ -464,8 +465,6 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		cv::findContours(sure_fg, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
 		if (contours.empty()) return;
 
-		//ofLogNotice() << "contours: " << &contours;
-
 		cv::Mat markers = cv::Mat::zeros(sure_fg.rows, sure_fg.cols, CV_32SC1);
 
 		int idx = 0;
@@ -473,7 +472,6 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 			cv::drawContours(markers, contours, idx, cv::Scalar::all(compCount + 1), -1, 8, hierarchy, INT_MAX);
 		}
 		markers = markers + 1;
-
 
 		for (int i = 0; i < markers.rows; i++) {
 			for (int j = 0; j < markers.cols; j++) {
@@ -483,7 +481,6 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 				}
 			}
 		}
-
 
 		cv::watershed(originalPicMat.original.clone(), markers);
 		viewPicMat.watershedHighest = cv::Mat::zeros(originalPicMat.original.size(), CV_8UC3);
@@ -554,7 +551,6 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		cvtColor(saliencyImg.clone(), picImgG, cv::COLOR_GRAY2BGR);
 
-
 		//wshed = wshed*0.5 + picImgG*0.5;
 		viewPicMat.watershedHighest = viewPicMat.watershedHighest*0.5 + picImgG*0.5;
 		viewPicMat.saliencyHighest = viewPicMat.saliencyHighest*0.5 + picImgG*0.5;
@@ -572,7 +568,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s6, outputOfPicIMG.watershedAfter);
 		outputOfPicIMG.watershedAfter.update();
-		outputOfPicIMG.watershedAfter.save(prefixPath.picture + "/" + outputfileNamePic.watershed + fileNameExtension.jpgPath);
+		outputOfPicIMG.watershedAfter
+			.save(prefixPath.picture + "/" + outputOfPicFileName.watershed + ext.jpg);
 
 		ofxCv::toOf(s7, outputOfPicIMG.watershedHighest);
 		outputOfPicIMG.watershedHighest.update();
@@ -584,7 +581,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
 		outputOfPicIMG.saliencyMapHighest.update();
 		outputOfPicIMG.saliencyMapHighest
-			.save(prefixPath.picture + "/" + outputfileNamePic.saliencyMapHighest + "_1" + fileNameExtension.jpgPath);
+			.save(prefixPath.picture + "/" + outputOfPicFileName.saliencyMapHighest + "_1" + ext.jpg);
 
 		markersPicSave = markers.clone();
 
@@ -597,8 +594,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 	else if (loadState == ConstTools::EYELOAD)
 	{
 		cv::Mat thresh;
-		//cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
-		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY);
+		cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+		//cv::threshold(saliencyImg.clone(), thresh, 255/4, 255, CV_THRESH_BINARY);
 
 		cv::Mat opening;
 		cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -747,7 +744,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s6, outputOfEyeIMG.watershedAfter);
 		outputOfEyeIMG.watershedAfter.update();
 		outputOfEyeIMG.watershedAfter
-			.save(prefixPath.eyeGaze + "/" + outputfileNameEye.watershed + fileNameExtension.jpgPath);
+			.save(prefixPath.eyeGaze + "/" + outputOfEyeFileName.watershed + ext.jpg);
 		ofxCv::toOf(s7, outputOfEyeIMG.watershedHighest);
 		outputOfEyeIMG.watershedHighest.update();
 		viewEyeMat.matMix = originalEyeMat.original*0.2 + originalEyeMat.copy*0.8;
@@ -757,7 +754,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
 		outputOfEyeIMG.saliencyMapHighest.update();
 		outputOfEyeIMG.saliencyMapHighest
-			.save(prefixPath.eyeGaze + "/" + outputfileNameEye.saliencyMapHighest + "_1" + fileNameExtension.jpgPath);
+			.save(prefixPath.eyeGaze + "/" + outputOfEyeFileName.saliencyMapHighest + "_1" + ext.jpg);
 
 		markersEyeSave = markers.clone();
 
@@ -888,7 +885,7 @@ void ofApp::keyPressed(int key) {
 		// "S"‚ð‰Ÿ‚µ‚½Žž:
 		if (eyeTrackState == ConstTools::STANDBY && ((mode == ConstTools::EYETRACK) || (mode == ConstTools::EYETRACKHEATMAP) || (mode == ConstTools::IMAGEVIEW)))
 		{
-			heatmap.save(prefixPath.eyeGaze + "/" + outputfileNameEye.eyeGazeHeatMap + fileNameExtension.pngPath);
+			heatmap.save(prefixPath.eyeGaze + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
 			eyeTrackState = ConstTools::SAVE;
 		}
 		break;

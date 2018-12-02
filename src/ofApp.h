@@ -52,8 +52,8 @@ public:
 	ConstTools::InputFileName inputFileName;
 	ConstTools::InputIPUFileName inputIPUFileName;
 	ConstTools::InputMockFileName inputMockFileName;
-	ConstTools::OutputFileName_Picture outputfileNamePic;
-	ConstTools::OutputFileName_EyeGaze outputfileNameEye;
+	ConstTools::OutputOfPicFileName outputOfPicFileName;
+	ConstTools::OutputOfEyeFileName outputOfEyeFileName;
 
 	ofImage inputOfImg, loadOfImage;
 
@@ -111,6 +111,6 @@ public:
 	ConstTools::Infomation infomation;
 	ConstTools::Mode mode;
 	ConstTools::PrefixPath prefixPath;
-	ConstTools::FileNameExtension fileNameExtension;
+	ConstTools::FileNameExtension ext;
 
 };

@@ -6,37 +6,37 @@ public:
 
 	struct InputFileName {
 		struct NonObject {
-			std::string field = "field";
-			std::string brick = "brick";
+			const std::string field = "field";
+			const std::string brick = "brick";
 		};
 
 		struct Object {
-		std::string furniture = "furniture";
-		std::string football = "football";
-		std::string sunset = "sunset";
-		std::string waterfall = "waterfall";
+			const std::string furniture = "furniture";
+			const std::string football = "football";
+			const std::string sunset = "sunset";
+			const std::string waterfall = "waterfall";
 		};
 
 		struct ManyObjects {
-		std::string balloon = "balloon";
-		std::string livingRoom = "living-room";
-		std::string architecture = "architecture";
-		std::string loadLine = "load-line";
+			const std::string balloon = "balloon";
+			const std::string livingRoom = "living-room";
+			const std::string architecture = "architecture";
+			const std::string loadLine = "load-line";
 		};
 
 		struct Dark {
-		std::string moon = "moon";
-		std::string weather = "weather";
+			const std::string moon = "moon";
+			const std::string weather = "weather";
 		};
 
 		struct OnePerson {
-		std::string lion = "lion";
-		std::string child = "child";
+			const std::string lion = "lion";
+			const std::string child = "child";
 		};
 
 		struct MultiplePeople {
-		std::string brothers = "brothers";
-		std::string sibling = "sibling";
+			const std::string brothers = "brothers";
+			const std::string sibling = "sibling";
 		};
 
 		NonObject non;
@@ -49,23 +49,23 @@ public:
 
 	struct InputIPUFileName {
 		struct NonObject {
-		std::string sky = "sky";
-		std::string grass = "grass";
+			const std::string sky = "sky";
+			const std::string grass = "grass";
 		};
 
 		struct Object {
-		std::string tree = "tree";
-		std::string fireHydrant = "fireHydrant";
-		std::string sign = "sign";
+			const std::string tree = "tree";
+			const std::string fireHydrant = "fireHydrant";
+			const std::string sign = "sign";
 		};
 
 		struct ManyObjects {
-		std::string corn = "corn";
-		std::string vendingMachine = "vendingMachine";
-		std::string treeTrees = "treeTrees";
-		std::string board = "board";
-		std::string pc = "pc";
-		std::string landscape = "landscape";
+			const std::string corn = "corn";
+			const std::string vendingMachine = "vendingMachine";
+			const std::string treeTrees = "treeTrees";
+			const std::string board = "board";
+			const std::string pc = "pc";
+			const std::string landscape = "landscape";
 		};
 
 		NonObject non;
@@ -74,13 +74,13 @@ public:
 	};
 
 	struct InputMockFileName {
-		std::string lenna = "lenna";
-		std::string dog = "dog";
-		std::string nightview = "nightview";
-		std::string groupphoto = "groupphoto";
-		std::string lighttower = "lighttower";
-		std::string sea = "sea";
-		std::string hotellandscape = "hotellandscape";
+		const std::string lenna = "lenna";
+		const std::string dog = "dog";
+		const std::string nightview = "nightview";
+		const std::string groupphoto = "groupphoto";
+		const std::string lighttower = "lighttower";
+		const std::string sea = "sea";
+		const std::string hotellandscape = "hotellandscape";
 	};
 	
 	struct OutputOfImg
@@ -92,30 +92,30 @@ public:
 		ofImage eyeGazeResult;
 	};
 
-	struct OutputFileName_Picture {
-		std::string saliencyMap = "outputOfSaliencyImg";
-		std::string watershed = "outputOfWatershedImg";
-		std::string saliencyMapHighest = "outputOfSaliencyMapHighestImg";
+	struct OutputOfPicFileName {
+		const std::string saliencyMap = "outputOfSaliencyImg";
+		const std::string watershed = "outputOfWatershedImg";
+		const std::string saliencyMapHighest = "outputOfSaliencyMapHighestImg";
 	};
 
-	struct OutputFileName_EyeGaze {
-		std::string watershed = "outputOfWatershedImg";
-		std::string saliencyMapHighest = "outputOfSaliencyMapHighestImg";
-		std::string eyeGazeHeatMap = "outputOfEyeGazeHeatMapImg";
+	struct OutputOfEyeFileName {
+		const std::string watershed = "outputOfWatershedImg";
+		const std::string saliencyMapHighest = "outputOfSaliencyMapHighestImg";
+		const std::string eyeGazeHeatMap = "outputOfEyeGazeHeatMapImg";
 	};
 	
 	struct PrefixPath
 	{
-		std::string sampleImage = "sampleImage";
-		std::string image = "image";
-		std::string image_IPU = "image_IPU";
-		std::string picture = "result/picture";
-		std::string eyeGaze = "result/eyeGaze";
+		const std::string sampleImage = "sampleImage";
+		const std::string image = "image";
+		const std::string image_IPU = "image_IPU";
+		const std::string picture = "result/picture";
+		const std::string eyeGaze = "result/eyeGaze";
 	};
 
 	struct FileNameExtension {
-		std::string jpgPath = ".jpg";
-		std::string pngPath = ".png";
+		const std::string jpg = ".jpg";
+		const std::string png = ".png";
 	};
 
 	enum Mode {
