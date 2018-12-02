@@ -46,8 +46,8 @@ public:
 
 	void createSaliencyMap(cv::Mat img);
 	void createWatershed(cv::Mat saliencyImg);
-
 	void loadEyeGaze(bool path);
+	void dumpOSC(ofxOscMessage m);
 
 	ConstTools::InputFileName inputFileName;
 	ConstTools::InputIPUFileName inputIPUFileName;
@@ -60,7 +60,7 @@ public:
 	struct OriginalMat {
 		cv::Mat original, copy;
 	};
-	OriginalMat originalMatPicture, originalMatEyeGaze;
+	OriginalMat originalPicMat, originalEyeMat;
 
 	ConstTools::OutputOfImg outputOfPicIMG, outputOfEyeIMG;
 
@@ -68,55 +68,49 @@ public:
 	{
 		cv::Mat saliencyMap, saliencyMapColor;
 		cv::Mat watershedHighest, saliencyHighest;
-		cv::Mat mat_mix;
+		cv::Mat matMix;
+		cv::Mat eyeGazeMat;
 	};
-	ViewMat viewMatSaliency, viewMatEyeGaze;
+	ViewMat viewPicMat, viewEyeMat;
 
-	std::vector<cv::Vec3b> colorTabSaliency, colorTabEyeGaze;
+	std::vector<cv::Vec3b> colorPicTab, colorEyeTab;
 
-	cv::Mat picMarkersSave, eyeMarkersSave;
+	cv::Mat markersPicSave, markersEyeSave;
 
 	cv::Mat picImgG, eyeImgG;
-
-	//    std::vector<int> pixelsList;
 
 	struct SaliencyPoint
 	{
 		std::vector<int> save, backup;
 	};
-	SaliencyPoint saliencyPointPicture, saliencyPointEyeGaze;
+	SaliencyPoint saliencyPicPoint, saliencyEyePoint;
 
 	struct MaxSaliencyPoint
 	{
 		std::vector<int>::iterator iter;
 		int maxIndex;
 	};
-	MaxSaliencyPoint maxSaliencyPointPicture, maxSaliencyPointEyeGaze;
+	MaxSaliencyPoint maxSaliencyPicPoint, maxSaliencyEyePoint;
 
-	ConstTools::EnterState enterState;
-	int enterCountPicture, enterCountEyeGaze;
+	std::string fileName;
+	std::string eyeGazePath;
 
-	std::stringstream enterCountStringPicture, enterCountStringEyeGaze;
-
-	ConstTools::Mode mode;
+	ofxHeatMap heatmap;
 
 	ofxOscReceiver receiver;
 	float remoteEyeGazeX, remoteEyeGazeY;
 
-	void dumpOSC(ofxOscMessage m);
+	ConstTools::EnterState enterState;
+	int enterPicCount, enterEyeCount;
 
-	cv::Mat eyeGazeMat;
+	std::stringstream enterPicCountString, enterEyeCountString;
+
 	ConstTools::EyeTrackState eyeTrackState;
 	ConstTools::LoadState loadState;
 
-	ofxHeatMap heatmap;
-
 	ConstTools::Infomation infomation;
-
+	ConstTools::Mode mode;
 	ConstTools::PrefixPath prefixPath;
-
-	std::string fileName;
-	std::string eyeGazePath = prefixPath.eyeGaze + "/" + outputfileNameEye.outputOfEyeGazeHeatMapImg + fileNameExtension.pngPath;
-
 	ConstTools::FileNameExtension fileNameExtension;
+
 };
