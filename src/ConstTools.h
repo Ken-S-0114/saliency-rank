@@ -5,28 +5,38 @@ class ConstTools {
 public:
 
 	struct InputFileName {
-		std::string architecture = "architecture";
-		std::string balloon = "balloon";
 		std::string field = "field";
+		std::string brick = "brick";
+
 		std::string furniture = "furniture";
-		std::string lion = "lion";
-		std::string livingRoom = "living-room";
-		std::string loadLine = "load-line";
-		std::string moon = "moon";
-		std::string sibling = "sibling";
+		std::string football = "football";
 		std::string sunset = "sunset";
 		std::string waterfall = "waterfall";
+
+		std::string balloon = "balloon";
+		std::string livingRoom = "living-room";
+		std::string architecture = "architecture";
+		std::string loadLine = "load-line";
+
+		std::string moon = "moon";
 		std::string weather = "weather";
-		std::string football = "football";
-		std::string brick = "brick";
+
+		std::string lion = "lion";
+		std::string child = "child";
+
+		std::string brothers = "brothers";
+		std::string sibling = "sibling";
+
 	};
 
 	struct InputIPUFileName {
 		std::string sky = "sky";
 		std::string grass = "grass";
+
 		std::string tree = "tree";
 		std::string fireHydrant = "fireHydrant";
 		std::string sign = "sign";
+
 		std::string corn = "corn";
 		std::string vendingMachine = "vendingMachine";
 		std::string treeTrees = "treeTrees";
