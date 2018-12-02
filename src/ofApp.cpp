@@ -594,7 +594,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 	else if (loadState == ConstTools::EYELOAD)
 	{
 		cv::Mat thresh;
-		cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
+		cv::threshold(saliencyImg.clone(), thresh, 0, 255, CV_THRESH_BINARY);
 		//cv::threshold(saliencyImg.clone(), thresh, 255/4, 255, CV_THRESH_BINARY);
 
 		cv::Mat opening;
@@ -859,7 +859,7 @@ void ofApp::keyPressed(int key) {
 			enterState = ConstTools::SALIENCYMAP;
 			break;
 		case ConstTools::RESULT:
-			saliencyPicPoint.save = saliencyPicPoint.backup;
+			saliencyEyePoint.save = saliencyEyePoint.backup;
 			enterEyeCount = 0;
 			enterState = ConstTools::EYEGAZE;
 			break;
@@ -883,7 +883,9 @@ void ofApp::keyPressed(int key) {
 
 	case 's':
 		// "S"‚ð‰Ÿ‚µ‚½Žž:
-		if (eyeTrackState == ConstTools::STANDBY && ((mode == ConstTools::EYETRACK) || (mode == ConstTools::EYETRACKHEATMAP) || (mode == ConstTools::IMAGEVIEW)))
+		if (eyeTrackState == ConstTools::STANDBY && 
+			((mode == ConstTools::EYETRACK) || (mode == ConstTools::EYETRACKHEATMAP) || (mode == ConstTools::IMAGEVIEW))
+			)
 		{
 			heatmap.save(prefixPath.eyeGaze + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
 			eyeTrackState = ConstTools::SAVE;
