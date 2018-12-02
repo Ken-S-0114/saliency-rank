@@ -50,6 +50,7 @@ public:
 	void loadEyeGaze(bool path);
 
 	ConstTools::InputFileName inputFileName;
+	ConstTools::InputIPUFileName inputIPUFileName;
 	ConstTools::InputMockFileName inputMockFileName;
 	ConstTools::OutputFileName_Picture outputfileNamePic;
 	ConstTools::OutputFileName_EyeGaze outputfileNameEye;
@@ -61,13 +62,7 @@ public:
 	};
 	OriginalMat originalMatPicture, originalMatEyeGaze;
 
-	struct OutputOfImg
-	{
-		ofImage outputOfSaliencyImg, outputOfHeatMapImg;
-		ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg, outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg, outputOfEyeGazeImg;
-		ofImage outputOfEyeGazeHeatMapImg, outputOfResultImg;
-	};
-	OutputOfImg outputOfIMG_FIRST, outputOfIMG_SECOND;
+	ConstTools::OutputOfImg outputOfPicIMG, outputOfEyeIMG;
 
 	struct ViewMat
 	{
@@ -79,9 +74,9 @@ public:
 
 	std::vector<cv::Vec3b> colorTabSaliency, colorTabEyeGaze;
 
-	cv::Mat markersSave, markersSave_SECOND;
+	cv::Mat picMarkersSave, eyeMarkersSave;
 
-	cv::Mat imgG, imgG2;
+	cv::Mat picImgG, eyeImgG;
 
 	//    std::vector<int> pixelsList;
 
@@ -118,14 +113,7 @@ public:
 
 	ConstTools::Infomation infomation;
 
-	struct PrefixPath 
-	{
-		std::string sampleImage = "sampleImage";
-		std::string image = "image";
-		std::string picture = "result/picture";
-		std::string eyeGaze = "result/eyeGaze";
-	};
-	PrefixPath prefixPath;
+	ConstTools::PrefixPath prefixPath;
 
 	std::string fileName;
 	std::string eyeGazePath = prefixPath.eyeGaze + "/" + outputfileNameEye.outputOfEyeGazeHeatMapImg + fileNameExtension.pngPath;

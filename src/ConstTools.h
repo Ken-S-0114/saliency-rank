@@ -21,6 +21,20 @@ public:
 		std::string brick = "brick";
 	};
 
+	struct InputIPUFileName {
+		std::string sky = "sky";
+		std::string grass = "grass";
+		std::string tree = "tree";
+		std::string fireHydrant = "fireHydrant";
+		std::string sign = "sign";
+		std::string corn = "corn";
+		std::string vendingMachine = "vendingMachine";
+		std::string treeTrees = "treeTrees";
+		std::string board = "board";
+		std::string pc = "pc";
+		std::string landscape = "landscape";
+	};
+
 	struct InputMockFileName {
 		std::string lenna = "lenna";
 
@@ -30,6 +44,15 @@ public:
 		std::string lighttower = "lighttower";
 		std::string sea = "sea";
 		std::string hotellandscape = "hotellandscape";
+	};
+	
+	struct OutputOfImg
+	{
+		ofImage outputOfSaliencyImg, outputOfHeatMapImg;
+		ofImage outputOfBackgroundImg, outputOfUnknownImg, outputOfWatershedImg, outputOfWatershedAfterImg;
+		ofImage outputOfWatershedHighestImg, outputOfSaliencyMapHighestImg;
+		ofImage outputOfEyeGazeImg, outputOfEyeGazeHeatMapImg;
+		ofImage outputOfEyeGazeResultImg;
 	};
 
 	struct OutputFileName_Picture {
@@ -42,6 +65,15 @@ public:
 		std::string outputOfWatershedImg = "outputOfWatershedImg";
 		std::string outputOfSaliencyMapHighestImg = "outputOfSaliencyMapHighestImg";
 		std::string outputOfEyeGazeHeatMapImg = "outputOfEyeGazeHeatMapImg";
+	};
+	
+	struct PrefixPath
+	{
+		std::string sampleImage = "sampleImage";
+		std::string image = "image";
+		std::string image_IPU = "image_IPU";
+		std::string picture = "result/picture";
+		std::string eyeGaze = "result/eyeGaze";
 	};
 
 	struct FileNameExtension {
