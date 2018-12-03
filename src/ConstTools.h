@@ -86,6 +86,7 @@ public:
 	struct OutputOfImg
 	{
 		ofImage saliencyMap, heatMap;
+		ofImage loadMat8UC1, gray;
 		ofImage background, unknown, watershed, watershedAfter;
 		ofImage watershedHighest, saliencyMapHighest;
 		ofImage eyeGaze, eyeGazeHeatMap;
@@ -93,15 +94,15 @@ public:
 	};
 
 	struct OutputOfPicFileName {
-		const std::string saliencyMap = "outputOfSaliencyImg";
-		const std::string watershed = "outputOfWatershedImg";
+		const std::string saliencyMap = "saliencyMap";
+		const std::string watershed = "watershed";
 		const std::string saliencyMapHighest = "outputOfSaliencyMapHighestImg";
 	};
 
 	struct OutputOfEyeFileName {
-		const std::string watershed = "outputOfWatershedImg";
-		const std::string saliencyMapHighest = "outputOfSaliencyMapHighestImg";
-		const std::string eyeGazeHeatMap = "outputOfEyeGazeHeatMapImg";
+		const std::string watershed = "watershed";
+		const std::string saliencyMapHighest = "saliencyMapHighest";
+		const std::string eyeGazeHeatMap = "eyeGazeHeatMap";
 	};
 	
 	struct PrefixPath

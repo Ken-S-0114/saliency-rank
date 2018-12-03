@@ -81,7 +81,7 @@ public:
 
 	struct SaliencyPoint
 	{
-		std::vector<int> save, backup;
+		std::vector<int> saved, backup;
 	};
 	SaliencyPoint saliencyPicPoint, saliencyEyePoint;
 
