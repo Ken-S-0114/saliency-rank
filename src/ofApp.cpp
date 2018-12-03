@@ -3,8 +3,11 @@
 #define PORT 8000
 #define HOST "127.0.0.1"
 
-#define THRESH_PIC 0.3
-#define THRESH_EYE 0.3
+#define THRESH_PIC 40
+#define THRESH_EYE 40
+
+#define THRESH_MAXVAL_PIC 0.3
+#define THRESH_MAXVAL_EYE 0.3
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -31,18 +34,21 @@ void ofApp::setup() {
 	enterPicCountString << "The " << enterPicCount + 1 << " most saliency place";
 	enterEyeCountString << "The " << enterEyeCount + 1 << " most saliency place";
 
-	eyeGazePath = prefixPath.eyeGaze + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png;
-
 	std::string inputFilePath;
-
-	fileName = inputFileName.non.brick;
-	inputFilePath = prefixPath.image + "/" + fileName + ext.jpg;
-
-	/*fileName = inputIPUFileName.landscape;
-	inputFilePath = prefixPath.image_IPU + "/" + fileName + ext.jpg;*/
-
+	//--------------------------------------------------------------
+	// Add image file !!
+	//fileName = inputFileName.non.brick;
+	//inputFilePath = prefixPath.image + "/" + fileName + ext.jpg;
+	//--------------------------------------------------------------
+	// Add image-IPU file !!
+	fileName = inputIPUFileName.objs.landscape;
+	inputFilePath = prefixPath.image_IPU + "/" + fileName + ext.jpg;
+	//--------------------------------------------------------------
 	//fileName = inputMockFileName.dog;
 	//inputFilePath = prefixPath.sampleImage + "/" + fileName + ext.jpg;
+	//--------------------------------------------------------------
+
+	eyeGazePath = prefixPath.eyeGaze + "/" + fileName + "_" + outputOfEyeFileName.eyeGazeHeatMap + ext.png;
 
 	if (inputOfImg.load(inputFilePath))
 	{
@@ -428,7 +434,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 	{
 		cv::Mat thresh;
 		//cv::threshold(saliencyImg.clone(), thresh, 0, 255, cv::THRESH_OTSU);
-		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY);
+		cv::threshold(saliencyImg.clone(), thresh, THRESH_PIC, 255, CV_THRESH_BINARY);
 
 		cv::Mat opening;
 		cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -446,7 +452,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		double min_val, max_val;
 
 		cv::minMaxLoc(dist_transform, &min_val, &max_val, &min_loc, &max_loc);
-		cv::threshold(dist_transform.clone(), sure_fg, THRESH_PIC*max_val, 255, 0);
+		cv::threshold(dist_transform.clone(), sure_fg, THRESH_MAXVAL_PIC*max_val, 255, 0);
 
 		dist_transform = dist_transform / max_val;
 
@@ -603,7 +609,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 	else if (loadState == ConstTools::EYELOAD)
 	{
 		cv::Mat thresh;
-		cv::threshold(saliencyImg.clone(), thresh, 40, 255, CV_THRESH_BINARY);
+		cv::threshold(saliencyImg.clone(), thresh, THRESH_EYE, 255, CV_THRESH_BINARY);
 
 		cv::Mat opening;
 		cv::Mat kernel(3, 3, CV_8U, cv::Scalar(1));
@@ -620,7 +626,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		double min_val, max_val;
 
 		cv::minMaxLoc(dist_transform, &min_val, &max_val, &min_loc, &max_loc);
-		cv::threshold(dist_transform.clone(), sure_fg, THRESH_EYE*max_val, 255, 0);
+		cv::threshold(dist_transform.clone(), sure_fg, THRESH_MAXVAL_EYE*max_val, 255, 0);
 
 		dist_transform = dist_transform / max_val;
 
