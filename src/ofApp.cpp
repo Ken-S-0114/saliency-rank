@@ -4,7 +4,7 @@
 #define HOST "127.0.0.1"
 
 #define THRESH_PIC 40
-#define THRESH_EYE 40
+#define THRESH_EYE 20
 
 #define THRESH_MAXVAL_PIC 0.3
 #define THRESH_MAXVAL_EYE 0.3
@@ -37,18 +37,20 @@ void ofApp::setup() {
 	std::string inputFilePath;
 	//--------------------------------------------------------------
 	// Add image file !!
-	//fileName = inputFileName.non.brick;
-	//inputFilePath = prefixPath.image + "/" + fileName + ext.jpg;
+	fileName = inputFileName.mul.brothers;
+	inputFilePath = prefixPath.image + "/" + fileName + ext.jpg;
+	folderName = prefixPath.image;
 	//--------------------------------------------------------------
 	// Add image-IPU file !!
-	fileName = inputIPUFileName.objs.landscape;
-	inputFilePath = prefixPath.image_IPU + "/" + fileName + ext.jpg;
+	//fileName = inputIPUFileName.obj.tree;
+	//inputFilePath = prefixPath.image_IPU + "/" + fileName + ext.jpg;
+	//folderName = prefixPath.image_IPU;
 	//--------------------------------------------------------------
 	//fileName = inputMockFileName.dog;
 	//inputFilePath = prefixPath.sampleImage + "/" + fileName + ext.jpg;
 	//--------------------------------------------------------------
 
-	eyeGazePath = prefixPath.eyeGaze + "/" + fileName + "_" + outputOfEyeFileName.eyeGazeHeatMap + ext.png;
+	eyeGazePath = prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png;
 
 	if (inputOfImg.load(inputFilePath))
 	{
@@ -168,7 +170,7 @@ void ofApp::update() {
 			ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
 			outputOfPicIMG.saliencyMapHighest.update();
 			outputOfPicIMG.saliencyMapHighest
-				.save(prefixPath.picture + "/" + fileName + "_" + outputOfPicFileName.saliencyMapHighest + "_" + number.str() + ext.png);
+				.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 
 			enterPicCountString << "The " << enterPicCount + 1 << " most saliency place";
 
@@ -230,7 +232,7 @@ void ofApp::update() {
 			ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
 			outputOfEyeIMG.saliencyMapHighest.update();
 			outputOfEyeIMG.saliencyMapHighest
-				.save(prefixPath.eyeGaze + "/" + fileName + "_" + outputOfEyeFileName.saliencyMapHighest + "_" + number.str() + ext.png);
+				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 
 			enterEyeCountString << "The " << enterEyeCount + 1 << " most saliency place";
 
@@ -424,7 +426,7 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 
 	ofxCv::toOf(s2, outputOfPicIMG.heatMap);
 	outputOfPicIMG.heatMap.update();
-	outputOfPicIMG.heatMap.save(prefixPath.picture + "/" + fileName + "_" + outputOfPicFileName.saliencyMap + ext.jpg);
+	outputOfPicIMG.heatMap.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMap + ext.jpg);
 
 }
 
@@ -584,7 +586,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s6, outputOfPicIMG.watershedAfter);
 		outputOfPicIMG.watershedAfter.update();
 		outputOfPicIMG.watershedAfter
-			.save(prefixPath.picture + "/" + fileName + "_" + outputOfPicFileName.watershed + ext.jpg);
+			.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.watershed + ext.jpg);
 
 		ofxCv::toOf(s7, outputOfPicIMG.watershedHighest);
 		outputOfPicIMG.watershedHighest.update();
@@ -596,7 +598,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
 		outputOfPicIMG.saliencyMapHighest.update();
 		outputOfPicIMG.saliencyMapHighest
-			.save(prefixPath.picture + "/" + fileName + "_" + outputOfPicFileName.saliencyMapHighest + "_1" + ext.jpg);
+			.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_1" + ext.jpg);
 
 		markersPicSave = markers.clone();
 
@@ -759,7 +761,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s6, outputOfEyeIMG.watershedAfter);
 		outputOfEyeIMG.watershedAfter.update();
 		outputOfEyeIMG.watershedAfter
-			.save(prefixPath.eyeGaze + "/" + fileName + "_" + outputOfEyeFileName.watershed + ext.jpg);
+			.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.watershed + ext.jpg);
 		ofxCv::toOf(s7, outputOfEyeIMG.watershedHighest);
 		outputOfEyeIMG.watershedHighest.update();
 		viewEyeMat.matMix = originalEyeMat.original*0.2 + originalEyeMat.copy*0.8;
@@ -769,7 +771,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
 		outputOfEyeIMG.saliencyMapHighest.update();
 		outputOfEyeIMG.saliencyMapHighest
-			.save(prefixPath.eyeGaze + "/" + fileName + "_" + outputOfEyeFileName.saliencyMapHighest + "_1" + ext.jpg);
+			.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.saliencyMapHighest + "_1" + ext.jpg);
 
 		markersEyeSave = markers.clone();
 
@@ -924,7 +926,7 @@ void ofApp::keyPressed(int key) {
 			((mode == ConstTools::EYETRACK) || (mode == ConstTools::EYETRACKHEATMAP) || (mode == ConstTools::IMAGEVIEW))
 			)
 		{
-			heatmap.save(prefixPath.eyeGaze + "/" + fileName + "_" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
+			heatmap.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
      		eyeTrackState = ConstTools::SAVE;
 		}
 		break;

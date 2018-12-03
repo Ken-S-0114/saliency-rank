@@ -113,4 +113,5 @@ public:
 	ConstTools::PrefixPath prefixPath;
 	ConstTools::FileNameExtension ext;
 
+	std::string folderName;
 };
