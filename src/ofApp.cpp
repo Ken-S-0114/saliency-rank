@@ -385,8 +385,22 @@ void ofApp::draw() {
 	{
 	case ConstTools::Infomation::VIEW:
 		ofDrawBitmapStringHighlight(
-			"SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n  *V: EYETRACKHEATMAP \n  *B: IMAGEVIEW\n  *N: RESULT\n  *M: SLEEP",
-			ofGetWidth() - ofGetWidth() / 6, 20
+			"SELECT KEY PRESSED\r\n"
+			"  *Z: RELEASE\n"
+			"  *X: DEBUG\n"
+			"  *C: EYETRACK\n"
+			"  *V: EYETRACKHEATMAP\n"
+			"  *B: IMAGEVIEW\n"
+			"  *N: RESULT\n"
+			"  *M: SLEEP\n\n"
+			"  if picture 'Z'or'X' key pressed\n"
+			"    *Enter: Next HighSaliency Place\n  *Delete: Reset\n"
+			"  if picture 'C'or'V'or'B' key pressed\n"
+			"    *SPACE: STARTÅESTOP\n  *S: SAVE\n"
+			"  if picture 'Z'or'X' key pressed\n"
+			"  if eyeGaze 'N' key pressed\n"
+			"    *R: RANKING\n",
+			ofGetWidth() - ofGetWidth() / 5, 20
 		);
 		break;
 	case ConstTools::Infomation::HIDE:
@@ -505,7 +519,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s4, outputOfPicIMG.unknown);
 		outputOfPicIMG.unknown.update();
 
-		int compCount = 0;
+		unsigned int compCount = 0;
 
 		std::vector<std::vector<cv::Point>> contours;
 		std::vector<cv::Vec4i> hierarchy;
@@ -678,7 +692,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s4, outputOfEyeIMG.unknown);
 		outputOfEyeIMG.unknown.update();
 
-		int compCount = 0;
+		unsigned int compCount = 0;
 
 		std::vector<std::vector<cv::Point>> contours;
 		std::vector<cv::Vec4i> hierarchy;
@@ -750,7 +764,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 			}
 		}
 
-		for (unsigned int i = 0; i < saliencyPoint.size(); i++) {
+		for (int i = 0; i < saliencyPoint.size(); i++) {
 			ofLogNotice() << "saliencyEyePoint[" << i << "]: " << saliencyPoint[i];
 		}
 
@@ -892,7 +906,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 		for (size_t i = 0; i < saliencyPicPoint.saved.size(); i++)
 		{
 			saliencyPicPoint.saved[maxSaliencyPicPoint.maxIndex] = 0;
-			unsigned int maxValue = *std::max_element(saliencyPicPoint.saved.begin(), saliencyPicPoint.saved.end());
+			int maxValue = *std::max_element(saliencyPicPoint.saved.begin(), saliencyPicPoint.saved.end());
 
 			if (maxValue == 0) {
 				break;
@@ -906,10 +920,10 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 			viewPicMat.saliencyHighest = cv::Mat::zeros(viewPicMat.saliencyHighest.size(), CV_8UC3);
 			originalPicMat.copy = originalPicMat.original.clone();
 
-			for (unsigned int i = 0; i < markersPicSave.rows; i++) {
-				for (unsigned int j = 0; j < markersPicSave.cols; j++)
+			for (int i = 0; i < markersPicSave.rows; i++) {
+				for (int j = 0; j < markersPicSave.cols; j++)
 				{
-					unsigned int index = markersPicSave.at<int>(i, j);
+					int index = markersPicSave.at<int>(i, j);
 					if (index == maxSaliencyPicPoint.maxIndex + 1) {
 						viewPicMat.saliencyHighest.at<cv::Vec3b>(i, j) = colorPicTab[index - 1];
 					}
@@ -939,7 +953,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 		for (size_t i = 0; i < saliencyEyePoint.saved.size(); i++)
 		{
 			saliencyEyePoint.saved[maxSaliencyEyePoint.maxIndex] = 0;
-			unsigned int maxValue = *std::max_element(saliencyEyePoint.saved.begin(), saliencyEyePoint.saved.end());
+		    int maxValue = *std::max_element(saliencyEyePoint.saved.begin(), saliencyEyePoint.saved.end());
 
 			if (maxValue == 0) {
 				break;

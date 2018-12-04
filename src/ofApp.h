@@ -89,7 +89,7 @@ public:
 	struct MaxSaliencyPoint
 	{
 		std::vector<int>::iterator iter;
-		int maxIndex;
+	    int maxIndex;
 	};
 	MaxSaliencyPoint maxSaliencyPicPoint, maxSaliencyEyePoint;
 
