@@ -47,6 +47,7 @@ public:
 	void createSaliencyMap(cv::Mat img);
 	void createWatershed(cv::Mat saliencyImg);
 	void loadEyeGaze(bool path);
+	void ranking(ConstTools::EnterState enterState);
 	void dumpOSC(ofxOscMessage m);
 
 	ConstTools::InputFileName inputFileName;
@@ -107,7 +108,7 @@ public:
 	float remoteEyeGazeX, remoteEyeGazeY;
 
 	ConstTools::EnterState enterState;
-	int enterPicCount, enterEyeCount;
+	unsigned int enterPicCount, enterEyeCount;
 
 	std::stringstream enterPicCountString, enterEyeCountString;
 
@@ -118,6 +119,7 @@ public:
 	ConstTools::Mode mode;
 	ConstTools::PrefixPath prefixPath;
 	ConstTools::FileNameExtension ext;
+	ConstTools::RankingState rankingState;
 
 	std::string folderName;
 };

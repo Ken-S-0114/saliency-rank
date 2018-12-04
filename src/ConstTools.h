@@ -153,4 +153,10 @@ public:
 		SALIENCYMAP,
 		EYEGAZE
 	};
+
+	enum RankingState {
+		MAKING,
+		DONE,
+		NOT
+	};
 };
