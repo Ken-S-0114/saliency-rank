@@ -36,8 +36,8 @@ void ofApp::setup() {
 	enterState = ConstTools::NONE;
 	enterPicCount = 0;
 	enterEyeCount = 0;
-	enterPicCountString << "The " << enterPicCount + 1 << " most saliency place";
-	enterEyeCountString << "The " << enterEyeCount + 1 << " most saliency place";
+	picCntStr << "The " << enterPicCount + 1 << " most saliency place";
+	eyeCntStr << "The " << enterEyeCount + 1 << " most saliency place";
 
 	std::string inputFilePath;
 	//--------------------------------------------------------------
@@ -132,9 +132,10 @@ void ofApp::update() {
 	}
 
 
+
 	if (enterState == ConstTools::EnterState::SALIENCYMAP) {
-		enterPicCountString.str("");
-		enterPicCountString.clear(stringstream::goodbit);
+		picCntStr.str("");
+		picCntStr.clear(stringstream::goodbit);
 
 		int maxValue = *std::max_element(saliencyPicPoint.saved.begin(), saliencyPicPoint.saved.end());
 
@@ -160,7 +161,6 @@ void ofApp::update() {
 					}
 					else {
 						originalPicMat.copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-						//mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
 					}
 				}
 			}
@@ -173,27 +173,24 @@ void ofApp::update() {
 
 			viewPicMat.matMix = originalPicMat.original*0.2 + originalPicMat.copy*0.8;
 
-			std::ostringstream number;
-			number << enterPicCount+1;
-
 			cv::Mat s8 = viewPicMat.matMix.clone();
 			ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
 			outputOfPicIMG.saliencyMapHighest.update();
 			//outputOfPicIMG.saliencyMapHighest
 			//.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 
-			enterPicCountString << "The " << enterPicCount + 1 << " most saliency place";
+			picCntStr << "The " << enterPicCount + 1 << " most saliency place";
 
 		}
 		else {
-			enterPicCountString << "Finish";
+			picCntStr << "Finish";
 		};
 
 		enterState = ConstTools::EnterState::NONE;
 	}
 	else if (enterState == ConstTools::EnterState::EYEGAZE) {
-		enterEyeCountString.str("");
-		enterEyeCountString.clear(stringstream::goodbit);
+		eyeCntStr.str("");
+		eyeCntStr.clear(stringstream::goodbit);
 
 		int maxValue = *std::max_element(saliencyEyePoint.saved.begin(), saliencyEyePoint.saved.end());
 
@@ -222,7 +219,6 @@ void ofApp::update() {
 					}
 					else {
 						originalEyeMat.copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-						//mat_copy.at<cv::Vec3b>(i,j) = cv::Vec3b((uchar)255, (uchar)255, (uchar)255);
 					}
 				}
 			}
@@ -235,20 +231,16 @@ void ofApp::update() {
 
 			viewEyeMat.matMix = originalEyeMat.original*0.2 + originalEyeMat.copy*0.8;
 
-			std::ostringstream number;
-			number << enterEyeCount + 1;
-
 			cv::Mat s8 = viewEyeMat.matMix.clone();
 			ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
 			outputOfEyeIMG.saliencyMapHighest.update();
 			//outputOfEyeIMG.saliencyMapHighest
 				//.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 
-			enterEyeCountString << "The " << enterEyeCount + 1 << " most saliency place";
-
+			eyeCntStr << "The " << enterEyeCount + 1 << " most saliency place";
 		}
 		else {
-			enterEyeCountString << "Finish";
+			eyeCntStr << "Finish";
 		};
 
 		enterState = ConstTools::EnterState::NONE;
@@ -271,7 +263,7 @@ void ofApp::draw() {
 		ofDrawBitmapStringHighlight("Enter: Next HighSaliency Place\nDelete: Reset",
 			ofGetWidth() - ofGetWidth() / 3 - 20, 20);
 
-		ofDrawBitmapStringHighlight(enterPicCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
+		ofDrawBitmapStringHighlight(picCntStr.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
 
 		ofSetWindowTitle("RELEASE");
 		break;
@@ -371,7 +363,7 @@ void ofApp::draw() {
 		outputOfEyeIMG.saliencyMapHighest.draw(ofGetWidth() - ofGetWidth() / 3, ofGetHeight() - ofGetHeight() / 3, ofGetWidth() / 3, ofGetHeight() / 3);
 		
 		ofDrawBitmapStringHighlight("View EyeGazeHeatMap", 20, 20);
-		//ofDrawBitmapStringHighlight(enterEyeCountString.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
+		//ofDrawBitmapStringHighlight(eyeCntStr.str(), ofGetWidth() / 2 + 20, ofGetHeight() / 2 + 50);
 		ofSetWindowTitle("RESULT");
 		break;
 
@@ -899,107 +891,93 @@ void ofApp::loadEyeGaze(bool path) {
 //--------------------------------------------------------------
 void ofApp::ranking(ConstTools::EnterState enterState) {
 	std::vector<int> points;
-
 	ofApp::MaxSaliencyPoint maxsaliencyPoint;
+	std::ostringstream number;
+	int maxValue;
+	cv::Mat s8;
 
-	if (enterState == ConstTools::EnterState::SALIENCYMAP)
+	switch (enterState)
 	{
+	case ConstTools::EnterState::SALIENCYMAP:
 		points = saliencyPicPoint.backup;
 		for (size_t i = 0; i < points.size(); i++)
 		{
-			if (i != 0)
-			{
+			if (i != 0){
 				points[maxsaliencyPoint.maxIndex] = 0;
 			}
 
-			int maxValue = *std::max_element(points.begin(), points.end());
-
+			maxValue = *std::max_element(points.begin(), points.end());
 			if (maxValue == 0) { break; }
-
-			points[maxsaliencyPoint.maxIndex] = 0;
 
 			maxsaliencyPoint.iter = std::max_element(points.begin(), points.end());
 			maxsaliencyPoint.maxIndex = std::distance(points.begin(), maxsaliencyPoint.iter);
 
-			viewPicMat.saliencyHighest = cv::Mat::zeros(viewPicMat.saliencyHighest.size(), CV_8UC3);
 			originalPicMat.copy = originalPicMat.original.clone();
 
 			for (int i = 0; i < markersPicSave.rows; i++) {
 				for (int j = 0; j < markersPicSave.cols; j++)
 				{
-					int index = markersPicSave.at<int>(i, j);
-					if (index == maxsaliencyPoint.maxIndex + 1) {
-						viewPicMat.saliencyHighest.at<cv::Vec3b>(i, j) = colorPicTab[index - 1];
-					}
-					else {
+					if (markersPicSave.at<int>(i, j) != maxsaliencyPoint.maxIndex + 1) {
 						originalPicMat.copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
 					}
 				}
 			}
 
-			viewPicMat.saliencyHighest = viewPicMat.saliencyHighest*0.5 + picImgG*0.5;
 			viewPicMat.matMix = originalPicMat.original*0.2 + originalPicMat.copy*0.8;
 
-			std::ostringstream number;
-			number << i + 2;
+			number.str("");
+			number.clear(stringstream::goodbit);
+			number << i + 1;
 
-			cv::Mat s8 = viewPicMat.matMix.clone();
+			s8 = viewPicMat.matMix.clone();
 			ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
 			outputOfPicIMG.saliencyMapHighest.update();
 			outputOfPicIMG.saliencyMapHighest
-				.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_" + number.str() + ext.png);	
+				.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 		}
+		break;
 
-	}
-	else if (enterState == ConstTools::EnterState::EYEGAZE)
-	{
+	case ConstTools::EnterState::EYEGAZE:
 		points = saliencyEyePoint.backup;
 		for (size_t i = 0; i < points.size(); i++)
 		{
-			points[maxsaliencyPoint.maxIndex] = 0;
-		    int maxValue = *std::max_element(points.begin(), points.end());
-
+			if (i != 0){
+				points[maxsaliencyPoint.maxIndex] = 0;
+			}
+			
+			maxValue = *std::max_element(points.begin(), points.end());
 			if (maxValue == 0) { break; }
 
 			maxsaliencyPoint.iter =
-						std::max_element(points.begin(), points.end());
+				std::max_element(points.begin(), points.end());
 			maxsaliencyPoint.maxIndex =
-						std::distance(points.begin(), maxsaliencyPoint.iter);
+				std::distance(points.begin(), maxsaliencyPoint.iter);
 
-					viewEyeMat.saliencyHighest = cv::Mat::zeros(viewEyeMat.saliencyHighest.size(), CV_8UC3);
-					originalEyeMat.copy = originalEyeMat.original.clone();
+			originalEyeMat.copy = originalEyeMat.original.clone();
 
-					for (int i = 0; i < markersEyeSave.rows; i++) {
-						for (int j = 0; j < markersEyeSave.cols; j++)
-						{
-							int index = markersEyeSave.at<int>(i, j);
-							if (index == maxsaliencyPoint.maxIndex + 1) {
-								viewEyeMat.saliencyHighest.at<cv::Vec3b>(i, j) = colorEyeTab[index - 1];
-							}
-							else {
-								originalEyeMat.copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
-							}
-						}
+			for (int i = 0; i < markersEyeSave.rows; i++) {
+				for (int j = 0; j < markersEyeSave.cols; j++)
+				{
+					if (markersEyeSave.at<int>(i, j) != maxsaliencyPoint.maxIndex + 1) {
+						originalEyeMat.copy.at<cv::Vec3b>(i, j) = cv::Vec3b((uchar)0, (uchar)0, (uchar)0);
 					}
+				}
+			}
 
-					viewEyeMat.saliencyHighest = viewEyeMat.saliencyHighest*0.5 + eyeImgG*0.5;
+			viewEyeMat.matMix = originalEyeMat.original*0.2 + originalEyeMat.copy*0.8;
 
-					cv::Mat s7 = viewEyeMat.saliencyHighest.clone();
-					ofxCv::toOf(s7, outputOfEyeIMG.watershedHighest);
-					outputOfEyeIMG.watershedHighest.update();
+			number.str("");
+			number.clear(stringstream::goodbit);
+			number << i + 1;
 
-					viewEyeMat.matMix = originalEyeMat.original*0.2 + originalEyeMat.copy*0.8;
-
-					std::ostringstream number;
-					number << i + 2;
-
-					cv::Mat s8 = viewEyeMat.matMix.clone();
-					ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
-					outputOfEyeIMG.saliencyMapHighest.update();
-					outputOfEyeIMG.saliencyMapHighest
-						.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.saliencyMapHighest + "_" + number.str() + ext.png);
+			s8 = viewEyeMat.matMix.clone();
+			ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
+			outputOfEyeIMG.saliencyMapHighest.update();
+			outputOfEyeIMG.saliencyMapHighest
+				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 
 		}
+		break;
 	}
 }
 

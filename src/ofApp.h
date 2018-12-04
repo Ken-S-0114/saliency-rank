@@ -110,7 +110,7 @@ public:
 	ConstTools::EnterState enterState;
 	unsigned int enterPicCount, enterEyeCount;
 
-	std::stringstream enterPicCountString, enterEyeCountString;
+	std::stringstream picCntStr, eyeCntStr;
 
 	ConstTools::EyeTrackState eyeTrackState;
 	ConstTools::LoadState loadState;
