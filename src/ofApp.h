@@ -95,7 +95,13 @@ public:
 	std::string fileName;
 	std::string eyeGazePath;
 
-	ofxHeatMap heatmap;
+	struct HeatMap {
+		ofxHeatMap gray;
+		ofxHeatMap grays;
+		ofxHeatMap spectral;
+		ofxHeatMap spectrals;
+	};
+	HeatMap heatMap;
 
 	ofxOscReceiver receiver;
 	float remoteEyeGazeX, remoteEyeGazeY;

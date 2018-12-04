@@ -102,7 +102,10 @@ public:
 	struct OutputOfEyeFileName {
 		const std::string watershed = "watershed";
 		const std::string saliencyMapHighest = "saliencyMapHighest";
+		const std::string eyeGazeHeatMapGray = "eyeGazeHeatMapGray";
+		const std::string eyeGazeHeatMapGraySoft = "eyeGazeHeatMapGraySoft";
 		const std::string eyeGazeHeatMap = "eyeGazeHeatMap";
+		const std::string eyeGazeHeatMapSoft = "eyeGazeHeatMapSoft";
 	};
 	
 	struct PrefixPath

@@ -17,6 +17,7 @@ void ofApp::setup() {
 	eyeTrackState = ConstTools::STANDBY;
 	loadState = ConstTools::PICLOAD;
 	infomation = ConstTools::VIEW;
+	mode = ConstTools::SLEEP;
 
 	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
 	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
@@ -26,7 +27,10 @@ void ofApp::setup() {
 	ofxCv::toOf(s9, outputOfEyeIMG.eyeGaze);
 	outputOfEyeIMG.eyeGaze.update();
 
-	heatmap.setup(WINWIDTH, WINHEIGHT, 32);
+	heatMap.gray.setup(WINWIDTH, WINHEIGHT, 32);
+	heatMap.grays.setup(WINWIDTH, WINHEIGHT, 32);
+	heatMap.spectral.setup(WINWIDTH, WINHEIGHT, 32);
+	heatMap.spectrals.setup(WINWIDTH, WINHEIGHT, 32);
 
 	enterState = ConstTools::NONE;
 	enterPicCount = 0;
@@ -50,7 +54,7 @@ void ofApp::setup() {
 	//inputFilePath = prefixPath.sampleImage + "/" + fileName + ext.jpg;
 	//--------------------------------------------------------------
 
-	eyeGazePath = prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png;
+	eyeGazePath = prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapGraySoft + ext.png;
 
 	if (inputOfImg.load(inputFilePath))
 	{
@@ -108,7 +112,11 @@ void ofApp::update() {
 					ofxCv::toOf(s9, outputOfEyeIMG.eyeGaze);
 					outputOfEyeIMG.eyeGaze.update();
 
-					heatmap.addPoint(X, Y);
+					
+					heatMap.gray.addPoint(X, Y);
+					heatMap.grays.addPoint(X, Y);
+					heatMap.spectral.addPoint(X, Y);
+					heatMap.spectrals.addPoint(X, Y);
 				}
 			}
 		}
@@ -116,10 +124,10 @@ void ofApp::update() {
 
 	if (eyeTrackState == ConstTools::TRACKING)
 	{
-		//heatmap.update();
-		//heatmap.update(OFX_HEATMAP_CS_GRAYS);
-		heatmap.update(OFX_HEATMAP_CS_GRAYS_SOFT);
-		//heatmap.update(OFX_HEATMAP_CS_GRAYS_MIXED);
+		heatMap.gray.update(OFX_HEATMAP_CS_GRAYS);
+		heatMap.grays.update(OFX_HEATMAP_CS_GRAYS_SOFT);
+		heatMap.spectral.update(OFX_HEATMAP_CS_SPECTRAL);
+		heatMap.spectrals.update(OFX_HEATMAP_CS_SPECTRAL_SOFT);
 	}
 
 	if (enterState == ConstTools::SALIENCYMAP) {
@@ -313,7 +321,10 @@ void ofApp::draw() {
 	case ConstTools::EYETRACKHEATMAP:
 		ofBackground(0, 0, 0);
 		ofSetColor(255, 255);
-		heatmap.draw(0, 0);
+		//heatMap.gray.draw(0, 0);
+		heatMap.grays.draw(0, 0);
+		//heatMap.spectral.draw(0, 0);
+		//heatMap.spectrals.draw(0, 0);
 
 		ofSetWindowTitle("EYETRACKHEATMAP");
 
@@ -372,7 +383,7 @@ void ofApp::draw() {
 	{
 	case ConstTools::VIEW:
 		ofDrawBitmapStringHighlight(
-			"SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n  *V: EYETRACKHEATMAP \n  *B: IMAGEVIEW\n  *N: RESULT",
+			"SELECT KEY PRESSED\r\n  *Z: RELEASE\n  *X: DEBUG\n  *C: EYETRACK\n  *V: EYETRACKHEATMAP \n  *B: IMAGEVIEW\n  *N: RESULT\n  *M: SLEEP",
 			ofGetWidth() - ofGetWidth() / 6, 20
 		);
 		break;
@@ -926,14 +937,25 @@ void ofApp::keyPressed(int key) {
 			((mode == ConstTools::EYETRACK) || (mode == ConstTools::EYETRACKHEATMAP) || (mode == ConstTools::IMAGEVIEW))
 			)
 		{
-			heatmap.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
-     		eyeTrackState = ConstTools::SAVE;
+			heatMap.gray
+				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapGray + ext.png);
+			heatMap.grays
+				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapGraySoft + ext.png);
+			heatMap.spectral
+				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
+			heatMap.spectrals
+				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapSoft + ext.png); 
+			
+			eyeTrackState = ConstTools::SAVE;
 		}
 		break;
 
-	//case 'r':
-	//	heatmap.clear();
-	//	break;
+	case 'r':
+		heatMap.gray.clear();
+		heatMap.grays.clear();
+		heatMap.spectral.clear();
+		heatMap.spectrals.clear();
+		break;
 
 	case 'i':
 		switch (infomation)
