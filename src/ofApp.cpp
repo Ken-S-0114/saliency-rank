@@ -441,7 +441,7 @@ void ofApp::createSaliencyMap(cv::Mat img) {
 
 	ofxCv::toOf(s2, outputOfPicIMG.heatMap);
 	outputOfPicIMG.heatMap.update();
-	outputOfPicIMG.heatMap.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMap + ext.jpg);
+	//outputOfPicIMG.heatMap.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMap + ext.jpg);
 
 }
 
@@ -600,7 +600,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s6, outputOfPicIMG.watershedAfter);
 		outputOfPicIMG.watershedAfter.update();
-		outputOfPicIMG.watershedAfter
+		//outputOfPicIMG.watershedAfter
 			.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.watershed + ext.jpg);
 
 		ofxCv::toOf(s7, outputOfPicIMG.watershedHighest);
@@ -1158,7 +1158,7 @@ void ofApp::keyPressed(int key) {
 		break;
 
 	case '8':
-		fileName = inputFileName.objs.balloon;
+		fileName = inputFileName.objs.livingRoom;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
