@@ -1158,114 +1158,121 @@ void ofApp::keyPressed(int key) {
 		break;
 
 	case '8':
-		fileName = inputFileName.objs.architecture;
+		fileName = inputFileName.objs.balloon;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
 
 	case '9':
-		fileName = inputFileName.objs.loadLine;
+		fileName = inputFileName.objs.architecture;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
 
 	case '0':
-		fileName = inputFileName.dark.moon;
+		fileName = inputFileName.objs.loadLine;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
 
 	case 45:
 		// "="‚ð‰Ÿ‚µ‚½Žž:
-		fileName = inputFileName.dark.weather;
+		fileName = inputFileName.dark.moon;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
 
 	case 94:
 		// "~"‚ð‰Ÿ‚µ‚½Žž:
-		fileName = inputFileName.one.lion;
+		fileName = inputFileName.dark.weather;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
 
 	case 92:
 		// "|"‚ð‰Ÿ‚µ‚½Žž:
-		fileName = inputFileName.one.child;
+		fileName = inputFileName.one.lion;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
 
 	case 'q':
-		fileName = inputFileName.mul.brothers;
+		fileName = inputFileName.one.child;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
 
 	case 'w':
+		fileName = inputFileName.mul.brothers;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case 'e':
 		fileName = inputFileName.mul.sibling;
 		picState = ConstTools::PictureState::IMAGE;
 		picSet = true;
 		break;
 
 
-	case 'e':
+	case 'r':
 		fileName = inputIPUFileName.non.sky;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
 		break;
 
-	case 'r':
+	case 't':
 		fileName = inputIPUFileName.non.grass;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
 		break;
 
-	case 't':
+	case 'y':
 		fileName = inputIPUFileName.obj.tree;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
 		break;
 
-	case 'y':
+	case 'u':
 		fileName = inputIPUFileName.obj.fireHydrant;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
 		break;
 
-	case 'u':
+	case 'i':
 		fileName = inputIPUFileName.obj.sign;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
 		break;
 
-	case 'i':
+	case 'o':
 		fileName = inputIPUFileName.objs.corn;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
 		break;
 
-	case 'o':
-		fileName = inputIPUFileName.objs.vendingMachine;
-		picState = ConstTools::PictureState::IPU;
-		picSet = true;
-		break;
-
 	case 'p':
-		fileName = inputIPUFileName.objs.treeTrees;
+		fileName = inputIPUFileName.objs.vendingMachine;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
 		break;
 
 	case 64:
 		// "`"‚ð‰Ÿ‚µ‚½Žž:
-		fileName = inputIPUFileName.objs.board;
+		fileName = inputIPUFileName.objs.treeTrees;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
 		break;
 
 	case 91:
 		// "{"‚ð‰Ÿ‚µ‚½Žž:
+		fileName = inputIPUFileName.objs.board;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 58:
+		// "*"‚ð‰Ÿ‚µ‚½Žž:
 		fileName = inputIPUFileName.objs.pc;
 		picState = ConstTools::PictureState::IPU;
 		picSet = true;
