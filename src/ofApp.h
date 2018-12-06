@@ -44,6 +44,7 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
 
+	void setupView(std::string path);
 	void createSaliencyMap(cv::Mat img);
 	void createWatershed(cv::Mat saliencyImg);
 	void loadEyeGaze(bool path);
@@ -122,4 +123,6 @@ public:
 	ConstTools::RankingState rankingState;
 
 	std::string folderName;
+
+	std::string inputFilePath;
 };

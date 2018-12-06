@@ -6,7 +6,7 @@
 #define THRESH_PIC 40
 #define THRESH_EYE 20
 
-#define THRESH_MAXVAL_PIC 0.4
+#define THRESH_MAXVAL_PIC 0.3
 #define THRESH_MAXVAL_EYE 0.3
 
 //--------------------------------------------------------------
@@ -19,7 +19,7 @@ void ofApp::setup() {
 	infomation = ConstTools::Infomation::VIEW;
 	mode = ConstTools::Mode::SLEEP;
 	rankingState = ConstTools::RankingState::NOT;
-
+	
 	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
 	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
 
@@ -39,25 +39,13 @@ void ofApp::setup() {
 	picCntStr << "The " << enterPicCount + 1 << " most saliency place";
 	eyeCntStr << "The " << enterEyeCount + 1 << " most saliency place";
 
-	std::string inputFilePath;
-	//--------------------------------------------------------------
-	// Add image file !!
-	fileName = inputFileName.mul.sibling;
-	inputFilePath = prefixPath.image + "/" + fileName + ext.jpg;
-	folderName = prefixPath.image;
-	//--------------------------------------------------------------
-	// Add image-IPU file !!
-	//fileName = inputIPUFileName.obj.tree;
-	//inputFilePath = prefixPath.image_IPU + "/" + fileName + ext.jpg;
-	//folderName = prefixPath.image_IPU;
-	//--------------------------------------------------------------
-	//fileName = inputMockFileName.dog;
-	//inputFilePath = prefixPath.sampleImage + "/" + fileName + ext.jpg;
-	//--------------------------------------------------------------
 
-	eyeGazePath = prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapGray + ext.png;
+	// êîéöÇâüÇ∑
+}
 
-	if (inputOfImg.load(inputFilePath))
+//--------------------------------------------------------------
+void ofApp::setupView(std::string path) {
+	if (inputOfImg.load(path))
 	{
 		inputOfImg.update();
 		originalPicMat.original = ofxCv::toCv(inputOfImg);
@@ -95,24 +83,17 @@ void ofApp::update() {
 
 			if (eyeTrackState == ConstTools::EyeTrackState::TRACKING)
 			{
-				if ((0 > X) || (0 > Y))
-				{
-					return;
-				}
+				if ((0 > X) || (0 > Y)) { return; }
 				if ((X <= WINWIDTH) && (Y <= WINHEIGHT))
 				{
 					/*ofLogNotice() << "X(after): " << X;
 					ofLogNotice() << "Y(after): " << Y;*/
-					if ((int)viewEyeMat.eyeGazeMat.at<uchar>(Y, X) >= 255)
-					{
-						return;
-					}
+					if ((int)viewEyeMat.eyeGazeMat.at<uchar>(Y, X) >= 255) { return; }
 					//ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(Y, X);
 					viewEyeMat.eyeGazeMat.at<uchar>(Y, X) += 254;
 					cv::Mat s9 = viewEyeMat.eyeGazeMat.clone();
 					ofxCv::toOf(s9, outputOfEyeIMG.eyeGaze);
 					outputOfEyeIMG.eyeGaze.update();
-
 					
 					heatMap.gray.addPoint(X, Y);
 					heatMap.grays.addPoint(X, Y);
@@ -384,23 +365,23 @@ void ofApp::draw() {
 			"  *V: EYETRACKHEATMAP\n"
 			"  *B: IMAGEVIEW\n"
 			"  *N: RESULT\n"
-			"  *M: SLEEP\n\n"
+			"  *M: SLEEP\n"
+			"  *F: INFORMATION\n\n"
 			"  if picture 'Z'or'X' key pressed\n"
 			"    *Enter: Next HighSaliency Place\n"
 			"    *Delete: Reset\n"
 			"  if picture 'C'or'V'or'B' pressed\n"
 			"    *SPACE: STARTÅESTOP\n"
 			"    *S: SAVE\n"
+			"    *D: DELETE\n"
 			"  if picture 'Z'or'X' pressed\n"
 			"  if eyeGaze 'N' key pressed\n"
-			"   and first place only\n\n"
-			"    *R: RANKING\n",
+			"    *A: RANKING\n",
 			ofGetWidth() - ofGetWidth() / 5, 20
 		);
 		break;
 	case ConstTools::Infomation::HIDE:
 		break;
-
 	}
 
 	switch (rankingState)
@@ -849,10 +830,6 @@ void ofApp::loadEyeGaze(bool path) {
 		ofxCv::toOf(s10, outputOfEyeIMG.eyeGazeResult);
 		outputOfEyeIMG.eyeGazeResult.update();
 
-		ofLogNotice() << "loadMat.type: " << loadMat.type();
-		ofLogNotice() << "loadMat.depth: " << loadMat.depth();
-		ofLogNotice() << "loadMat.channels: " << loadMat.channels();
-
 		cv::cvtColor(loadMat.clone(), loadMatBGR, CV_BGRA2BGR);
 		loadMatBGR.clone().convertTo(loadMat8UC1, CV_8UC1);
 		
@@ -865,20 +842,10 @@ void ofApp::loadEyeGaze(bool path) {
 
 		cvtColor(loadMat8UC1.clone(), loadMat_gray, cv::COLOR_BGR2GRAY);
 
-		cv::Point min_loc, max_loc;
-		double min_val, max_val;
-
-		cv::minMaxLoc(loadMat_gray.clone(), &min_val, &max_val, &min_loc, &max_loc);
-		ofLogNotice() << "MaxValue: " << max_val;
-
 		viewEyeMat.saliencyMap = loadMat_gray.clone();
 		cv::Mat s13 = viewEyeMat.saliencyMap.clone();
 		ofxCv::toOf(s13, outputOfEyeIMG.gray);
 		outputOfEyeIMG.gray.update();
-
-		ofLogNotice() << "viewEyeMat.saliencyMap.type: " << viewEyeMat.saliencyMap.type();
-		ofLogNotice() << "viewEyeMat.saliencyMap.depth: " << viewEyeMat.saliencyMap.depth();
-		ofLogNotice() << "viewEyeMat.saliencyMap.channels: " << viewEyeMat.saliencyMap.channels();
 
 		createWatershed(viewEyeMat.saliencyMap.clone());
 
@@ -984,6 +951,11 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
 	ofLogNotice() << "keyPressed: " << key;
+
+	eyeTrackState = ConstTools::EyeTrackState::STANDBY;
+	ConstTools::PictureState picState = ConstTools::PictureState::NONPIC;
+	bool picSet = false;
+
 	rankingState = ConstTools::RankingState::NOT;
 
 	switch (key) {
@@ -1029,7 +1001,7 @@ void ofApp::keyPressed(int key) {
 		break;
 	case ' ':
 		// "Space"ÇâüÇµÇΩéû:
-		if ((mode == ConstTools::Mode::EYETRACK) || (mode == ConstTools::Mode::EYETRACKHEATMAP) || (mode == ConstTools::Mode::IMAGEVIEW))
+ 		if ((mode == ConstTools::Mode::EYETRACK) || (mode == ConstTools::Mode::EYETRACKHEATMAP) || (mode == ConstTools::Mode::IMAGEVIEW))
 		{
 			if (eyeTrackState == ConstTools::EyeTrackState::STANDBY) {
 				eyeTrackState = ConstTools::EyeTrackState::TRACKING;
@@ -1041,7 +1013,6 @@ void ofApp::keyPressed(int key) {
 		break;
 
 	case 's':
-		// "S"ÇâüÇµÇΩéû:
 		if (eyeTrackState == ConstTools::EyeTrackState::STANDBY &&
 			((mode == ConstTools::Mode::EYETRACK) || (mode == ConstTools::Mode::EYETRACKHEATMAP) || (mode == ConstTools::Mode::IMAGEVIEW))
 			)
@@ -1059,8 +1030,7 @@ void ofApp::keyPressed(int key) {
 		}
 		break;
 
-	case 'r':
-		// "R"ÇâüÇµÇΩéû:
+	case 'a':
 		switch (mode)
 		{
 		case ConstTools::Mode::RELEASE:
@@ -1080,13 +1050,21 @@ void ofApp::keyPressed(int key) {
 
 		ConstTools::EnterState::NONE;
 
-		/*heatMap.gray.clear();
-		heatMap.grays.clear();
-		heatMap.spectral.clear();
-		heatMap.spectrals.clear();*/
 		break;
 
-	case 'i':
+	case 'd':
+		heatMap.gray.clear();
+		heatMap.grays.clear();
+		heatMap.spectral.clear();
+		heatMap.spectrals.clear();
+
+		heatMap.gray.setup(WINWIDTH, WINHEIGHT, 32);
+		heatMap.grays.setup(WINWIDTH, WINHEIGHT, 32);
+		heatMap.spectral.setup(WINWIDTH, WINHEIGHT, 32);
+		heatMap.spectrals.setup(WINWIDTH, WINHEIGHT, 32);
+
+		break;
+	case 'f':
 		switch (infomation)
 		{
 		case ConstTools::Infomation::VIEW:
@@ -1097,6 +1075,7 @@ void ofApp::keyPressed(int key) {
 			break;
 		}
 		break;
+
 		//-------------   ä¬ã´   ------------------
 	case 'z':
 		// "Z"ÇâüÇµÇΩéû: release
@@ -1133,11 +1112,197 @@ void ofApp::keyPressed(int key) {
 	case 'm':
 		mode = ConstTools::Mode::SLEEP;
 		break;
+
+
+		//-------------   âÊëú   ------------------
+	case '1':
+		fileName = inputFileName.non.field;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '2':
+		fileName = inputFileName.non.brick;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '3':
+		fileName = inputFileName.obj.furniture;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '4':
+		fileName = inputFileName.obj.football;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '5':
+		fileName = inputFileName.obj.sunset;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '6':
+		fileName = inputFileName.obj.waterfall;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '7':
+		fileName = inputFileName.objs.balloon;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '8':
+		fileName = inputFileName.objs.architecture;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '9':
+		fileName = inputFileName.objs.loadLine;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case '0':
+		fileName = inputFileName.dark.moon;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case 45:
+		// "="ÇâüÇµÇΩéû:
+		fileName = inputFileName.dark.weather;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case 94:
+		// "~"ÇâüÇµÇΩéû:
+		fileName = inputFileName.one.lion;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case 92:
+		// "|"ÇâüÇµÇΩéû:
+		fileName = inputFileName.one.child;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case 'q':
+		fileName = inputFileName.mul.brothers;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+	case 'w':
+		fileName = inputFileName.mul.sibling;
+		picState = ConstTools::PictureState::IMAGE;
+		picSet = true;
+		break;
+
+
+	case 'e':
+		fileName = inputIPUFileName.non.sky;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 'r':
+		fileName = inputIPUFileName.non.grass;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 't':
+		fileName = inputIPUFileName.obj.tree;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 'y':
+		fileName = inputIPUFileName.obj.fireHydrant;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 'u':
+		fileName = inputIPUFileName.obj.sign;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 'i':
+		fileName = inputIPUFileName.objs.corn;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 'o':
+		fileName = inputIPUFileName.objs.vendingMachine;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 'p':
+		fileName = inputIPUFileName.objs.treeTrees;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 64:
+		// "`"ÇâüÇµÇΩéû:
+		fileName = inputIPUFileName.objs.board;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 91:
+		// "{"ÇâüÇµÇΩéû:
+		fileName = inputIPUFileName.objs.pc;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
+	case 93:
+		// "}"ÇâüÇµÇΩéû:
+		fileName = inputIPUFileName.objs.landscape;
+		picState = ConstTools::PictureState::IPU;
+		picSet = true;
+		break;
+
 	default:
 		break;
 	}
 
+	switch (picState)
+	{
+	case ConstTools::PictureState::IMAGE:
+		inputFilePath = prefixPath.image + "/" + fileName + ext.jpg;
+		folderName = prefixPath.image;
+		break;
+	case ConstTools::PictureState::IPU:
+		inputFilePath = prefixPath.image_IPU + "/" + fileName + ext.jpg;
+		folderName = prefixPath.image_IPU;
+		break;
+	default:
+		break;
+	}
+
+	if (picSet)
+	{
+		eyeGazePath = prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapGray + ext.png;
+		setupView(inputFilePath);
+	}
 }
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key) {

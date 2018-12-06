@@ -159,4 +159,10 @@ public:
 		DONE,
 		NOT
 	};
+
+	enum PictureState {
+		NONPIC,
+		IMAGE,
+		IPU
+	};
 };
