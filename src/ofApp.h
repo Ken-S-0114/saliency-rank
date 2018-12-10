@@ -86,6 +86,10 @@ public:
 		std::vector<int> saved, backup;
 	};
 	SaliencyPoint saliencyPicPoint, saliencyEyePoint;
+	SaliencyPoint saliencyPicTotalPoint, saliencyEyeTotalPoint;
+
+	std::vector<int> maxValuePicCount, maxValueEyeCount;
+
 
 	struct MaxSaliencyPoint
 	{
