@@ -1001,6 +1001,29 @@ void ofApp::loadEyeGaze(bool path) {
 		cv::Mat loadMat, loadMat_gray, loadMatBGR, loadMat8UC1;
 		loadMat = ofxCv::toCv(loadOfImage);
 
+		for (int x = 0; x < loadMat.rows; ++x) {
+			for (int y = 0; y < loadMat.cols; ++y) {
+				//ofLogNotice() << "loadMat.at<cv::Vec4b>(" << x << "," << y << ") : " << (float)loadMat.at<cv::Vec4b>(x, y)[3];
+				if ((float)loadMat.at<cv::Vec4b>(x, y)[3] != 0.0 )
+				{
+					if (loadMat.at<cv::Vec4b>(x, y)[0] <= 254)
+					{
+						loadMat.at<cv::Vec4b>(x, y)[0] += 1;
+					}
+		
+					if (loadMat.at<cv::Vec4b>(x, y)[1] <= 254)
+					{
+						loadMat.at<cv::Vec4b>(x, y)[1] += 1;
+					}
+
+					if (loadMat.at<cv::Vec4b>(x, y)[2] <= 254)
+					{
+						loadMat.at<cv::Vec4b>(x, y)[2] += 1;
+					}
+				}
+			}
+		}
+
 		cv::Mat s10 = loadMat.clone();
 		ofxCv::toOf(s10, outputOfEyeIMG.eyeGazeResult);
 		outputOfEyeIMG.eyeGazeResult.update();
@@ -1015,6 +1038,7 @@ void ofApp::loadEyeGaze(bool path) {
 		ofxCv::toOf(s12, outputOfEyeIMG.loadMat8UC1);
 		outputOfEyeIMG.loadMat8UC1.update();
 
+		viewEyeMat.saliencyMap = loadMat_gray.clone();
 		cvtColor(loadMat8UC1.clone(), loadMat_gray, cv::COLOR_BGR2GRAY);
 
 		viewEyeMat.saliencyMap = loadMat_gray.clone();
