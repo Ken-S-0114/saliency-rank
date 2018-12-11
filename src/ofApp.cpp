@@ -7,7 +7,10 @@
 #define THRESH_EYE 0
 
 #define THRESH_MAXVAL_PIC 0.3
-#define THRESH_MAXVAL_EYE 0.3
+#define THRESH_MAXVAL_EYE 0.0
+
+#define ALPHANOTZERO 255/10
+
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -188,7 +191,7 @@ void ofApp::update() {
 			ofxCv::toOf(s7, outputOfPicIMG.watershedHighest);
 			outputOfPicIMG.watershedHighest.update();
 
-			viewPicMat.matMix = originalPicMat.original*0.2 + originalPicMat.copy*0.8;
+			viewPicMat.matMix = originalPicMat.original*0.1 + originalPicMat.copy*0.9;
 
 			cv::Mat s8 = viewPicMat.matMix.clone();
 			ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
@@ -284,7 +287,7 @@ void ofApp::update() {
 			ofxCv::toOf(s7, outputOfEyeIMG.watershedHighest);
 			outputOfEyeIMG.watershedHighest.update();
 
-			viewEyeMat.matMix = originalEyeMat.original*0.2 + originalEyeMat.copy*0.8;
+			viewEyeMat.matMix = originalEyeMat.original*0 + originalEyeMat.copy*1;
 
 			cv::Mat s8 = viewEyeMat.matMix.clone();
 			ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
@@ -720,7 +723,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		ofxCv::toOf(s7, outputOfPicIMG.watershedHighest);
 		outputOfPicIMG.watershedHighest.update();
 
-		viewPicMat.matMix = originalPicMat.original*0.2 + originalPicMat.copy*0.8;
+		viewPicMat.matMix = originalPicMat.original*0.1 + originalPicMat.copy*0.9;
 
 		cv::Mat s8 = viewPicMat.matMix.clone();
 
@@ -946,7 +949,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 			.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.watershed + ext.jpg);
 		ofxCv::toOf(s7, outputOfEyeIMG.watershedHighest);
 		outputOfEyeIMG.watershedHighest.update();
-		viewEyeMat.matMix = originalEyeMat.original*0.2 + originalEyeMat.copy*0.8;
+		viewEyeMat.matMix = originalEyeMat.original*0 + originalEyeMat.copy*1;
 
 		cv::Mat s8 = viewEyeMat.matMix.clone();
 
@@ -1006,19 +1009,19 @@ void ofApp::loadEyeGaze(bool path) {
 				//ofLogNotice() << "loadMat.at<cv::Vec4b>(" << x << "," << y << ") : " << (float)loadMat.at<cv::Vec4b>(x, y)[3];
 				if ((float)loadMat.at<cv::Vec4b>(x, y)[3] > 0.0 )
 				{
-					if (loadMat.at<cv::Vec4b>(x, y)[0] <= 254)
+					if (loadMat.at<cv::Vec4b>(x, y)[0] <= ALPHANOTZERO)
 					{
-						loadMat.at<cv::Vec4b>(x, y)[0] += 5;
+						loadMat.at<cv::Vec4b>(x, y)[0] += ALPHANOTZERO;
 					}
 		
-					if (loadMat.at<cv::Vec4b>(x, y)[1] <= 254)
+					if (loadMat.at<cv::Vec4b>(x, y)[1] <= ALPHANOTZERO)
 					{
-						loadMat.at<cv::Vec4b>(x, y)[1] += 5;
+						loadMat.at<cv::Vec4b>(x, y)[1] += ALPHANOTZERO;
 					}
 
-					if (loadMat.at<cv::Vec4b>(x, y)[2] <= 254)
+					if (loadMat.at<cv::Vec4b>(x, y)[2] <= ALPHANOTZERO)
 					{
-						loadMat.at<cv::Vec4b>(x, y)[2] += 5;
+						loadMat.at<cv::Vec4b>(x, y)[2] += ALPHANOTZERO;
 					}
 				}
 			}
@@ -1127,7 +1130,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 				}
 			}
 
-			viewPicMat.matMix = originalPicMat.original*0.2 + originalPicMat.copy*0.8;
+			viewPicMat.matMix = originalPicMat.original*0.1 + originalPicMat.copy*0.9;
 
 			number.str("");
 			number.clear(stringstream::goodbit);
@@ -1144,6 +1147,12 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 	case ConstTools::EnterState::EYEGAZE:
 		points = saliencyEyePoint.backup;
 		totalPoints = saliencyEyeTotalPoint.backup;
+
+		ofImage src;
+		auto srcPath = ofToDataPath(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
+		src.load(srcPath);
+		cv::Mat originalMat = ofxCv::toCv(src); // カラー画像
+
 		for (size_t i = 0; i < points.size(); i++)
 		{
 			if (i != 0){
@@ -1168,8 +1177,8 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 			for (size_t i = 0; i < points.size(); i++)
 			{
-				ofLogNotice() << "saliencyPoint[" << i << "]: " << points[i];
-				ofLogNotice() << "maxValue: " << maxValue;
+				/*ofLogNotice() << "saliencyPoint[" << i << "]: " << points[i];
+				ofLogNotice() << "maxValue: " << maxValue;*/
 				if (maxValue < points[i])
 				{
 					maxSaliencyPoint.maxIndex = i;
@@ -1179,8 +1188,8 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 				}
 				else if (maxValue == points[i]) 
 				{
-					ofLogNotice() << "maxValueEyeCount[" << i << "]: " << maxValueEyeCount[i];
-					ofLogNotice() << "maxValueCount: " << maxValueCount;
+					/*ofLogNotice() << "maxValueEyeCount[" << i << "]: " << maxValueEyeCount[i];
+					ofLogNotice() << "maxValueCount: " << maxValueCount;*/
 					if (maxValueCount < maxValueEyeCount[i])
 					{
 						maxSaliencyPoint.maxIndex = i;
@@ -1190,8 +1199,8 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 					}
 					else if (maxValueCount == maxValueEyeCount[i])
 					{
-						ofLogNotice() << "saliencyEyeTotalPoint[" << i << "]: " << saliencyEyeTotalPoint.saved[i];
-						ofLogNotice() << "maxTotalValue: " << maxTotalValue;
+						/*ofLogNotice() << "saliencyEyeTotalPoint[" << i << "]: " << saliencyEyeTotalPoint.saved[i];
+						ofLogNotice() << "maxTotalValue: " << maxTotalValue;*/
 						if (maxTotalValue < totalPoints[i])
 						{
 							maxSaliencyPoint.maxIndex = i;
@@ -1215,7 +1224,31 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 				}
 			}
 
-			viewEyeMat.matMix = originalEyeMat.original*0.2 + originalEyeMat.copy*0.8;
+			viewEyeMat.matMix = originalEyeMat.original*0 + originalEyeMat.copy*1;
+			
+
+			
+			cv::Mat targetMat = originalEyeMat.copy.clone(); // 白黒のループしてくるやつ
+
+			cv::threshold(targetMat, targetMat, 50, 255, CV_THRESH_BINARY_INV); // TODO: 閾値を変える
+
+			std::vector<cv::Vec4i> hierarchy;
+			std::vector < vector<cv::Point>> contours;
+
+			cv::Mat targetMat8UC1, targetMat8UC3;
+			cv::cvtColor(targetMat.clone(), targetMat8UC1, CV_BGR2GRAY);
+			//targetMat.convertTo(targetMat8UC1, CV_8UC1);
+			
+			cv::findContours(targetMat8UC1, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+
+			cv::cvtColor(originalMat, originalMat, CV_BGRA2BGR);
+
+			if (contours.size() >= 2  && i < 10) {
+				auto textPoint = cv::Point(contours[1][0].x, contours[1][0].y);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, 1, 5, (0, 0, 255), 5);
+			}
+
+
 
 			number.str("");
 			number.clear(stringstream::goodbit);
@@ -1228,6 +1261,13 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + "rank/"+ outputOfEyeFileName.saliencyMapHighest + "_" + number.str() + ext.png);
 
 		}
+		//cv::cvtColor(targetMat8UC1.clone(), targetMat8UC3, CV_GRAY2BGR);
+		ofImage saveImage;
+		cv::Mat s = originalMat.clone();
+		ofxCv::toOf(s, saveImage);
+		saveImage.update();
+		saveImage.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.rank + ext.png);
+
 		break;
 	}
 }

@@ -106,6 +106,7 @@ public:
 		const std::string eyeGazeHeatMapGraySoft = "eyeGazeHeatMapGraySoft";
 		const std::string eyeGazeHeatMap = "eyeGazeHeatMap";
 		const std::string eyeGazeHeatMapSoft = "eyeGazeHeatMapSoft";
+		const std::string rank = "eyeGazeRank";
 	};
 	
 	struct PrefixPath
