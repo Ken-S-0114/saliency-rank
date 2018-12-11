@@ -1004,21 +1004,21 @@ void ofApp::loadEyeGaze(bool path) {
 		for (int x = 0; x < loadMat.rows; ++x) {
 			for (int y = 0; y < loadMat.cols; ++y) {
 				//ofLogNotice() << "loadMat.at<cv::Vec4b>(" << x << "," << y << ") : " << (float)loadMat.at<cv::Vec4b>(x, y)[3];
-				if ((float)loadMat.at<cv::Vec4b>(x, y)[3] != 0.0 )
+				if ((float)loadMat.at<cv::Vec4b>(x, y)[3] > 0.0 )
 				{
 					if (loadMat.at<cv::Vec4b>(x, y)[0] <= 254)
 					{
-						loadMat.at<cv::Vec4b>(x, y)[0] += 1;
+						loadMat.at<cv::Vec4b>(x, y)[0] += 5;
 					}
 		
 					if (loadMat.at<cv::Vec4b>(x, y)[1] <= 254)
 					{
-						loadMat.at<cv::Vec4b>(x, y)[1] += 1;
+						loadMat.at<cv::Vec4b>(x, y)[1] += 5;
 					}
 
 					if (loadMat.at<cv::Vec4b>(x, y)[2] <= 254)
 					{
-						loadMat.at<cv::Vec4b>(x, y)[2] += 1;
+						loadMat.at<cv::Vec4b>(x, y)[2] += 5;
 					}
 				}
 			}
