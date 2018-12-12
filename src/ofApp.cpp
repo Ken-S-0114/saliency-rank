@@ -721,8 +721,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s6, outputOfPicIMG.watershedAfter);
 		outputOfPicIMG.watershedAfter.update();
-		//outputOfPicIMG.watershedAfter
-			//.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.watershed + ext.jpg);
+		outputOfPicIMG.watershedAfter
+			.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.watershed + ext.jpg);
 
 		ofxCv::toOf(s7, outputOfPicIMG.watershedHighest);
 		outputOfPicIMG.watershedHighest.update();
@@ -1269,7 +1269,7 @@ void ofApp::keyPressed(int key) {
 	//ofLogNotice() << "keyPressed: " << key;
 
 	eyeTrackState = ConstTools::EyeTrackState::STANDBY;
-	ConstTools::PictureState picState = ConstTools::PictureState::NONPIC;
+	picState = ConstTools::PictureState::NONPIC;
 	bool picSet = false;
 
 	rankingState = ConstTools::RankingState::NOT;
