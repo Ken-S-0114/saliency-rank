@@ -3,7 +3,7 @@
 #define PORT 8000
 #define HOST "127.0.0.1"
 
-#define THRESH_PIC 40
+#define THRESH_PIC 255/4
 #define THRESH_EYE 0
 
 #define THRESH_MAXVAL_PIC 0.3
@@ -590,7 +590,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 			for (int j = 0; j < markers.cols; j++) {
 				unsigned char &v = unknown.at<unsigned char>(i, j);
 				if (v == 255) {
-					markers.at<int>(i, j) = 0;
+					markers.at<int>(i, j) = 255;
 				}
 			}
 		}

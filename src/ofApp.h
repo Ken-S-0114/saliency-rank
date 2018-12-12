@@ -125,6 +125,7 @@ public:
 	ConstTools::PrefixPath prefixPath;
 	ConstTools::FileNameExtension ext;
 	ConstTools::RankingState rankingState;
+	ConstTools::PictureState picState;
 
 	std::string folderName;
 	std::string inputFilePath;
