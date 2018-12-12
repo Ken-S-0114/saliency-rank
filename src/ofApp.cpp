@@ -10,7 +10,7 @@
 #define THRESH_MAXVAL_EYE 0.0
 
 #define ALPHANOTZERO 255/10
-
+#define USERNAME ""
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -23,8 +23,8 @@ void ofApp::setup() {
 	mode = ConstTools::Mode::SLEEP;
 	rankingState = ConstTools::RankingState::NOT;
 	
-	ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
-	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();
+	/*ofLogNotice() << "ofGetScreenWidth: " << ofGetScreenWidth();
+	ofLogNotice() << "ofGetScreenHeight: " << ofGetScreenHeight();*/
 
 	viewEyeMat.eyeGazeMat = cv::Mat::zeros(WINHEIGHT, WINWIDTH, CV_8UC1);
 	cv::Mat s9 = viewEyeMat.eyeGazeMat.clone();
@@ -41,6 +41,15 @@ void ofApp::setup() {
 	enterEyeCount = 0;
 	picCntStr << "The " << enterPicCount + 1 << " most saliency place";
 	eyeCntStr << "The " << enterEyeCount + 1 << " most saliency place";
+
+	//std::vector<int> key{ 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 45, 94, 92, 113, 119, 101, 114, 116, 121, 117, 105, 111, 112, 64, 91, 58, 93 };
+	//for (size_t i = 0; i < key.size(); i++)
+	//{
+	//	keyPressed(key[i]);
+	//	keyPressed(110);
+	//	keyPressed(97);
+	//	keyPressed(109);
+	//}
 
 }
 
@@ -161,7 +170,7 @@ void ofApp::update() {
 			/*maxSaliencyPicPoint.iter = std::max_element(saliencyPicPoint.saved.begin(), saliencyPicPoint.saved.end());
 			maxSaliencyPicPoint.maxIndex = std::distance(saliencyPicPoint.saved.begin(), maxSaliencyPicPoint.iter);*/
 
-			ofLogNotice() << "Index of max element: " << maxSaliencyPicPoint.maxIndex;
+			//ofLogNotice() << "Index of max element: " << maxSaliencyPicPoint.maxIndex;
 
 			viewPicMat.saliencyHighest = cv::Mat::zeros(viewPicMat.saliencyHighest.size(), CV_8UC3);
 			originalPicMat.copy = originalPicMat.original.clone();
@@ -257,7 +266,7 @@ void ofApp::update() {
 			maxSaliencyEyePoint.maxIndex = 
 				std::distance(saliencyEyePoint.saved.begin(), maxSaliencyEyePoint.iter);*/
 
-			ofLogNotice() << "Index of max element: " << maxSaliencyEyePoint.maxIndex;
+			//ofLogNotice() << "Index of max element: " << maxSaliencyEyePoint.maxIndex;
 
 
 			viewEyeMat.saliencyHighest = cv::Mat::zeros(viewEyeMat.saliencyHighest.size(), CV_8UC3);
@@ -596,7 +605,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		std::vector<int> saliencyTotalPoint(compCount + 1, 0);
 		std::vector<int> maxValueCount(compCount + 1, 0);
 
-		ofLogNotice() << "count: " << compCount;
+		//ofLogNotice() << "count: " << compCount;
 		for (int i = 0; i < compCount + 1; i++)
 		{
 			int b = cv::theRNG().uniform(0, 255);
@@ -645,7 +654,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		for (size_t i = 0; i < saliencyPoint.size(); i++)
 		{
 
-			ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPoint[i];
+			//ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPoint[i];
 			if (maxValue < saliencyPoint[i])
 			{
 				maxSaliencyPicPoint.maxIndex = i;
@@ -677,7 +686,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		/*maxSaliencyPicPoint.iter = std::max_element(saliencyPoint.begin(), saliencyPoint.end());
 		maxSaliencyPicPoint.maxIndex = std::distance(saliencyPoint.begin(), maxSaliencyPicPoint.iter);*/
-		ofLogNotice() << "Index of max element: " << maxSaliencyPicPoint.maxIndex;
+		//ofLogNotice() << "Index of max element: " << maxSaliencyPicPoint.maxIndex;
 
 		for (int i = 0; i < markers.rows; i++) {
 			for (int j = 0; j < markers.cols; j++)
@@ -819,7 +828,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		cv::Mat wshed(markers.size(), CV_8UC3);
 
-		ofLogNotice() << "count: " << compCount;
+		//ofLogNotice() << "count: " << compCount;
 		std::vector<int> saliencyPoint(compCount + 1, 0);
 		std::vector<int> saliencyTotalPoint(compCount + 1, 0);
 		std::vector<int> maxValueCount(compCount + 1, 0);
@@ -871,7 +880,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 		int count = 0;
 		for (size_t i = 0; i < saliencyPoint.size(); i++)
 		{
-			ofLogNotice() << "saliencyEyePoint[" << i << "]: " << saliencyPoint[i];
+			//ofLogNotice() << "saliencyEyePoint[" << i << "]: " << saliencyPoint[i];
 			if (maxValue < saliencyPoint[i])
 			{
 				maxSaliencyEyePoint.maxIndex = i;
@@ -905,7 +914,7 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		/*maxSaliencyEyePoint.iter = std::max_element(saliencyPoint.begin(), saliencyPoint.end());
 		maxSaliencyEyePoint.maxIndex = std::distance(saliencyPoint.begin(), maxSaliencyEyePoint.iter);*/
-		ofLogNotice() << "Index of max element: " << maxSaliencyEyePoint.maxIndex;
+		//ofLogNotice() << "Index of max element: " << maxSaliencyEyePoint.maxIndex;
 
 		for (int i = 0; i < markers.rows; i++) {
 			for (int j = 0; j < markers.cols; j++)
@@ -1084,7 +1093,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 			int maxValueCount = 0;
 			for (size_t i = 0; i < points.size(); i++)
 			{
-				ofLogNotice() << "saliencyPoint[" << i << "]: " << points[i];
+				//ofLogNotice() << "saliencyPoint[" << i << "]: " << points[i];
 				if (maxValue < points[i])
 				{
 					maxSaliencyPoint.maxIndex = i;
@@ -1163,7 +1172,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 			int maxTotalValue = 0;
 			int maxValueCount = 0;
 
-			ofLogNotice() << "maxValueEyeCount.size(): " << maxValueEyeCount.size();
+			//ofLogNotice() << "maxValueEyeCount.size(): " << maxValueEyeCount.size();
 
 			for (size_t i = 0; i < points.size(); i++)
 			{
@@ -1249,13 +1258,15 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 		saveImage.update();
 		saveImage.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.rank + ext.png);
 
+		saveImage.save(prefixPath.eyeGaze + "/" + prefixPath.rank + "/" + fileName + "/" + USERNAME + ext.png);
+
 		break;
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-	ofLogNotice() << "keyPressed: " << key;
+	//ofLogNotice() << "keyPressed: " << key;
 
 	eyeTrackState = ConstTools::EyeTrackState::STANDBY;
 	ConstTools::PictureState picState = ConstTools::PictureState::NONPIC;

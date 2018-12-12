@@ -116,6 +116,7 @@ public:
 		const std::string image_IPU = "image_IPU";
 		const std::string picture = "result/picture";
 		const std::string eyeGaze = "result/eyeGaze";
+		const std::string rank = "rank";
 	};
 
 	struct FileNameExtension {

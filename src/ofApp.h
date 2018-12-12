@@ -127,6 +127,5 @@ public:
 	ConstTools::RankingState rankingState;
 
 	std::string folderName;
-
 	std::string inputFilePath;
 };
