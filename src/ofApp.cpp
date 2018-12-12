@@ -51,11 +51,6 @@ void ofApp::setupView(std::string path) {
 		inputOfImg.update();
 		originalPicMat.original = ofxCv::toCv(inputOfImg);
 		createSaliencyMap(originalPicMat.original.clone());
-
-		ofLogNotice() << "viewPicMat.saliencyMap.type: " << viewPicMat.saliencyMap.type();
-		ofLogNotice() << "viewPicMat.saliencyMap.depth: " << viewPicMat.saliencyMap.depth();
-		ofLogNotice() << "viewPicMat.saliencyMap.channels: " << viewPicMat.saliencyMap.channels();
-
 		createWatershed(viewPicMat.saliencyMap.clone());
 	}
 	else {
@@ -87,10 +82,8 @@ void ofApp::update() {
 				if ((0 > X) || (0 > Y)) { return; }
 				if ((X <= WINWIDTH) && (Y <= WINHEIGHT))
 				{
-					/*ofLogNotice() << "X(after): " << X;
-					ofLogNotice() << "Y(after): " << Y;*/
 					if ((int)viewEyeMat.eyeGazeMat.at<uchar>(Y, X) >= 255) { return; }
-					//ofLogNotice() << "eyeGazeMat: " << (int)eyeGazeMat.at<uchar>(Y, X);
+
 					viewEyeMat.eyeGazeMat.at<uchar>(Y, X) += 254;
 					cv::Mat s9 = viewEyeMat.eyeGazeMat.clone();
 					ofxCv::toOf(s9, outputOfEyeIMG.eyeGaze);
@@ -129,8 +122,8 @@ void ofApp::update() {
 			int maxValueCount = 0;
 			for (size_t i = 0; i < saliencyPicPoint.saved.size(); i++)
 			{
-				ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPicPoint.saved[i];
-				ofLogNotice() << "maxValue: " << maxValue;
+				/*ofLogNotice() << "saliencyPoint[" << i << "]: " << saliencyPicPoint.saved[i];
+				ofLogNotice() << "maxValue: " << maxValue;*/
 
 				if (maxValue < saliencyPicPoint.saved[i])
 				{
@@ -140,8 +133,8 @@ void ofApp::update() {
 					maxValueCount = maxValuePicCount[i];
 				}
 				else if (maxValue == saliencyPicPoint.saved[i]) {
-					ofLogNotice() << "maxValuePicCount[" << i << "]: " << maxValuePicCount[i];
-					ofLogNotice() << "maxValueCount: " << maxValueCount;
+					/*ofLogNotice() << "maxValuePicCount[" << i << "]: " << maxValuePicCount[i];
+					ofLogNotice() << "maxValueCount: " << maxValueCount;*/
 					if (maxValueCount < maxValuePicCount[i])
 					{
 						maxSaliencyPicPoint.maxIndex = i;
@@ -151,8 +144,8 @@ void ofApp::update() {
 					}
 					else if (maxValueCount == maxValuePicCount[i])
 					{
-						ofLogNotice() << "saliencyTotalPoint[" << i << "]: " << saliencyPicTotalPoint.saved[i];
-						ofLogNotice() << "maxTotalValue: " << maxTotalValue;
+						/*ofLogNotice() << "saliencyTotalPoint[" << i << "]: " << saliencyPicTotalPoint.saved[i];
+						ofLogNotice() << "maxTotalValue: " << maxTotalValue;*/
 						if (maxTotalValue < saliencyPicTotalPoint.saved[i])
 						{
 							maxSaliencyPicPoint.maxIndex = i;
@@ -167,6 +160,7 @@ void ofApp::update() {
 
 			/*maxSaliencyPicPoint.iter = std::max_element(saliencyPicPoint.saved.begin(), saliencyPicPoint.saved.end());
 			maxSaliencyPicPoint.maxIndex = std::distance(saliencyPicPoint.saved.begin(), maxSaliencyPicPoint.iter);*/
+
 			ofLogNotice() << "Index of max element: " << maxSaliencyPicPoint.maxIndex;
 
 			viewPicMat.saliencyHighest = cv::Mat::zeros(viewPicMat.saliencyHighest.size(), CV_8UC3);
@@ -223,8 +217,8 @@ void ofApp::update() {
 			for (size_t i = 0; i < saliencyEyePoint.saved.size(); i++)
 			{
 
-				ofLogNotice() << "saliencyEyePoint[" << i << "]: " << saliencyEyePoint.saved[i];
-				ofLogNotice() << "maxValue: " << maxValue;
+				/*ofLogNotice() << "saliencyEyePoint[" << i << "]: " << saliencyEyePoint.saved[i];
+				ofLogNotice() << "maxValue: " << maxValue;*/
 
 				if (maxValue < saliencyEyePoint.saved[i])
 				{
@@ -234,8 +228,8 @@ void ofApp::update() {
 					maxValueCount = maxValueEyeCount[i];
 				}
 				else if (maxValue == saliencyEyePoint.saved[i]) {
-					ofLogNotice() << "maxValueEyeCount[" << i << "]: " << maxValueEyeCount[i];
-					ofLogNotice() << "maxValueCount: " << maxValueCount;
+					/*ofLogNotice() << "maxValueEyeCount[" << i << "]: " << maxValueEyeCount[i];
+					ofLogNotice() << "maxValueCount: " << maxValueCount;*/
 					if (maxValueCount < maxValueEyeCount[i])
 					{
 						maxSaliencyEyePoint.maxIndex = i;
@@ -245,8 +239,8 @@ void ofApp::update() {
 					}
 					else if (maxValueCount == maxValueEyeCount[i])
 					{
-						ofLogNotice() << "saliencyEyeTotalPoint[" << i << "]: " << saliencyEyeTotalPoint.saved[i];
-						ofLogNotice() << "maxTotalValue: " << maxTotalValue;
+						/*ofLogNotice() << "saliencyEyeTotalPoint[" << i << "]: " << saliencyEyeTotalPoint.saved[i];
+						ofLogNotice() << "maxTotalValue: " << maxTotalValue;*/
 						if (maxTotalValue < saliencyEyeTotalPoint.saved[i])
 						{
 							maxSaliencyEyePoint.maxIndex = i;
@@ -262,6 +256,7 @@ void ofApp::update() {
 				std::max_element(saliencyEyePoint.saved.begin(), saliencyEyePoint.saved.end());
 			maxSaliencyEyePoint.maxIndex = 
 				std::distance(saliencyEyePoint.saved.begin(), maxSaliencyEyePoint.iter);*/
+
 			ofLogNotice() << "Index of max element: " << maxSaliencyEyePoint.maxIndex;
 
 
@@ -1115,7 +1110,6 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 							maxTotalValue = totalPoints[i];
 						}
 					}
-
 				}
 			}
 
@@ -1132,15 +1126,11 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 			viewPicMat.matMix = originalPicMat.original*0.1 + originalPicMat.copy*0.9;
 
-			number.str("");
-			number.clear(stringstream::goodbit);
-			number << i + 1;
-
 			s8 = viewPicMat.matMix.clone();
 			ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
 			outputOfPicIMG.saliencyMapHighest.update();
 			outputOfPicIMG.saliencyMapHighest
-				.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_" + number.str() + ext.png);
+				.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_" + std::to_string(i + 1) + ext.png);
 		}
 		break;
 
@@ -1225,10 +1215,8 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 			}
 
 			viewEyeMat.matMix = originalEyeMat.original*0 + originalEyeMat.copy*1;
-			
 
-			
-			cv::Mat targetMat = originalEyeMat.copy.clone(); // 白黒のループしてくるやつ
+			cv::Mat targetMat = originalEyeMat.copy.clone(); // 白黒の矩形
 
 			cv::threshold(targetMat, targetMat, 50, 255, CV_THRESH_BINARY_INV); // TODO: 閾値を変える
 
@@ -1237,7 +1225,6 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 			cv::Mat targetMat8UC1, targetMat8UC3;
 			cv::cvtColor(targetMat.clone(), targetMat8UC1, CV_BGR2GRAY);
-			//targetMat.convertTo(targetMat8UC1, CV_8UC1);
 			
 			cv::findContours(targetMat8UC1, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
@@ -1248,20 +1235,14 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 				cv::putText(originalMat, std::to_string(i + 1), textPoint, 1, 5, (0, 0, 255), 5);
 			}
 
-
-
-			number.str("");
-			number.clear(stringstream::goodbit);
-			number << i + 1;
-
 			s8 = viewEyeMat.matMix.clone();
 			ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
 			outputOfEyeIMG.saliencyMapHighest.update();
 			outputOfEyeIMG.saliencyMapHighest
-				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + "rank/"+ outputOfEyeFileName.saliencyMapHighest + "_" + number.str() + ext.png);
+				.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + "rank/"+ outputOfEyeFileName.saliencyMapHighest + "_" + std::to_string(i + 1) + ext.png);
 
 		}
-		//cv::cvtColor(targetMat8UC1.clone(), targetMat8UC3, CV_GRAY2BGR);
+
 		ofImage saveImage;
 		cv::Mat s = originalMat.clone();
 		ofxCv::toOf(s, saveImage);
