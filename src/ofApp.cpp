@@ -42,13 +42,22 @@ void ofApp::setup() {
 	picCntStr << "The " << enterPicCount + 1 << " most saliency place";
 	eyeCntStr << "The " << enterEyeCount + 1 << " most saliency place";
 
-	//std::vector<int> key{ 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 45, 94, 92, 113, 119, 101, 114, 116, 121, 117, 105, 111, 112, 64, 91, 58, 93 };
+	std::vector<int> key{ 
+		49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 45, 94, 92, 113,
+		119, 101, 114, 116, 121, 117, 105, 111, 112, 64, 91, 58, 93 
+	};
+
 	//for (size_t i = 0; i < key.size(); i++)
 	//{
-	//	keyPressed(key[i]);
-	//	keyPressed(110);
-	//	keyPressed(97);
-	//	keyPressed(109);
+		/*keyPressed(key[i]);
+		keyPressed(110);
+		keyPressed(97);
+		keyPressed(109);*/
+
+		/*keyPressed(key[i]);
+		keyPressed(122);
+		keyPressed(97);
+		keyPressed(109);*/
 	//}
 
 }
@@ -1069,11 +1078,29 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 	int maxValueCheck;
 	cv::Mat s8;
 
+	ofImage src;
+	std::string srcPath;
+	cv::Mat originalMat;	// カラー画像
+	cv::Mat targetMat;		// 白黒の矩形
+
+	std::vector<cv::Vec4i> hierarchy;
+	std::vector < vector<cv::Point>> contours;
+
+	cv::Mat targetMat8UC1, targetMat8UC3;
+
+	ofImage saveImage;
+	cv::Mat s;
+
 	switch (enterState)
 	{
 	case ConstTools::EnterState::SALIENCYMAP:
 		points = saliencyPicPoint.backup;
 		totalPoints = saliencyPicTotalPoint.backup;
+
+		srcPath = ofToDataPath(saliencyMapPath);
+		src.load(srcPath);
+		originalMat = ofxCv::toCv(src); // 顕著性マップ
+
 		for (size_t i = 0; i < points.size(); i++)
 		{
 			if (i != 0){
@@ -1135,22 +1162,52 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 			viewPicMat.matMix = originalPicMat.original*0.1 + originalPicMat.copy*0.9;
 
+			targetMat = originalPicMat.copy.clone();
+
+			cv::threshold(targetMat, targetMat, 50, 255, CV_THRESH_BINARY_INV); // TODO: 閾値を変える
+
+			if (!hierarchy.empty())
+			{
+				hierarchy.clear();
+			}
+			if (!contours.empty())
+			{
+				contours.clear();
+			}
+
+			cv::cvtColor(targetMat.clone(), targetMat8UC1, CV_BGR2GRAY);
+
+			cv::findContours(targetMat8UC1, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+
+			cv::cvtColor(originalMat, originalMat, CV_BGRA2BGR);
+
+			if (contours.size() >= 2 && i < 10) {
+				auto textPoint = cv::Point(contours[1][0].x, contours[1][0].y);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, 1, 5, (0, 0, 255), 5);
+			}
+
 			s8 = viewPicMat.matMix.clone();
 			ofxCv::toOf(s8, outputOfPicIMG.saliencyMapHighest);
 			outputOfPicIMG.saliencyMapHighest.update();
 			outputOfPicIMG.saliencyMapHighest
 				.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_" + std::to_string(i + 1) + ext.png);
 		}
+
+		s = originalMat.clone();
+		ofxCv::toOf(s, saveImage);
+		saveImage.update();
+
+		saveImage.save(prefixPath.picture + "/" + prefixPath.rank + "/" + fileName + ext.png);
+
 		break;
 
 	case ConstTools::EnterState::EYEGAZE:
 		points = saliencyEyePoint.backup;
 		totalPoints = saliencyEyeTotalPoint.backup;
 
-		ofImage src;
-		auto srcPath = ofToDataPath(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
+		srcPath = ofToDataPath(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
 		src.load(srcPath);
-		cv::Mat originalMat = ofxCv::toCv(src); // カラー画像
+		originalMat = ofxCv::toCv(src);
 
 		for (size_t i = 0; i < points.size(); i++)
 		{
@@ -1225,14 +1282,19 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 			viewEyeMat.matMix = originalEyeMat.original*0 + originalEyeMat.copy*1;
 
-			cv::Mat targetMat = originalEyeMat.copy.clone(); // 白黒の矩形
+			targetMat = originalEyeMat.copy.clone();
 
 			cv::threshold(targetMat, targetMat, 50, 255, CV_THRESH_BINARY_INV); // TODO: 閾値を変える
 
-			std::vector<cv::Vec4i> hierarchy;
-			std::vector < vector<cv::Point>> contours;
+			if (!hierarchy.empty())
+			{
+				hierarchy.clear();
+			}
+			if (!contours.empty())
+			{
+				contours.clear();
+			}
 
-			cv::Mat targetMat8UC1, targetMat8UC3;
 			cv::cvtColor(targetMat.clone(), targetMat8UC1, CV_BGR2GRAY);
 			
 			cv::findContours(targetMat8UC1, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
@@ -1252,8 +1314,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 		}
 
-		ofImage saveImage;
-		cv::Mat s = originalMat.clone();
+		s = originalMat.clone();
 		ofxCv::toOf(s, saveImage);
 		saveImage.update();
 		saveImage.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.rank + ext.png);
@@ -1266,10 +1327,10 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-	//ofLogNotice() << "keyPressed: " << key;
+	ofLogNotice() << "keyPressed: " << key;
 
 	eyeTrackState = ConstTools::EyeTrackState::STANDBY;
-	picState = ConstTools::PictureState::NONPIC;
+	/*picState = ConstTools::PictureState::NONPIC;*/
 	bool picSet = false;
 
 	rankingState = ConstTools::RankingState::NOT;
@@ -1614,10 +1675,12 @@ void ofApp::keyPressed(int key) {
 	case ConstTools::PictureState::IMAGE:
 		inputFilePath = prefixPath.image + "/" + fileName + ext.jpg;
 		folderName = prefixPath.image;
+		saliencyMapPath = prefixPath.picture + "/" + folderName+ "/" + fileName + "/" + prefixPath.saliencyMap + ext.jpg;
 		break;
 	case ConstTools::PictureState::IPU:
 		inputFilePath = prefixPath.image_IPU + "/" + fileName + ext.jpg;
 		folderName = prefixPath.image_IPU;
+		saliencyMapPath = prefixPath.picture + "/" + folderName + "/" + fileName + "/" + prefixPath.saliencyMap + ext.jpg;
 		break;
 	default:
 		break;

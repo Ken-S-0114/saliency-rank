@@ -117,6 +117,8 @@ public:
 		const std::string picture = "result/picture";
 		const std::string eyeGaze = "result/eyeGaze";
 		const std::string rank = "rank";
+		const std::string saliencyMap = "saliencyMap";
+		const std::string watershed = "watershed";
 	};
 
 	struct FileNameExtension {

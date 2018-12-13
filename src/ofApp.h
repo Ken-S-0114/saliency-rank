@@ -129,4 +129,5 @@ public:
 
 	std::string folderName;
 	std::string inputFilePath;
+	std::string saliencyMapPath;
 };
