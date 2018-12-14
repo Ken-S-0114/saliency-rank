@@ -10,7 +10,7 @@
 #define THRESH_MAXVAL_EYE 0.0
 
 #define ALPHANOTZERO 255/10
-#define USERNAME "aaa"
+#define USERNAME ""
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -42,30 +42,33 @@ void ofApp::setup() {
 	picCntStr << "The " << enterPicCount + 1 << " most saliency place";
 	eyeCntStr << "The " << enterEyeCount + 1 << " most saliency place";
 
-	std::vector<int> key{ 
+	const std::vector<int> key{ 
 		49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 45, 94, 92, 113,
 		119, 101, 114, 116, 121, 117, 105, 111, 112, 64, 91, 58, 93 
 	};
 
-	//for (size_t i = 0; i < key.size(); i++)
-	//{
-	//	// 写真
-	//	keyPressed(key[i]);
-	//	keyPressed(122);
-	//	keyPressed(97);
-	//	keyPressed(109);
+	for (size_t i = 0; i < key.size(); i++)
+	{
+		// 写真
+		ofLogNotice() << std::to_string(i + 1) << "枚目スタート";
+		/*keyPressed(key[i]);
+		keyPressed(122);
+		keyPressed(97);
+		keyPressed(109);*/
 
-	//	// 視線
-	//	/*keyPressed(key[j]);
-	//	keyPressed(110);
-	//	keyPressed(97);
-	//	keyPressed(109);*/
-	//}
+		// 視線
+		keyPressed(key[i]);
+		keyPressed(110);
+		keyPressed(97);
+		keyPressed(109);
 
-	std::vector<std::string> name{
-		"haruna", "hiromu", "iori", "kaori", "kazama", "kotaro", "manami", "mayu", "miyu", 
-		"moriya(m)", "rio", "saya", "shinya", "takao(m)", "tatsuki", "tsubasa", "yoshikawa","yoshiya", "yuta"
-	};
+		ofLogNotice() << std::to_string(i + 1) << "枚目完了";
+	}
+
+	//std::vector<std::string> name{
+	//	"haruna", "hiromu", "iori", "kaori", "kazama", "kotaro", "manami", "mayu", "miyu", 
+	//	"moriya(m)", "rio", "saya", "shinya", "takao(m)", "tatsuki", "tsubasa", "yoshikawa","yoshiya", "yuta"
+	//};
 
 	//for (size_t i = 0; i < name.size(); i++)
 	//{
@@ -1207,7 +1210,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 			if (contours.size() >= 2 && i < 10) {
 				auto textPoint = cv::Point(contours[1][0].x, contours[1][0].y);
-				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0, 0, 255), 5, CV_AA);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(255, 0, 0), 5, CV_AA);
 			}
 
 			s8 = viewPicMat.matMix.clone();
@@ -1358,7 +1361,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 			rankOfMat = ofxCv::toCv(rankOfImg);
 			originalPicOfMat = ofxCv::toCv(originalPicOfImg);
 
-			mixMat = originalMat.clone() * 0.5 + rankOfMat * 0.3 + originalPicOfMat * 0.2;
+			mixMat = originalMat.clone() * 0.5 + rankOfMat * 0.4 + originalPicOfMat * 0.1;
 			s = mixMat.clone();
 		}
 		else {
