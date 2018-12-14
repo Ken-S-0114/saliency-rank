@@ -49,17 +49,36 @@ void ofApp::setup() {
 
 	//for (size_t i = 0; i < key.size(); i++)
 	//{
-		/*keyPressed(key[i]);
-		keyPressed(110);
-		keyPressed(97);
-		keyPressed(109);*/
+	//	// ŽÊ^
+	//	keyPressed(key[i]);
+	//	keyPressed(122);
+	//	keyPressed(97);
+	//	keyPressed(109);
 
-		/*keyPressed(key[i]);
-		keyPressed(122);
-		keyPressed(97);
-		keyPressed(109);*/
+	//	// Ž‹ü
+	//	/*keyPressed(key[j]);
+	//	keyPressed(110);
+	//	keyPressed(97);
+	//	keyPressed(109);*/
 	//}
 
+	std::vector<std::string> name{
+		"haruna", "hiromu", "iori", "kaori", "kazama", "kotaro", "manami", "mayu", "miyu", 
+		"moriya(m)", "rio", "saya", "shinya", "takao(m)", "tatsuki", "tsubasa", "yoshikawa","yoshiya", "yuta"
+	};
+
+	//for (size_t i = 0; i < name.size(); i++)
+	//{
+	//	for (size_t j = 0; i < key.size(); j++)
+	//	{
+	//		// Ž‹ü
+	//		keyPressed(key[j]);
+	//		keyPressed(110);
+	//		keyPressed(97);
+	//		keyPressed(109);
+
+	//	}
+	//}
 }
 
 //--------------------------------------------------------------
@@ -1092,6 +1111,10 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 	ofImage saveImage;
 	cv::Mat s;
 
+	std::string originalPicOfImgPath, rankOfImgPath;
+	ofImage originalPicOfImg, rankOfImg;
+	cv::Mat originalPicOfMat, rankOfMat;
+	
 	switch (enterState)
 	{
 	case ConstTools::EnterState::SALIENCYMAP:
@@ -1194,7 +1217,14 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 				.save(prefixPath.picture + "/" + folderName + "/" + fileName + "/" + outputOfPicFileName.saliencyMapHighest + "_" + std::to_string(i + 1) + ext.png);
 		}
 
-		s = originalMat.clone();
+		originalPicOfImgPath = ofToDataPath(inputFilePath);
+
+		originalPicOfImg.load(originalPicOfImgPath);
+		originalPicOfMat = ofxCv::toCv(originalPicOfImg);
+
+		mixMat = originalMat.clone() * 0.6 + originalPicOfMat * 0.4;
+
+		s = mixMat.clone();
 		ofxCv::toOf(s, saveImage);
 		saveImage.update();
 
@@ -1316,14 +1346,11 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 		}
 
-		auto rankOfImgPath = ofToDataPath(saliencyRankPath);
-		ofImage rankOfImg;
+		rankOfImgPath = ofToDataPath(saliencyRankPath);
 		if (rankOfImg.load(rankOfImgPath))
 		{
 
-			auto originalPicOfImgPath = ofToDataPath(inputFilePath);
-			ofImage originalPicOfImg;
-			cv::Mat rankOfMat, originalPicOfMat;
+			originalPicOfImgPath = ofToDataPath(inputFilePath);
 
 			rankOfImg.load(rankOfImgPath);
 			originalPicOfImg.load(originalPicOfImgPath);
