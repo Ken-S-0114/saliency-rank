@@ -10,7 +10,7 @@
 #define THRESH_MAXVAL_EYE 0.0
 
 #define ALPHANOTZERO 255/10
-#define USERNAME ""
+#define USERNAME "aaa"
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -1082,6 +1082,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 	std::string srcPath;
 	cv::Mat originalMat;	// ƒJƒ‰[‰æ‘œ
 	cv::Mat targetMat;		// ”’•‚Ì‹éŒ`
+	cv::Mat mixMat;
 
 	std::vector<cv::Vec4i> hierarchy;
 	std::vector < vector<cv::Point>> contours;
@@ -1183,7 +1184,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 			if (contours.size() >= 2 && i < 10) {
 				auto textPoint = cv::Point(contours[1][0].x, contours[1][0].y);
-				cv::putText(originalMat, std::to_string(i + 1), textPoint, 1, 5, (0, 0, 255), 5);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0, 0, 255), 5, CV_AA);
 			}
 
 			s8 = viewPicMat.matMix.clone();
@@ -1300,10 +1301,11 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 			cv::findContours(targetMat8UC1, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
 
 			cv::cvtColor(originalMat, originalMat, CV_BGRA2BGR);
+			originalMat.convertTo(originalMat, CV_8UC3);
 
 			if (contours.size() >= 2  && i < 10) {
 				auto textPoint = cv::Point(contours[1][0].x, contours[1][0].y);
-				cv::putText(originalMat, std::to_string(i + 1), textPoint, 1, 5, (0, 0, 255), 5);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0, 255, 0), 5, CV_AA);
 			}
 
 			s8 = viewEyeMat.matMix.clone();
@@ -1314,11 +1316,32 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 		}
 
-		s = originalMat.clone();
+		auto rankOfImgPath = ofToDataPath(saliencyRankPath);
+		ofImage rankOfImg;
+		if (rankOfImg.load(rankOfImgPath))
+		{
+
+			auto originalPicOfImgPath = ofToDataPath(inputFilePath);
+			ofImage originalPicOfImg;
+			cv::Mat rankOfMat, originalPicOfMat;
+
+			rankOfImg.load(rankOfImgPath);
+			originalPicOfImg.load(originalPicOfImgPath);
+
+			rankOfMat = ofxCv::toCv(rankOfImg);
+			originalPicOfMat = ofxCv::toCv(originalPicOfImg);
+
+			mixMat = originalMat.clone() * 0.5 + rankOfMat * 0.3 + originalPicOfMat * 0.2;
+			s = mixMat.clone();
+		}
+		else {
+			s = originalMat.clone();
+		}
+
 		ofxCv::toOf(s, saveImage);
 		saveImage.update();
-		saveImage.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.rank + ext.png);
 
+		saveImage.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.rank + ext.png);
 		saveImage.save(prefixPath.eyeGaze + "/" + prefixPath.rank + "/" + fileName + "/" + USERNAME + ext.png);
 
 		break;
@@ -1688,6 +1711,7 @@ void ofApp::keyPressed(int key) {
 
 	if (picSet)
 	{
+		saliencyRankPath = prefixPath.picture + "/" + prefixPath.rank + "/" + fileName + ext.png;
 		eyeGazePath = prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapGray + ext.png;
 		setupView(inputFilePath);
 	}
