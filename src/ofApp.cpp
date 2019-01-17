@@ -49,25 +49,31 @@ void ofApp::setup() {
 	picCntStr << "The " << enterPicCount + 1 << " most saliency place";
 	eyeCntStr << "The " << enterEyeCount + 1 << " most saliency place";
 
-	const std::vector<int> key{ 
-		49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 45, 94, 92, 113,
-		119, 101, 114, 116, 121, 117, 105, 111, 112, 64, 91, 58, 93 
+	//const std::vector<int> key{ 
+	//	49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 45, 94, 92, 113,
+	//	119, 101, 114, 116, 121, 117, 105, 111, 112, 64, 91, 58, 93 
+	//};
+
+	const std::vector<int> key{
+		55
 	};
 
 	for (size_t i = 0; i < key.size(); i++)
 	{
-		// 写真
+
 		ofLogNotice() << std::to_string(i + 1) << "枚目スタート";
+
+		// 写真
 		keyPressed(key[i]);
 		keyPressed(122);
 		keyPressed(97);
 		keyPressed(109);
 
 		// 視線
-		//keyPressed(key[i]);
-		//keyPressed(110);
-		//keyPressed(97);
-		//keyPressed(109);
+		/*keyPressed(key[i]);
+		keyPressed(110);
+		keyPressed(97);
+		keyPressed(109);*/
 
 		ofLogNotice() << std::to_string(i + 1) << "枚目完了";
 	}
@@ -1219,7 +1225,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 			cv::cvtColor(originalMat, originalMat, CV_BGRA2BGR);
 
 			if (contours.size() >= 2 && i < HIGHRANK) {
-				auto textPoint = cv::Point(contours[1][0].x, contours[1][0].y);
+				auto textPoint = cv::Point(contours[1][8].x, contours[1][8].y);
 				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 7, cv::Scalar(255, 255, 255), 16, CV_AA);
 				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 7, cv::Scalar(0, 0, 0), 7, CV_AA);
 			}
@@ -1238,7 +1244,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 		mixMat = originalMat.clone() * 0.6 + originalPicOfMat * 0.4;
 
-		cvtColor(mixMat.clone(), mixMat, cv::COLOR_BGR2GRAY);
+		//cvtColor(mixMat.clone(), mixMat, cv::COLOR_BGR2GRAY);
 
 		s = mixMat.clone();
 		ofxCv::toOf(s, saveImage);
@@ -1366,17 +1372,16 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 		rankOfImgPath = ofToDataPath(saliencyRankPath);
 		if (rankOfImg.load(rankOfImgPath))
 		{
-
 			originalPicOfImgPath = ofToDataPath(inputFilePath);
-
-			rankOfImg.load(rankOfImgPath);
-			originalPicOfImg.load(originalPicOfImgPath);
-
 			rankOfMat = ofxCv::toCv(rankOfImg);
-			originalPicOfMat = ofxCv::toCv(originalPicOfImg);
+			if (originalPicOfImg.load(originalPicOfImgPath)) 
+			{
+				originalPicOfMat = ofxCv::toCv(originalPicOfImg);
 
-			mixMat = originalMat.clone() * 0.5 + rankOfMat * 0.4 + originalPicOfMat * 0.1;
-			s = mixMat.clone();
+				mixMat = originalMat.clone() * 0.5 + rankOfMat * 0.49 + originalPicOfMat * 0.01;
+				//cvtColor(mixMat.clone(), mixMat, cv::COLOR_BGR2GRAY);
+				s = mixMat.clone();
+			}
 		}
 		else {
 			s = originalMat.clone();
