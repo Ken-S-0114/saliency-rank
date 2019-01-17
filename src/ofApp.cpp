@@ -12,6 +12,13 @@
 #define ALPHANOTZERO 255/10
 #define USERNAME ""
 
+#define HIGHRANK 5
+
+/*
+1. ~/bin/data/result/picture or ~/bin/data/result/eyeGaze にデータセット
+2. #define USERNAME に被験者の名前入力
+*/
+
 //--------------------------------------------------------------
 void ofApp::setup() {
 
@@ -51,16 +58,16 @@ void ofApp::setup() {
 	{
 		// 写真
 		ofLogNotice() << std::to_string(i + 1) << "枚目スタート";
-		/*keyPressed(key[i]);
+		keyPressed(key[i]);
 		keyPressed(122);
 		keyPressed(97);
-		keyPressed(109);*/
+		keyPressed(109);
 
 		// 視線
-		keyPressed(key[i]);
-		keyPressed(110);
-		keyPressed(97);
-		keyPressed(109);
+		//keyPressed(key[i]);
+		//keyPressed(110);
+		//keyPressed(97);
+		//keyPressed(109);
 
 		ofLogNotice() << std::to_string(i + 1) << "枚目完了";
 	}
@@ -990,8 +997,8 @@ void ofApp::createWatershed(cv::Mat saliencyImg) {
 
 		ofxCv::toOf(s8, outputOfEyeIMG.saliencyMapHighest);
 		outputOfEyeIMG.saliencyMapHighest.update();
-		//outputOfEyeIMG.saliencyMapHighest
-			//.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.saliencyMapHighest + "_1" + ext.jpg);
+		/*outputOfEyeIMG.saliencyMapHighest
+			.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.saliencyMapHighest + "_1" + ext.jpg);*/
 
 		markersEyeSave = markers.clone();
 
@@ -1083,6 +1090,9 @@ void ofApp::loadEyeGaze(bool path) {
 		cv::Mat s13 = viewEyeMat.saliencyMap.clone();
 		ofxCv::toOf(s13, outputOfEyeIMG.gray);
 		outputOfEyeIMG.gray.update();
+
+		/*outputOfEyeIMG.gray
+			.save(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + "gray" + ext.jpg);*/
 
 		createWatershed(viewEyeMat.saliencyMap.clone());
 
@@ -1208,9 +1218,10 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 			cv::cvtColor(originalMat, originalMat, CV_BGRA2BGR);
 
-			if (contours.size() >= 2 && i < 10) {
+			if (contours.size() >= 2 && i < HIGHRANK) {
 				auto textPoint = cv::Point(contours[1][0].x, contours[1][0].y);
-				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(255, 0, 0), 5, CV_AA);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 7, cv::Scalar(255, 255, 255), 16, CV_AA);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 7, cv::Scalar(0, 0, 0), 7, CV_AA);
 			}
 
 			s8 = viewPicMat.matMix.clone();
@@ -1227,6 +1238,8 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 
 		mixMat = originalMat.clone() * 0.6 + originalPicOfMat * 0.4;
 
+		cvtColor(mixMat.clone(), mixMat, cv::COLOR_BGR2GRAY);
+
 		s = mixMat.clone();
 		ofxCv::toOf(s, saveImage);
 		saveImage.update();
@@ -1239,7 +1252,7 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 		points = saliencyEyePoint.backup;
 		totalPoints = saliencyEyeTotalPoint.backup;
 
-		srcPath = ofToDataPath(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMap + ext.png);
+		srcPath = ofToDataPath(prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapSoft + ext.png);
 		src.load(srcPath);
 		originalMat = ofxCv::toCv(src);
 
@@ -1336,9 +1349,10 @@ void ofApp::ranking(ConstTools::EnterState enterState) {
 			cv::cvtColor(originalMat, originalMat, CV_BGRA2BGR);
 			originalMat.convertTo(originalMat, CV_8UC3);
 
-			if (contours.size() >= 2  && i < 10) {
+			if (contours.size() >= 2  && i < HIGHRANK) {
 				auto textPoint = cv::Point(contours[1][0].x, contours[1][0].y);
-				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 3, cv::Scalar(0, 255, 0), 5, CV_AA);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 7, cv::Scalar(0, 0, 0), 16, CV_AA);
+				cv::putText(originalMat, std::to_string(i + 1), textPoint, cv::FONT_HERSHEY_SIMPLEX, 7, cv::Scalar(255, 255, 255), 7, CV_AA);
 			}
 
 			s8 = viewEyeMat.matMix.clone();
@@ -1742,7 +1756,7 @@ void ofApp::keyPressed(int key) {
 	if (picSet)
 	{
 		saliencyRankPath = prefixPath.picture + "/" + prefixPath.rank + "/" + fileName + ext.png;
-		eyeGazePath = prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapGray + ext.png;
+		eyeGazePath = prefixPath.eyeGaze + "/" + folderName + "/" + fileName + "/" + outputOfEyeFileName.eyeGazeHeatMapGraySoft + ext.png;
 		setupView(inputFilePath);
 	}
 }
